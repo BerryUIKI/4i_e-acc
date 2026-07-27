@@ -16,6 +16,7 @@
 | `data/` | 数据集、参考表与外部数据来源。 | [README.md](./data/README.md) | [README-zh_CN.md](./data/README-zh_CN.md) |
 | `archive/` | 已被替代或留存备查的历史文档。 | [README.md](./archive/README.md) | [README-zh_CN.md](./archive/README-zh_CN.md) |
 | `assets/` | 文档引用的图表、图片与其他媒体素材。 | [README.md](./assets/README.md) | [README-zh_CN.md](./assets/README-zh_CN.md) |
+| `articles/` | 长文随笔；每篇独立成夹，自带草稿、笔记与素材。 | [README.md](./articles/README.md) | [README-zh_CN.md](./articles/README-zh_CN.md) |
 
 ## 约定
 - 默认文档为 `README.md`（英文），中文版本为 `README-zh_CN.md`。

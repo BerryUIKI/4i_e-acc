@@ -16,6 +16,7 @@ This workspace publishes investment-related documents. Documents are organized i
 | `data/` | Datasets, reference tables, and external sources. | [README.md](./data/README.md) | [README-zh_CN.md](./data/README-zh_CN.md) |
 | `archive/` | Superseded or historical documents retained for record. | [README.md](./archive/README.md) | [README-zh_CN.md](./archive/README-zh_CN.md) |
 | `assets/` | Charts, images, and other media referenced by docs. | [README.md](./assets/README.md) | [README-zh_CN.md](./assets/README-zh_CN.md) |
+| `articles/` | Long-form essays; each article is self-contained with its own draft, notes, and assets. | [README.md](./articles/README.md) | [README-zh_CN.md](./articles/README-zh_CN.md) |
 
 ## Conventions
 - Default document is `README.md` (English). The Chinese version is `README-zh_CN.md`.
