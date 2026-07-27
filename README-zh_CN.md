@@ -22,3 +22,6 @@
 - 默认文档为 `README.md`（英文），中文版本为 `README-zh_CN.md`。
 - 文件夹名称使用英文；文档标题可双语。
 - 使用相对路径在文档间交叉引用。
+
+## 贡献
+本仓库采用 Pull Request 工作流。**请勿直接推送到 `main`。** 分支规范、PR 模板与免费私有库的限制说明见 [CONTRIBUTING.md](./CONTRIBUTING.md)（英文）/ [CONTRIBUTING-zh_CN.md](./CONTRIBUTING-zh_CN.md)（中文）。归属与审核路由见 [CODEOWNERS](./CODEOWNERS)。

@@ -22,3 +22,6 @@ This workspace publishes investment-related documents. Documents are organized i
 - Default document is `README.md` (English). The Chinese version is `README-zh_CN.md`.
 - Keep folder names in English; document titles may be bilingual.
 - Cross-link related docs using relative paths.
+
+## Contributing
+This repo follows a pull-request workflow. **Do not push directly to `main`.** See [CONTRIBUTING.md](./CONTRIBUTING.md) ( English ) / [CONTRIBUTING-zh_CN.md](./CONTRIBUTING-zh_CN.md) ( 中文 ) for the branch convention, PR template, and the enforcement caveat for free private repos. Ownership and review routing: [CODEOWNERS](./CODEOWNERS).
