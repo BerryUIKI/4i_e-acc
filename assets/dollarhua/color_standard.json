@@ -1,0 +1,111 @@
+{
+  "standard": "DollarHua Digital Color Standard",
+  "version": "v1.0",
+  "authority": "Normalized from the approved DollarHua visual baseline. Official reference images remain authoritative for rendered appearance.",
+  "primary_identity_color": "signature_pink",
+  "tokens": [
+    {
+      "id": "signature_pink",
+      "name": "Signature Pink",
+      "hex": "#FEC6CD",
+      "rgb": [
+        254,
+        198,
+        205
+      ],
+      "usage": "Hoodie, primary soft-pink fields, friendly emphasis, and major brand surfaces.",
+      "restriction": "Do not shift the dominant character pink toward saturated magenta or cool purple."
+    },
+    {
+      "id": "blossom_pink",
+      "name": "Blossom Pink",
+      "hex": "#F3A6AF",
+      "rgb": [
+        243,
+        166,
+        175
+      ],
+      "usage": "Flower accessories, blush, hearts, sticker lettering, and secondary emphasis.",
+      "restriction": "Keep enough contrast from Signature Pink when both colors appear together."
+    },
+    {
+      "id": "amber_gold",
+      "name": "Amber Gold",
+      "hex": "#E3A04B",
+      "rgb": [
+        227,
+        160,
+        75
+      ],
+      "highlight_hex": "#FFD36F",
+      "highlight_rgb": [
+        255,
+        211,
+        111
+      ],
+      "usage": "Iris base, stars, sparkles, prosperity cues, and warm highlights.",
+      "restriction": "Keep eye highlights white; do not replace the amber-gold eye family with green or blue."
+    },
+    {
+      "id": "outline_navy",
+      "name": "Outline Navy",
+      "hex": "#1D1E50",
+      "rgb": [
+        29,
+        30,
+        80
+      ],
+      "usage": "Primary character line art, dark display text, sticker keylines, and high-contrast accents.",
+      "restriction": "Prefer this navy over pure black in core character artwork."
+    },
+    {
+      "id": "pendant_bronze",
+      "name": "Pendant Bronze",
+      "hex": "#B86C40",
+      "rgb": [
+        184,
+        108,
+        64
+      ],
+      "usage": "Round pendant, brown bead bracelet, and controlled metallic-earth accents.",
+      "restriction": "Do not replace the pendant with bright yellow gold without a new approved asset version."
+    },
+    {
+      "id": "warm_skin",
+      "name": "Warm Skin",
+      "hex": "#F9DECE",
+      "rgb": [
+        249,
+        222,
+        206
+      ],
+      "usage": "Skin base and soft warm facial rendering.",
+      "restriction": "Keep skin rendering soft and warm; avoid harsh gray shadows."
+    },
+    {
+      "id": "soft_white",
+      "name": "Soft White",
+      "hex": "#FCFDFD",
+      "rgb": [
+        252,
+        253,
+        253
+      ],
+      "usage": "Hair, ears, clean backgrounds, sticker cutlines, and visual breathing space.",
+      "restriction": "Use subtle shading to preserve white forms; do not flatten all white areas into one field."
+    },
+    {
+      "id": "contextual_lucky_red",
+      "name": "Contextual Lucky Red",
+      "status": "secondary_contextual_accent",
+      "hex": "#E85D61",
+      "rgb": [
+        232,
+        93,
+        97
+      ],
+      "usage": "Limited prosperity, warning, celebration, or feng shui accents when 红色招财 is relevant.",
+      "restriction": "Never displace Signature Pink as the primary visual identity color."
+    }
+  ]
+}

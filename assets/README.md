@@ -6,7 +6,7 @@
 Charts, images, and other media referenced by docs.
 
 ## Contents
-Add documents for this category here.
+- **[DollarHua (花有财) — Shared IP Character](./dollarhua/README.md)** · [中文](./dollarhua/README-zh_CN.md) — reusable mascot IP (character pack v1.4 Lite); identity, 8-color standard, references, and base prompt. The single source of truth for the workspace mascot.
 
 ## Related
 - Workspace home: [README.md](../README.md) · [中文](../README-zh_CN.md)

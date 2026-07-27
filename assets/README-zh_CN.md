@@ -6,7 +6,7 @@
 文档引用的图表、图片与其他媒体素材。
 
 ## 内容
-请在此文件夹中添加相关文档。
+- **[DollarHua（花有财）— 共享 IP 形象](./dollarhua/README-zh_CN.md)** · [English](./dollarhua/README.md) — 可复用吉祥物 IP（形象包 v1.4 Lite）；含形象设定、8 色标准、参考图与基础提示词。本工作区吉祥物的唯一权威来源。
 
 ## 相关
 - 工作区主页：[README.md](../README.md) · [中文](../README-zh_CN.md)
