@@ -30,4 +30,18 @@ Thumbs.db
 dist/
 build/
 out/
+output/
 *.log
+
+# ---- LaTeX auxiliary files ----
+*.aux
+*.toc
+*.lof
+*.lot
+*.bbl
+*.blg
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.out
+*.xdv
