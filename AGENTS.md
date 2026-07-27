@@ -15,6 +15,7 @@ Guidance for AI agents operating in this repo — a **bilingual investment-docum
 
 ## Structure pointers (read the files; don't duplicate)
 - **Doc folders** (`reports/`, `research/`, `portfolio/`, `market/`, `strategies/`, `data/`, `archive/`, `assets/`): each has a bilingual README index — drop investment docs there.
+- **`skills/`** (`skills/README.md`): project-level agent skills for specialized workflows. Not investment documents — reusable task bundles (editorial review, etc.).
 - **`articles/`**: long-form essays. One folder per essay `<yyyy>-<english-slug>/` containing `manuscript.md` (Chinese-primary, English inline), `notes.md`, `references.md`, `assets/`. Rules live in `articles/STYLE.md`; scaffold in `articles/_template/`.
 - **`CONTRIBUTING.md` / `CONTRIBUTING-zh_CN.md`**: human-facing workflow and the rationale for the PR-only policy.
 

@@ -1,0 +1,186 @@
+%===========================================================
+%  pandoc-template.tex — DollarHua PDF Toolbook Template
+%  Version: v1.0 · Updated: 2026-07-28
+%
+%  Used with: pandoc input.md --template=this -o output.tex
+%  Compile with: xelatex (2 passes for TOC + cross-refs)
+%===========================================================
+
+% ── Document class (ctexbook = Chinese-enabled book) ──
+\documentclass[a4paper,12pt,oneside]{ctexbook}
+
+% ── Page geometry ──
+\usepackage[top=2.5cm, bottom=2.5cm, left=2.8cm, right=2.3cm,
+            headheight=14pt, headsep=8mm, footskip=12mm,
+            includeheadfoot]{geometry}
+
+% ── DollarHua brand colors ──
+\definecolor{dh-pink}{HTML}{FEC6CD}
+\definecolor{dh-blossom}{HTML}{F3A6AF}
+\definecolor{dh-gold}{HTML}{E3A04B}
+\definecolor{dh-navy}{HTML}{1D1E50}
+\definecolor{dh-bronze}{HTML}{B86C40}
+\definecolor{dh-skin}{HTML}{F9DECE}
+\definecolor{dh-white}{HTML}{FCFDFD}
+\definecolor{dh-red}{HTML}{E85D61}
+
+% ── CJK typography ──
+\usepackage{fontspec}
+\usepackage{xeCJK}
+\setCJKmainfont{PingFang SC}[
+    BoldFont={PingFang SC Semibold},
+    ItalicFont={STSongti-SC-Regular}
+]
+\setCJKsansfont{PingFang SC}
+\setCJKmonofont{STSongti-SC-Regular}
+
+% ── Page style (headers / footers) ──
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\headrule}{\hbox to\headwidth{%
+  \color{dh-pink}\leaders\hrule height \headrulewidth\hfill}}
+\fancyhead[LE,RO]{\footnotesize\color{dh-pink}\leftmark}
+\fancyhead[RE,LO]{\footnotesize\color{dh-pink}\mytitle}
+\fancyfoot[C]{\thepage}
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyfoot[C]{\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+}
+
+% ── First-line indent: 2 CJK characters ──
+\setlength{\parindent}{2em}
+
+% ── Chapter/section title styling ──
+\usepackage{titlesec}
+
+% Chapter: Bond Navy large text + pink decor rules
+\titleformat{\chapter}[display]
+  {\centering\Huge\bfseries\color{dh-navy}}
+  {\color{dh-pink}\rule{0.6\textwidth}{2pt}\vspace{0.5cm}\\%
+   \chaptertitlename\ \thechapter}
+  {1em}
+  {}
+  [\vspace{0.3cm}\color{dh-pink}\rule{0.3\textwidth}{1pt}]
+
+% Section
+\titleformat{\section}
+  {\Large\bfseries\color{dh-navy}}
+  {\color{dh-pink}\thesection}
+  {1em}
+  {}
+  [\vspace{-0.3cm}\color{dh-pink}\titlerule[1pt]]
+
+% Subsection
+\titleformat{\subsection}
+  {\large\bfseries\color{dh-navy}}
+  {\color{dh-pink}\thesubsection}
+  {1em}
+  {}
+
+% ── Table of contents styling ──
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=dh-pink,
+  urlcolor=dh-gold,
+  pdfborder={0 0 0}
+}
+
+% ── Image support ──
+\usepackage{graphicx}
+\usepackage{float}
+\graphicspath{{./}{./assets/}{./images/}}
+\usepackage[export]{adjustbox}
+
+% ── Code highlighting ──
+\usepackage{listings}
+\usepackage{xcolor}
+\lstset{
+  basicstyle=\ttfamily\footnotesize\color{dh-navy},
+  backgroundcolor=\color{dh-white},
+  frame=single,
+  framerule=0.5pt,
+  rulecolor=\color{dh-pink},
+  breaklines=true,
+  numbers=left,
+  numberstyle=\tiny\color{dh-blossom},
+  keywordstyle=\color{dh-navy}\bfseries,
+  commentstyle=\color{dh-bronze}\itshape,
+  stringstyle=\color{dh-red},
+  tabsize=2,
+  showstringspaces=false
+}
+
+% ── Tables ──
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{colortbl}
+\renewcommand{\arraystretch}{1.3}
+
+% ── Callout boxes ──
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\newtcolorbox{tipbox}{
+  colback=dh-skin!30,
+  colframe=dh-pink,
+  arc=4pt,
+  boxrule=1pt,
+  leftrule=4pt,
+  breakable
+}
+\newtcolorbox{warnbox}{
+  colback=dh-red!10,
+  colframe=dh-red,
+  arc=4pt,
+  boxrule=1pt,
+  leftrule=4pt,
+  breakable
+}
+
+% ── Metadata ──
+$if(title)$
+\newcommand{\mytitle}{$title$}
+$else$
+\newcommand{\mytitle}{4i\_e-acc Toolbook}
+$endif$
+
+$if(author)$
+\newcommand{\myauthor}{$author$}
+$else$
+\newcommand{\myauthor}{}
+$endif$
+
+$if(date)$
+\newcommand{\mydate}{$date$}
+$else$
+\newcommand{\mydate}{\today}
+$endif$
+
+% ═══════════════════════════════════════════
+%  DOCUMENT BODY
+% ═══════════════════════════════════════════
+\begin{document}
+
+% ── Cover page ──
+\thispagestyle{empty}
+\newgeometry{top=0cm, bottom=0cm, left=0cm, right=0cm}
+
+~ % spacer
+\vfill
+\begin{center}
+{\huge\bfseries\color{dh-navy}\mytitle} \\[1.5cm]
+{\Large\color{dh-gold}\myauthor} \\[0.8cm]
+{\large\color{dh-blossom}\mydate}
+\end{center}
+\vfill
+
+\restoregeometry
+\newpage
+
+% ── Body (TOC + chapters inserted by Pandoc --toc flag) ──
+$body$
+
+\end{document}
