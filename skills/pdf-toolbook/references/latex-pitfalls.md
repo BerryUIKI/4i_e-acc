@@ -130,7 +130,7 @@ Pandoc doesn't support task list → LaTeX by default. **Fix**: convert to plain
 Embedded `<div>`, `<span>`, `<img>` tags are **passed through verbatim to LaTeX** by Pandoc — causing compile failure.
 
 **Fix** (before Pandoc):
-- `<img src="...">` → convert to `![](...)` Markdown syntax
+- `<img src="...">` → convert to Markdown `![]()` syntax
 - `<div>` / `<span>` → strip tags, keep inner text
 - `<br>` → keep (Pandoc handles it)
 
