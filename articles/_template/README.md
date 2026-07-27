@@ -7,12 +7,11 @@ Copy this folder to `articles/<yyyy-slug>/` to start a new article.
 ## Meta
 - **Working title:**
 - **Status:** Draft
-- **Languages:** 中文(主) / EN
+- **Languages:** 中文为主 / 英文混排 (Chinese-primary, English inline)
 - **Summary:**
 
 ## Files
-- `manuscript.zh.md` — Chinese canonical draft
-- `manuscript.en.md` — English translation
+- `manuscript.md` — Chinese-primary draft with English inline (混排)
 - `notes.md` — outline / research notes
 - `references.md` — sources
 - `assets/` — images, charts

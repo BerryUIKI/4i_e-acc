@@ -13,7 +13,7 @@
 
 | Slug | 暂定标题 | 语言 | 状态 | 文件夹 |
 |------|----------|------|------|--------|
-| `2026-quadruple-long-life` | 《四倍做多认知，长期做多人生》 | 中文(主) / 英文 | 草稿 | [文件夹](./2026-quadruple-long-life/README.md) |
+| `2026-quadruple-long-life` | 《四倍做多认知，长期做多人生》 | 中文为主 / 英文混排 | 草稿 | [文件夹](./2026-quadruple-long-life/README.md) |
 
 ## 如何新增一篇文章
 1. 复制 `_template/` 到 `articles/<yyyy-slug>/`（slug 用**英文**）。

@@ -14,7 +14,7 @@ conflicts and keep materials isolated from the rest of the workspace.
 
 | Slug | Working title | Languages | Status | Folder |
 |------|---------------|-----------|--------|--------|
-| `2026-quadruple-long-life` | 《四倍做多认知，长期做多人生》 | 中文(主) / EN | Draft | [folder](./2026-quadruple-long-life/README.md) |
+| `2026-quadruple-long-life` | 《四倍做多认知，长期做多人生》 | 中文为主 / 英文混排 | Draft | [folder](./2026-quadruple-long-life/README.md) |
 
 ## How to add a new article
 1. Copy `_template/` to `articles/<yyyy-slug>/` (use an **English** slug).
