@@ -60,8 +60,8 @@ Recursively scan the target directory, collect all `.md` files (excluding `READM
 
 > Scanned: `directory/` · Total: N documents
 
-1. [Doc Title](./relative/path/to/doc1.md)
-2. [Doc Title](./relative/path/to/doc2.md)
+1. Doc Title — `./relative/path/to/doc1.md`
+2. Doc Title — `./relative/path/to/doc2.md`
 ...
 ```
 
@@ -104,7 +104,7 @@ The `preprocess_markdown()` function in `build_pdf.py` handles steps 1–3 autom
 ### Step 5 — Image Path Resolution
 
 Resolve relative image paths in Markdown to workspace absolute paths:
-- **Default (Plan A)** — auto-resolve `![](assets/foo.png)` relative to the MD file's directory
+- **Default (Plan A)** — auto-resolve images relative to the MD file's directory (e.g. `assets/foo.png`)
 - **Fallback (Plan B)** — copy all referenced images to a temp directory if Plan A fails
 
 ### Step 6 — Generate PDF
