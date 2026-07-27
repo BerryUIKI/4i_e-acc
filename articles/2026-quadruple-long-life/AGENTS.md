@@ -1,0 +1,49 @@
+# AGENTS.md — 《四倍做多认知，长期做多人生》
+
+> 本书（文章）专属的智能体工作指南。仓库级规则在根目录 `../../AGENTS.md`，请先读它。
+> Book-scoped agent guidance. Repo-wide rules live in `../../AGENTS.md` — read it first.
+
+## 这是什么 (What this is)
+一本面向 **四爱（4i）社群** 的长期投资科普手册，作者 **花花**（「4i❤️e-acc 四倍做多认知」群 出品）。
+受众：零基础 → 中级投资者。定位：建立正确的财富观、资产配置思维、长期投资习惯；
+**不荐股、不鼓吹短期投机**（与公开仓库政策一致）。
+
+## 行文风格 (Voice) — 非常重要
+像一位懂投资的朋友，在咖啡馆里陪你聊天。
+- 没有居高临下的说教，没有故作高深的术语堆砌。
+- 把复杂的问题讲简单，把长期的道理讲温暖。
+- 把财富最终落脚到「人生的选择权」。
+- 语气：轻松、亲切、有陪伴感；内容保持严谨可靠。
+
+## 工作流 (Workflow)
+1. **先同步章节大纲**：智能体提出大纲，作者确认 / 修改（见 `outline.md`）。
+2. **作者写 MD 文字发给智能体** → 智能体负责 **整理 / 翻译**（英文部分由智能体决定）。
+3. **配图**：智能体标记需要配图的章节，在 `illustrations/<n>-<slug>.md` 写清
+   —— 图片内容、比例、背景（透明 / 底色）、以及用于生成的 Prompt。
+4. **完成全部章节后输出 PDF**：中文为主，术语附英文。PDF 阶段由作者另行通知，**现在不做**。
+
+## 翻译政策 (Translation)
+- 中文为主、英文混排；术语首现附英文，如 做多 (long)、回撤 (drawdown)、
+  定投 (DCA, dollar-cost averaging)、资产配置 (asset allocation)、复利 (compounding)。
+- 哪些段落需要英文版由智能体决定（通常：术语、章节标题可选双语、章末摘要）。
+
+## 配图约定 (Illustrations)
+- 规格文档放 `illustrations/`，每个需要配图的章节一个文件。
+- 每个文件含：用途、图片内容描述、比例、背景、以及用于生成的英文 Prompt。
+- 配色：暖奶油色背景 `#FBF7F0` 为主；部分内联图用透明底 PNG。
+- 全书视觉基调：扁平 / 编辑插画，柔和暖色调（奶油、焦糖、鼠尾草绿），圆润线条，治愈感。
+
+## 仓库约束 (Repo constraints)
+- 分支：`article/2026-quadruple-long-life`（已建、已推远程）。
+- **绝不直接推 `main`**；改动走 commit → push 分支 → 开 PR（draft，squash 合并，管理员自合并）。
+- 公开仓库：不提交密钥；不荐股。
+- 提交前跑 `../../.github/scripts/check_links.py` 与 `check_style.py`。
+
+## 文件结构 (Files)
+- `manuscript.md` — 全书正文（H1=书名，H2=章，H3=节）。作者在此填字。
+- `outline.md` — 章节大纲（本次需与作者同步）。
+- `notes.md` — 写作计划 / 素材抽屉。
+- `references.md` — 参考资料。
+- `illustrations/` — 配图规格与 Prompt。
+- `README.md` / `README-zh_CN.md` — 双语索引。
+- `assets/` — 最终图片素材。
