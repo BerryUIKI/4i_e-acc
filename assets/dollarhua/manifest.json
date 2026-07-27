@@ -1,0 +1,83 @@
+{
+  "package": "DollarHua_AI_Character_Pack_Lite_v1.4",
+  "version": "v1.4",
+  "edition": "Lite",
+  "release_date": "2026-07-18",
+  "updated_date": "2026-07-19",
+  "intended_use": "Flexible AI generation for low-complexity and lower-requirement scenarios.",
+  "contains_pdf": false,
+  "contains_negative_prompt_or_prompt_restrictions": false,
+  "file_count_including_manifest": 15,
+  "files": [
+    {
+      "path": "character.json",
+      "bytes": 947,
+      "sha256": "ee00adaf6b199d632411d58e728879decd7e0df406db83c4fd7dbc35d152ebf5"
+    },
+    {
+      "path": "color_standard.json",
+      "bytes": 3241,
+      "sha256": "28eeb018d87371fa5516db942fb3596084c877881d0cf06ddb0b8e6b7a9c7450"
+    },
+    {
+      "path": "examples/crying.png",
+      "bytes": 295213,
+      "sha256": "a7e67327d95e036ff81f947ea8f56cdbbe04e880df81454b2fdf5b7bb0ea9924"
+    },
+    {
+      "path": "examples/happy.png",
+      "bytes": 322125,
+      "sha256": "5ecd0a039f2bec1b03579d20822dc6c31996de6d9fd6da3b976536532c6f46ce"
+    },
+    {
+      "path": "examples/hello.png",
+      "bytes": 281029,
+      "sha256": "e3fb222dae4d970ca237f797020bbd180d1b0be77bcec189d98069e87f461f27"
+    },
+    {
+      "path": "examples/thinking.png",
+      "bytes": 291554,
+      "sha256": "cec2138ce8ff120f2748a3a782fcb288ef36a9f7d18917e1b9d8c396fdc965ee"
+    },
+    {
+      "path": "prompt_seed.txt",
+      "bytes": 357,
+      "sha256": "05b072edfe3c3e4fcad06372e6c5307e2a8ba782eee544354f06d7c469c9764c"
+    },
+    {
+      "path": "references/back.png",
+      "bytes": 1641722,
+      "sha256": "7ff40b2578c8b98c9ff2a079ec89f80cff1d042ecde5fd13c1feda7c747b76d6"
+    },
+    {
+      "path": "references/front.png",
+      "bytes": 5793473,
+      "sha256": "9615c66d7da77ea76fee4806f3b895832e0d29ade2df17a11cae8a6604ea79db"
+    },
+    {
+      "path": "references/front_three_quarter.png",
+      "bytes": 1230401,
+      "sha256": "20e7c1727c8d34e954fb01918c36b59d70d3ca8f64d3d3140499f0c020d6b94a"
+    },
+    {
+      "path": "references/front_transparent.png",
+      "bytes": 4341378,
+      "sha256": "7d4df0b8d6eed62f9770ccad93860deb7927d1f2d60b1b584e368ae82b4802cd"
+    },
+    {
+      "path": "references/left.png",
+      "bytes": 1790675,
+      "sha256": "12b3a36f9e26d52027131005abf17f57d58bb0dd0592182fbc693bac3ba26a17"
+    },
+    {
+      "path": "references/rear_three_quarter.png",
+      "bytes": 1084721,
+      "sha256": "94a33b4dc71873affb2578ee4b4678b38cdb2ef73205d9a09b25ddc6052527b1"
+    },
+    {
+      "path": "references/right.png",
+      "bytes": 1132524,
+      "sha256": "5e2845e1eab3fe81daeb489134e67551113c35c5497c6c854e37a4d84b091227"
+    }
+  ]
+}
