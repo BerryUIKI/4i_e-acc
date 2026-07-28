@@ -32,6 +32,47 @@ It uses a multi-directory layout (`Front-Matter/`, `Main-Text/`, `Appendices/`, 
 and follows its own `agents.md` rather than `articles/STYLE.md`.
 See its [README](./articles/2026-quadruple-long-life/README.md) for the full structure and writing conventions.
 
+## Multi-agent / Multi-device Collaboration
+
+This repo is worked on by multiple AI agents across multiple devices.
+To avoid history disconnects, lost work, and PR failures, follow these rules.
+
+### Sync protocol — every time, no exceptions
+1. **Pull before anything:** `git fetch && git pull --ff-only`. Verify you are on the latest remote.
+2. **Push regularly:** commit + `git push` after each meaningful chunk. Small, frequent pushes prevent conflicts.
+3. **NEVER force-push** (`--force`, `--force-with-lease`). Force-push rewrites shared history and can disconnect the branch from `main`, breaking PR creation entirely.
+4. **Before handing off:** `git push` everything. No half-committed state should be the handoff point.
+
+### Handoff document — `HANDOFF-YYYY-MM-DD.md`
+When passing work to another agent/device, write this file at the **workspace root**.
+
+```markdown
+# HANDOFF-YYYY-MM-DD
+
+## Current state
+- Branch: `<name>`
+- Last pushed commit: `git log --oneline -1` (paste the output)
+- CI status: pass / fail / not applicable
+
+## Work completed
+- [Bullet list of what was done since last handoff]
+
+## Work in progress (not yet finished / not yet pushed)
+- [Bullet list — empty if everything is pushed]
+
+## To-do / Next steps
+- [Prioritised list for the receiving agent]
+
+## Data gaps / Blockers
+- [Missing data, external dependencies, known issues]
+
+## Prompt for receiving agent
+> [Copy-paste ready prompt — code block format. Be specific about which files
+> to work on, what to do, where to commit, and whether to push.]
+```
+
+**After receiving:** read the handoff → `git fetch && git pull --ff-only` → verify → continue from "Next steps".
+
 ## Verify before pushing
 - `python .github/scripts/check_links.py` — offline relative-link check.
 - `python .github/scripts/check_style.py` — structure/style check per `STYLE.md`.
