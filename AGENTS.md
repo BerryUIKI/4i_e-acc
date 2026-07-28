@@ -44,10 +44,21 @@ To avoid history disconnects, lost work, and PR failures, follow these rules.
 4. **Before handing off:** `git push` everything. No half-committed state should be the handoff point.
 
 ### Handoff document — `HANDOFF-YYYY-MM-DD.md`
-When passing work to another agent/device, write this file at the **workspace root**.
+
+**When to trigger a handoff:**
+- Switching devices ("continuing on another computer")
+- User explicitly says "交接" / "写个交接" / "handoff"
+- Finishing a major work unit and the next step is unclear or for someone else
+- Delegating a task to a different agent (e.g., illustration generation, data analysis)
+
+**Template** — write at the **workspace root**:
 
 ```markdown
 # HANDOFF-YYYY-MM-DD
+
+## Source
+- Device: `<device name or type, e.g. M2 MacBook / Ubuntu CI runner>`
+- Agent: `<agent name or model — optional, helps the receiver understand context>`
 
 ## Current state
 - Branch: `<name>`
