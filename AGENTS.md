@@ -15,7 +15,7 @@ Guidance for AI agents operating in this repo — a **bilingual investment-docum
 
 ## Structure pointers (read the files; don't duplicate)
 - **Doc folders** (`reports/`, `research/`, `portfolio/`, `market/`, `strategies/`, `data/`, `archive/`, `assets/`): each has a bilingual README index — drop investment docs there.
-- **`articles/`**: long-form essays. One folder per essay `<yyyy>-<english-slug>/` containing `manuscript.md` (Chinese-primary, English inline), `notes.md`, `references.md`, `assets/`. Rules live in `articles/STYLE.md`; scaffold in `articles/_template/`.
+- **`articles/`**: long-form essays and books. One folder per project `<yyyy>-<english-slug>/`. Short essays use `manuscript.md` (Chinese-primary, English inline), `notes.md`, `references.md`, `assets/` — rules live in `articles/STYLE.md`; scaffold in `articles/_template/`. **Book-length projects** may use their own layout and conventions — see their `agents.md` (e.g. `2026-quadruple-long-life/`).
 - **`CONTRIBUTING.md` / `CONTRIBUTING-zh_CN.md`**: human-facing workflow and the rationale for the PR-only policy.
 
 ## Shared IP asset — DollarHua (花有财)
@@ -25,6 +25,12 @@ A **reusable mascot IP** lives at `assets/dollarhua/` (character pack v1.4 Lite,
 - Identity, the 8-color standard, the file map, and the base prompt (`prompt_seed.txt`) are all defined there.
 - Respect the rules: keep the signature pink (`#FEC6CD`) as the primary identity color, never recolor the bronze coin pendant to bright yellow gold, and treat the reference PNGs as authoritative for rendered appearance.
 - Always pull from `assets/dollarhua/` — do not introduce a divergent copy elsewhere in the repo.
+
+## Flagship book -- 《四倍做多认知，长期做多人生》
+`articles/2026-quadruple-long-life/` is a 30-chapter + epilogue + 12-appendices investment guidebook.
+It uses a multi-directory layout (`Front-Matter/`, `Main-Text/`, `Appendices/`, `illustrations/`)
+and follows its own `agents.md` rather than `articles/STYLE.md`.
+See its [README](./articles/2026-quadruple-long-life/README.md) for the full structure and writing conventions.
 
 ## Verify before pushing
 - `python .github/scripts/check_links.py` — offline relative-link check.
