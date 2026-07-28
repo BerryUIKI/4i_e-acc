@@ -31,3 +31,7 @@ dist/
 build/
 out/
 *.log
+
+# ---- Collaboration / handoff ----
+# Handoff documents are for email, not version control.
+HANDOFF*.md
