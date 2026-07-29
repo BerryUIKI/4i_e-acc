@@ -9,6 +9,26 @@
 % ── Document class (ctexbook = Chinese-enabled book) ──
 \documentclass[a4paper,12pt,oneside,fontset=none]{ctexbook}
 
+% ── CJK typography (Source Han Serif body + Sans headings) ──
+% ctex with fontset=none requires ALL CJK families to be defined.
+% \setCJKmainfont only sets \CJKfamily{rm}, but ctex uses zh song/hei/kai/fs
+% for body text — so we must configure every family via ctexset.
+\usepackage{fontspec}
+\setCJKmainfont{Source Han Serif SC}[
+    BoldFont={Source Han Serif SC Bold}
+]
+\setCJKsansfont{Source Han Sans SC}[
+    BoldFont={Source Han Sans SC Bold}
+]
+\setCJKmonofont{Source Han Sans SC}
+
+\ctexset{
+    zhsong = {Source Han Serif SC},
+    zhhei  = {Source Han Sans SC},
+    zhfs   = {Source Han Serif SC},    % 仿宋→宋体 fallback
+    zhkai  = {Source Han Serif SC},    % 楷体→宋体 fallback
+}
+
 % ── Page geometry ──
 \usepackage[top=2.5cm, bottom=2.5cm, left=2.8cm, right=2.3cm,
             headheight=23pt, headsep=8mm, footskip=12mm,
@@ -24,19 +44,6 @@
 \definecolor{dh-skin}{HTML}{F9DECE}
 \definecolor{dh-white}{HTML}{FCFDFD}
 \definecolor{dh-red}{HTML}{E85D61}
-
-% ── CJK typography (Source Han Serif body + Sans headings) ──
-\usepackage{fontspec}
-\usepackage{xeCJK}
-% 正文：宋体风格 (Source Han Serif SC)
-\setCJKmainfont{Source Han Serif SC}[
-    BoldFont={Source Han Serif SC Bold}
-]
-% 标题 / 无衬线：黑体风格 (Source Han Sans SC)
-\setCJKsansfont{Source Han Sans SC}[
-    BoldFont={Source Han Sans SC Bold}
-]
-\setCJKmonofont{Source Han Sans SC}
 
 % ── Unicode character support ──
 \usepackage{newunicodechar}
