@@ -1,0 +1,97 @@
+name: Build Book PDF
+
+# Auto-compile 《四倍做多认知，长期做多人生》 to PDF on every push
+# to the book branch. Uses Pandoc + XeLaTeX with DollarHua brand styling.
+#
+# Architecture:
+#   1. Merge book chapters via build_pdf.py tex (generate .tex only)
+#   2. Patch macOS fonts → Ubuntu fonts (PingFang SC → Noto CJK)
+#   3. XeLaTeX 2-pass compilation
+#   4. Upload PDF artifact (90-day retention)
+
+on:
+  push:
+    branches:
+      - article/2026-quadruple-long-life
+    paths:
+      - 'articles/2026-quadruple-long-life/**/*.md'
+      - 'skills/pdf-toolbook/**'
+      - '.github/workflows/build-book-pdf.yml'
+  workflow_dispatch:  # manual trigger
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ── System dependencies ──────────────────────────
+      - name: Install texlive + pandoc + CJK fonts
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            texlive-xetex \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-lang-chinese \
+            texlive-fonts-recommended \
+            pandoc \
+            fonts-noto-cjk \
+            python3
+
+      - name: Verify dependencies
+        run: |
+          echo "xelatex: $(xelatex --version 2>&1 | head -1)"
+          echo "pandoc:  $(pandoc --version 2>&1 | head -1)"
+          echo "CJK fonts installed:"
+          fc-list :lang=zh | head -5
+
+      # ── Generate .tex (no compilation yet) ───────────
+      - name: Generate LaTeX source
+        run: |
+          cd skills/pdf-toolbook
+          python3 scripts/build_pdf.py tex ../../book-task.md \
+            "$(pwd)/output/toolbook.tex"
+
+      # ── Patch fonts: macOS → Ubuntu ──────────────────
+      - name: Patch fonts for Ubuntu CI
+        run: |
+          cd skills/pdf-toolbook/output
+          # Find all .tex files (split: output/tex/*.tex, monolithic: output/*.tex)
+          find . -name "*.tex" -type f -exec sed -i \
+            -e 's/PingFang SC Semibold/Noto Sans CJK SC Bold/g' \
+            -e 's/PingFang SC/Noto Sans CJK SC/g' \
+            -e 's/STSongti-SC-Regular/Noto Serif CJK SC/g' \
+            -e 's/SF Mono/Noto Sans Mono CJK SC/g' \
+            {} +
+
+      # ── XeLaTeX 2-pass compilation ──────────────────
+      - name: Compile PDF (xelatex × 2)
+        run: |
+          cd skills/pdf-toolbook/output
+          # Locate main tex file (split → tex/main.tex, monolithic → toolbook.tex)
+          if [ -f "tex/main.tex" ]; then
+            MAIN="tex/main.tex"
+            TEX_DIR="tex"
+          else
+            MAIN="toolbook.tex"
+            TEX_DIR="."
+          fi
+          echo "Main tex: $MAIN"
+          # Pass 1: generate .aux / .toc (warnings OK, don't halt)
+          xelatex -interaction=nonstopmode -output-directory="$TEX_DIR" "$MAIN" || true
+          # Pass 2: resolve TOC + cross-refs (fail on real errors)
+          xelatex -interaction=nonstopmode -halt-on-error -output-directory="$TEX_DIR" "$MAIN"
+
+      # ── Upload artifact ─────────────────────────────
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: 四倍做多认知-长期做多人生
+          path: skills/pdf-toolbook/output/**/*.pdf
+          retention-days: 90

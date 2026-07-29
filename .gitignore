@@ -1,0 +1,38 @@
+# ---- WorkBuddy / project-local data ----
+# Local memory, state and caches should not be version-controlled.
+.workbuddy/
+
+# ---- Dependencies ----
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+vendor/
+
+# ---- Secrets / environment ----
+.env
+.env.*
+*.secret
+*.key
+id_rsa
+id_rsa.pub
+*.pem
+
+# ---- OS / editor junk ----
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ---- Build / output ----
+dist/
+build/
+out/
+*.log
+
+# ---- Agent handoff drafts (finalized handoffs are committed via agents/handoffs/) ----
+agents/handoffs/draft-*
+agents/handoffs/tmp-*
+agents/handoffs/.wip-*

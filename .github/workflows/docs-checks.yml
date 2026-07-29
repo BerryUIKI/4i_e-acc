@@ -1,0 +1,56 @@
+name: Docs Checks
+
+# Runs on every PR touching docs, on push to main, and weekly (cron) to
+# catch link rot over time. Workflow file must live on the default branch
+# (main) to be active; open a PR to land it, then merge.
+on:
+  pull_request:
+    paths:
+      - '**/*.md'
+      - '.github/scripts/**'
+      - '.github/workflows/**'
+      - '.markdownlint.json'
+  push:
+    branches: [main]
+    paths:
+      - '**/*.md'
+      - '.github/scripts/**'
+      - '.github/workflows/**'
+      - '.markdownlint.json'
+  schedule:
+    # Every Monday 03:17 UTC
+    - cron: '17 3 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  link-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check internal markdown links
+        run: python .github/scripts/check_links.py
+
+  markdown-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DavidAnson/markdownlint-cli2-action@v17
+        with:
+          config: .markdownlint.json
+          globs: '**/*.md'
+        continue-on-error: true
+
+  style-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Style / structure check (articles/STYLE.md)
+        run: python .github/scripts/check_style.py

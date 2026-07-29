@@ -1,0 +1,11 @@
+# CODEOWNERS — repository ownership & review routing
+#
+# GitHub auto-requests review from these owners when a pull request
+# touches matching paths.
+#
+# IMPORTANT: On a GitHub Free *private* repository, CODEOWNERS does NOT
+# block direct pushes — it only routes review requests. Enforced branch
+# protection (blocking direct pushes to `main`) is unavailable on the
+# free plan for private repos. See CONTRIBUTING.md for the intended workflow.
+
+*       @BerryUIKI
