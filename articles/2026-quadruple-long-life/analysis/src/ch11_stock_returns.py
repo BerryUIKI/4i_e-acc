@@ -1,7 +1,13 @@
 """
-Ch11 — 股票长期收益拆解：标普500 vs 沪深300
-收益 = 盈利增长 + 股息 + 估值变化。展示 2005-2025 年化回报。
-数据来源：Bloomberg / Wind 共识数据。
+Ch11 — 股票长期收益拆解：标普500 vs 沪深300（2005-2025）
+收益 = 盈利增长 + 股息收益 + 估值变化。
+
+数据来源：Bloomberg / Wind 终端共识数据
+  获取方式：终端导出各指数成分股汇总 EPS 增长、股息率、PE 变化
+  公开替代：
+    标普500：https://www.spglobal.com/spdji/ → 年度市场报告
+    沪深300：https://www.csindex.com.cn → 指数月报 → 估值与基本面
+  更新方法：修改 sp500 / csi300 数组中的年化数值
 """
 import matplotlib.pyplot as plt
 import numpy as np

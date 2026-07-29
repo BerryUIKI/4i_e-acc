@@ -1,6 +1,14 @@
 """
-Ch20 — 大类资产相关性矩阵
-展示股票/债券/黄金/现金之间的历史相关系数（2005-2025）。
+Ch20 — 大类资产相关性矩阵（2005-2025，年化）
+展示股票/债券/黄金/现金之间的历史 Pearson 相关系数。
+
+数据来源：Bloomberg / Wind / Portfolio Visualizer
+  获取方式：
+    - Bloomberg: 导出各资产年度总回报 → Excel → 计算 =CORREL()
+    - Portfolio Visualizer (免费): https://www.portfoliovisualizer.com →
+      Asset Correlations → 输入各资产 ETF 代码 → 导出矩阵
+    - Python 替代：使用 AKShare/yfinance 拉取价格 → df.corr()
+  更新方法：修改 corr_data 矩阵（5×5），保持对称
 """
 import matplotlib.pyplot as plt
 import numpy as np

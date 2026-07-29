@@ -1,6 +1,12 @@
 """
-Ch12 — 黄金年度回报 + 危机期间表现
-伦敦金定盘价 USD/oz，2005-2025。
+Ch12 — 黄金年度回报 + 危机期间表现（2005-2025）
+伦敦金定盘价 USD/oz 年度涨跌幅。
+
+数据来源：
+  伦敦金定盘价（LBMA Gold Price）
+    获取：https://www.lbma.org.uk → Pricing & Statistics
+  替代来源：World Gold Council (https://www.gold.org) 或 Investing.com
+  更新方法：在下方 gold_return 列表中追加最新年度涨跌幅
 """
 import matplotlib.pyplot as plt
 import numpy as np

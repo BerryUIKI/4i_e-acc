@@ -1,7 +1,16 @@
 """
 Ch29 — 市场周期与「错过最佳交易日」的代价
-展示沪深300 / 标普500 牛市熊市周期 + 错过最佳 N 天的回报差异。
-数据来源：Bloomberg 终端历史数据。
+沪深300 牛熊周期 + 错过标普500 最佳 N 个交易日的年化回报差异。
+
+数据来源：Bloomberg 终端历史数据
+  获取方式：
+    - 牛熊周期：终端导出沪深300 年度涨跌 → 按市场事件划分周期
+    - 错过最佳交易日：终端导出标普500 日收益 → 剔除最高 N 天 → 计算剩余年化
+    - Python 替代：使用 yfinance 拉取 ^GSPC / 000300.SS 日线 →
+      按日期排序 → 剔除 top N → 计算 CAGR
+  更新方法：
+    - cycles / csi300_chg：追加最新周期数据
+    - scenarios / annual_return：重新计算最新区间数据
 """
 import matplotlib.pyplot as plt
 import numpy as np

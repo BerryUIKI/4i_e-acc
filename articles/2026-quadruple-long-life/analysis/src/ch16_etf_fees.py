@@ -1,6 +1,11 @@
 """
-Ch16 — ETF 费率对长期收益的侵蚀
+Ch16 — ETF 费率对长期收益的侵蚀（纯数学模拟）
 比较 0.15%（低成本ETF）vs 1.00%（主动基金）30年后的终值差。
+
+数据来源：纯数学计算
+  公式：终值 = 本金 × (1 + 年化收益 - 费率)^年数
+  参数：本金 10 万、年化毛收益 7%、低成本费率 0.15%、高成本费率 1.00%
+  更新方法：修改 annual_return / low_fee_rate / high_fee_rate 即可
 """
 import matplotlib.pyplot as plt
 import numpy as np

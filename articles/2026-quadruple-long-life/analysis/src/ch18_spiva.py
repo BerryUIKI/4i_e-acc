@@ -1,7 +1,11 @@
 """
-Ch18 — SPIVA 主动基金 vs 被动指数基金
+Ch18 — SPIVA 主动基金 vs 被动指数基金（2024 年终）
 不同市场、不同周期下，主动基金跑输指数的比例。
-数据来源：S&P SPIVA Scorecard（2024 年终）。
+
+数据来源：S&P SPIVA Scorecard（年度报告，免费公开）
+  获取：https://www.spglobal.com/spdji/en/research-insights/spiva/
+        → 下载最新 PDF 报告 → 提取各分类「跑输基准的主动基金占比」
+  更新方法：修改 categories / underperform 数组为最新报告数据
 """
 import matplotlib.pyplot as plt
 import numpy as np

@@ -1,6 +1,12 @@
 """
 Ch15 — QDII-ETF 溢价案例
 展示 QDII ETF 在额度受限时的溢价率峰值及投资者亏损计算。
+
+数据来源：各 QDII-ETF 历史 IOPV 折溢价数据
+  获取方式：东方财富 (https://quote.eastmoney.com) → 搜索 ETF 代码 →
+            F10/基金概况 → IOPV 折溢价历史 → 取各产品历史溢价率峰值
+  更新方法：修改 products / premium_peak / loss_10w 数组
+  注意：溢价率峰值随时间变化，应标注数据截止日期
 """
 import matplotlib.pyplot as plt
 import numpy as np

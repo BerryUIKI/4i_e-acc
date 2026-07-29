@@ -1,6 +1,10 @@
 """
 Ch7 — 亏损与回本对照表
 跌幅越大，需要的涨幅越大才能回本。
+
+数据来源：纯数学计算
+  公式：回本所需涨幅 = 1/(1 - 跌幅) - 1
+  无需外部数据源，仅改动 loss_pcts 列表可调整展示范围
 """
 import matplotlib.pyplot as plt
 import numpy as np

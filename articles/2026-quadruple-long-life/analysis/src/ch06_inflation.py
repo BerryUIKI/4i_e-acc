@@ -1,13 +1,17 @@
 """
 Ch6 — 通胀与中国 CPI 数据（2013-2025）
 展示 CPI 同比走势 + 100 元购买力逐年侵蚀。
-数据来源：中国国家统计局 CPI 月度数据。
+
+数据来源：中国国家统计局 CPI 月度数据
+  获取方式：https://data.stats.gov.cn → 居民消费价格指数(CPI) → 年度同比
+  更新方法：在下方 cpi_yoy 列表中追加最新年份数据即可
 """
 import matplotlib.pyplot as plt
 import numpy as np
 from _style import CJK_FONT, C_RED, C_NAVY, C_GRAY, C_CREAM, save_chart
 
-# ── Data ────────────────────────────────────────────
+# ── Data (2013-2025 CPI YoY %) ─────────────────────
+# 来源：国家统计局年度 CPI 同比涨幅
 years = list(range(2013, 2026))
 cpi_yoy = [2.6, 2.0, 1.4, 2.0, 1.6, 2.1, 2.9, 2.5, 0.9, 2.0, 0.2, 0.3, 0.3]
 # 100 yuan purchasing power = 100 / cumulative inflation factor

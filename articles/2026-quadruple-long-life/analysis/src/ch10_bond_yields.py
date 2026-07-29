@@ -1,6 +1,11 @@
 """
 Ch10 — 中国国债收益率曲线（2024 vs 2025 vs 2026 年中对比）
-展示不同期限的收益率变化 + 利率下行趋势。
+不同期限（1Y-30Y）国债到期收益率 + 利率下行趋势。
+
+数据来源：中国债券信息网中债收益率曲线
+  获取：https://www.chinabond.com.cn → 中债收益率 → 国债到期收益率
+  选择每年 6 月 30 日（或最近交易日）各期限收益率填入下方数组
+  更新方法：追加最新年份数组（如 y2027）和对应 tenor 标签
 """
 import matplotlib.pyplot as plt
 from _style import C_NAVY, C_RED, C_BLUE, C_GREEN, C_CREAM, C_GRAY, save_chart

@@ -1,6 +1,13 @@
 """
 Ch9 — 货币基金收益率走势 vs 活期存款（2013-2026）
-数据来源：天弘余额宝 / 货币基金平均 7 日年化。
+货币基金 7 日年化 vs 活期存款基准利率。
+
+数据来源：
+  货币基金：天弘余额宝历史 7 日年化收益率
+    获取：https://fund.eastmoney.com → 余额宝(000198) → 历史净值
+  活期利率：中国人民银行活期存款基准利率
+    获取：http://www.pbc.gov.cn → 货币政策 → 利率政策
+  更新方法：在下方 moneymkt / demand 列表中追加最新年份数据
 """
 import matplotlib.pyplot as plt
 from _style import C_NAVY, C_GRAY, C_RED, C_BLUE, C_CREAM, save_chart
