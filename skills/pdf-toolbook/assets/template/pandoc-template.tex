@@ -25,14 +25,18 @@
 \definecolor{dh-white}{HTML}{FCFDFD}
 \definecolor{dh-red}{HTML}{E85D61}
 
-% ── CJK typography (macOS defaults; CI patches to Noto CJK) ──
+% ── CJK typography (Source Han Serif body + Sans headings) ──
 \usepackage{fontspec}
 \usepackage{xeCJK}
-\setCJKmainfont{PingFang SC}[
-    BoldFont={PingFang SC Semibold}
+% 正文：宋体风格 (Source Han Serif SC)
+\setCJKmainfont{Source Han Serif SC}[
+    BoldFont={Source Han Serif SC Bold}
 ]
-\setCJKsansfont{PingFang SC}
-\setCJKmonofont{PingFang SC}
+% 标题 / 无衬线：黑体风格 (Source Han Sans SC)
+\setCJKsansfont{Source Han Sans SC}[
+    BoldFont={Source Han Sans SC Bold}
+]
+\setCJKmonofont{Source Han Sans SC}
 
 % ── Unicode character support ──
 \usepackage{newunicodechar}
@@ -69,7 +73,7 @@
 
 % Chapter: Bond Navy large text + pink decor rules
 \titleformat{\chapter}[display]
-  {\centering\Huge\bfseries\color{dh-navy}}
+  {\centering\Huge\bfseries\sffamily\color{dh-navy}}
   {\color{dh-blossom}\rule{0.6\textwidth}{2pt}\vspace{0.5cm}\\%
    \chaptertitlename\ \thechapter}
   {1em}
@@ -78,7 +82,7 @@
 
 % Section
 \titleformat{\section}
-  {\Large\bfseries\color{dh-navy}}
+  {\Large\bfseries\sffamily\color{dh-navy}}
   {\color{dh-blossom}\thesection}
   {1em}
   {}
@@ -86,7 +90,7 @@
 
 % Subsection
 \titleformat{\subsection}
-  {\large\bfseries\color{dh-navy}}
+  {\large\bfseries\sffamily\color{dh-navy}}
   {\color{dh-blossom}\thesubsection}
   {1em}
   {}

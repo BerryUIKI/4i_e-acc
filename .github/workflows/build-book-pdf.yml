@@ -5,7 +5,7 @@ name: Build Book PDF
 #
 # Architecture:
 #   1. Merge book chapters via build_pdf.py tex (generate .tex only)
-#   2. Patch macOS fonts → Ubuntu fonts (PingFang SC → Noto CJK)
+#   2. Install Source Han Serif/Sans SC OTF fonts from Adobe releases
 #   3. XeLaTeX 2-pass compilation
 #   4. Upload PDF artifact (90-day retention)
 
@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@v4
 
       # ── System dependencies ──────────────────────────
-      - name: Install texlive + pandoc + CJK fonts
+      - name: Install texlive + pandoc
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends \
@@ -45,15 +45,35 @@ jobs:
             texlive-lang-chinese \
             texlive-fonts-recommended \
             pandoc \
-            fonts-noto-cjk \
-            python3
+            python3 \
+            unzip
+
+      # ── Install Source Han fonts from Adobe releases ──
+      - name: Install Source Han fonts (Serif + Sans SC)
+        run: |
+          mkdir -p ~/.fonts
+          # Source Han Serif SC v2.003R — 宋体风格，正文用
+          curl -sSL -o /tmp/SourceHanSerifCN.zip \
+            "https://github.com/adobe-fonts/source-han-serif/releases/download/2.003R/14_SourceHanSerifCN.zip"
+          unzip -qo /tmp/SourceHanSerifCN.zip -d /tmp/serif-fonts/
+          find /tmp/serif-fonts -name "*.otf" -exec cp {} ~/.fonts/ \;
+
+          # Source Han Sans SC v2.005R — 黑体风格，标题用
+          curl -sSL -o /tmp/SourceHanSansCN.zip \
+            "https://github.com/adobe-fonts/source-han-sans/releases/download/2.005R/19_SourceHanSansCN.zip"
+          unzip -qo /tmp/SourceHanSansCN.zip -d /tmp/sans-fonts/
+          find /tmp/sans-fonts -name "*.otf" -exec cp {} ~/.fonts/ \;
+
+          fc-cache -fv
+          echo "Source Han fonts installed:"
+          fc-list | grep -i "source han" | wc -l
 
       - name: Verify dependencies
         run: |
           echo "xelatex: $(xelatex --version 2>&1 | head -1)"
           echo "pandoc:  $(pandoc --version 2>&1 | head -1)"
-          echo "CJK fonts installed:"
-          fc-list :lang=zh | head -5
+          echo "Source Han fonts:"
+          fc-list | grep -i "source han" | head -10
 
       # ── Generate .tex (no compilation yet) ───────────
       - name: Generate LaTeX source
@@ -61,17 +81,6 @@ jobs:
           cd skills/pdf-toolbook
           python3 scripts/build_pdf.py tex ../../book-task.md \
             "$(pwd)/output/toolbook.tex"
-
-      # ── Patch fonts: macOS → Ubuntu ──────────────────
-      - name: Patch fonts for Ubuntu CI
-        run: |
-          cd skills/pdf-toolbook/output
-          # Replace macOS fonts with Ubuntu Noto CJK equivalents
-          # PingFang SC → Noto Serif CJK SC (serif for book body)
-          find . -name "*.tex" -type f -exec sed -i \
-            -e 's/PingFang SC Semibold/Noto Serif CJK SC Bold/g' \
-            -e 's/PingFang SC/Noto Serif CJK SC/g' \
-            {} +
 
       # ── XeLaTeX 3-pass compilation ──────────────────
       - name: Compile PDF (xelatex × 3)
