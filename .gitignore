@@ -32,6 +32,7 @@ build/
 out/
 *.log
 
-# ---- Collaboration / handoff ----
-# Handoff documents are for email, not version control.
-HANDOFF*.md
+# ---- Agent handoff drafts (finalized handoffs are committed via agents/handoffs/) ----
+agents/handoffs/draft-*
+agents/handoffs/tmp-*
+agents/handoffs/.wip-*
