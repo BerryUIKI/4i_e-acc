@@ -36,3 +36,8 @@ out/
 agents/handoffs/draft-*
 agents/handoffs/tmp-*
 agents/handoffs/.wip-*
+agents/dispatches/
+
+# ---- Session-local temp files ----
+handoff-extracted/
+handoff-*.zip

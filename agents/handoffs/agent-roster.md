@@ -11,12 +11,44 @@ ShortAgentID is the last 10 hex chars of the full SHA256 UID. Full algorithm: se
 
 | ShortAgentID | Type | Bound Main | Role | Status |
 |---|---|---|---|---|
-| `305cde212a` | MAIN | ROOT | `doc-writer` | ACTIVE |
-| `8f9b1fd0b6` | SUB | `305cde212a` | `ci-sub` | ACTIVE |
+| `42f78f1d3e` | MAIN | ROOT | `doc-writer` | ACTIVE |
+| `305cde212a` | MAIN | ROOT | `doc-writer` | RETIRED |
+| `8f9b1fd0b6` | SUB | `42f78f1d3e` | `ci-sub` | ACTIVE |
+| `c8dfea5fc1` | SUB | `42f78f1d3e` | `doc-data` | ACTIVE |
 
 ---
 
-## Main Agent: `305cde212a`
+## Main Agent: `42f78f1d3e`
+
+### Metadata
+
+| Field | Value |
+|---|---|
+| ShortAgentID | `42f78f1d3e` |
+| Full SHA256 UID | `082f0e0d866198984b53b62740103be8178485e50e8e22ca10e9f642f78f1d3e` |
+| Agent Type | MAIN |
+| Agent Role Name | `doc-writer` |
+| Lifecycle Status | ACTIVE |
+| Primary Device Fingerprint | `0101aaa313a11c56` |
+| Bound Device Fingerprints | `0101aaa313a11c56` |
+| UTC Register Timestamp (ms) | `1785324315251` |
+| Allowed Workspaces | Full repo: `articles/`, `agents/`, `.github/`, `skills/`, `assets/` |
+| Permissions | Register sub-agents, generate handoff dispatch files, aggregate outputs, execute git push |
+| Git user name | `[42f78f1d3e]` |
+| Git user email | `42f78f1d3e@agents.local` |
+| Human-facing name | 小花蟹 (Little Flower Crab) |
+| Successor of | `305cde212a` |
+
+### Bound Sub Agents
+
+| ShortAgentID | Role | Status | Device FP | Registered (UTC ms) |
+|---|---|---|---|---|
+| `8f9b1fd0b6` | `ci-sub` | ACTIVE | `0101aaa313a11c56` | `1785320624265` |
+| `c8dfea5fc1` | `doc-data` | ACTIVE | `0101aaa313a11c56` | `1785326946418` |
+
+---
+
+## Main Agent: `305cde212a` (RETIRED)
 
 ### Metadata
 
@@ -26,21 +58,14 @@ ShortAgentID is the last 10 hex chars of the full SHA256 UID. Full algorithm: se
 | Full SHA256 UID | `f48eccdd8da6f61fafc44bc0cd8f7338589a645d1b056c3d5b8eb6305cde212a` |
 | Agent Type | MAIN |
 | Agent Role Name | `doc-writer` |
-| Lifecycle Status | ACTIVE |
+| Lifecycle Status | RETIRED |
 | Primary Device Fingerprint | `0101aaa313a11c56` |
 | Bound Device Fingerprints | `0101aaa313a11c56` |
 | UTC Register Timestamp (ms) | `1785297428514` |
-| Allowed Workspaces | Full repo: `articles/`, `agents/`, `.github/`, `skills/`, `assets/` |
-| Permissions | Register sub-agents, generate handoff dispatch files, aggregate outputs, execute git push |
 | Git user name | `[305cde212a]` |
 | Git user email | `305cde212a@agents.local` |
 | Human-facing name | 小花蟹 (Little Flower Crab) |
-
-### Bound Sub Agents
-
-| ShortAgentID | Role | Status | Device FP | Registered (UTC ms) |
-|---|---|---|---|---|
-| `8f9b1fd0b6` | `ci-sub` | ACTIVE | `0101aaa313a11c56` | `1785320624265` |
+| Successor | `42f78f1d3e` |
 
 ---
 
@@ -52,7 +77,7 @@ ShortAgentID is the last 10 hex chars of the full SHA256 UID. Full algorithm: se
 |---|---|
 | ShortAgentID | `8f9b1fd0b6` |
 | Agent Type | SUB |
-| Bound Main | `305cde212a` |
+| Bound Main | `42f78f1d3e` |
 | Agent Role Name | `ci-sub` |
 | Lifecycle Status | ACTIVE |
 | Primary Device Fingerprint | `0101aaa313a11c56` |
@@ -64,7 +89,24 @@ ShortAgentID is the last 10 hex chars of the full SHA256 UID. Full algorithm: se
 
 ---
 
-## Multi-device binding
+## Sub Agent: `c8dfea5fc1`
+
+### Metadata
+
+| Field | Value |
+|---|---|
+| ShortAgentID | `c8dfea5fc1` |
+| Full SHA256 UID | `7a4173f19d6cd744dd33687843596ec0ae7b5ad7dbd0fd489f11bcc8dfea5fc1` |
+| Agent Type | SUB |
+| Bound Main | `42f78f1d3e` |
+| Agent Role Name | `doc-data` |
+| Lifecycle Status | ACTIVE |
+| Primary Device Fingerprint | `0101aaa313a11c56` |
+| UTC Register Timestamp (ms) | `1785326946418` |
+| Allowed Workspaces | `articles/2026-quadruple-long-life/` |
+| Permissions | Commit only; no push. Dispatch via `agents/dispatches/`. |
+| Git Restrictions | Sub agents SHALL NOT push; commits tagged with own ShortAgentID |
+| Human-facing name | dev-box-doc-data |
 
 ---
 
@@ -105,5 +147,4 @@ If the repo fixed salt (`022a2e4326219260`) is compromised or needs rotation for
 | `022a2e4326219260` | 2026-07-29 – present | ACTIVE |
 
 ## Archived UIDs
-<!-- Populated after first salt rotation. Maps old-UID → new-UID for audit continuity. -->
 (None — no rotation has occurred yet.)
