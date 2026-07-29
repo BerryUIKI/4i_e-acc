@@ -11,10 +11,11 @@
 
 % ── Page geometry ──
 \usepackage[top=2.5cm, bottom=2.5cm, left=2.8cm, right=2.3cm,
-            headheight=14pt, headsep=8mm, footskip=12mm,
+            headheight=23pt, headsep=8mm, footskip=12mm,
             includeheadfoot]{geometry}
 
 % ── DollarHua brand colors ──
+\usepackage{xcolor}
 \definecolor{dh-pink}{HTML}{FEC6CD}
 \definecolor{dh-blossom}{HTML}{F3A6AF}
 \definecolor{dh-gold}{HTML}{E3A04B}
@@ -33,6 +34,10 @@
 ]
 \setCJKsansfont{PingFang SC}
 \setCJKmonofont{STSongti-SC-Regular}
+
+% ── Unicode character support ──
+\usepackage{newunicodechar}
+\newunicodechar{≈}{\ensuremath{\approx}}
 
 % ── Page style (headers / footers) ──
 \usepackage{fancyhdr}
@@ -71,7 +76,7 @@
   {\color{dh-pink}\thesection}
   {1em}
   {}
-  [\vspace{-0.3cm}\color{dh-pink}\titlerule[1pt]]
+  [\vspace{-0.3cm}{\color{dh-pink}\titlerule[1pt]}]
 
 % Subsection
 \titleformat{\subsection}
@@ -97,7 +102,7 @@
 
 % ── Code highlighting ──
 \usepackage{listings}
-\usepackage{xcolor}
+% \usepackage{xcolor} (loaded above)
 \lstset{
   basicstyle=\ttfamily\footnotesize\color{dh-navy},
   backgroundcolor=\color{dh-white},
@@ -114,73 +119,53 @@
   showstringspaces=false
 }
 
+% ── Pandoc compatibility ──
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{longtable}
+\usepackage{calc}
+
 % ── Tables ──
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{colortbl}
-\renewcommand{\arraystretch}{1.3}
+\arrayrulecolor{dh-pink}
 
-% ── Callout boxes ──
-\usepackage{tcolorbox}
-\tcbuselibrary{skins,breakable}
-\newtcolorbox{tipbox}{
-  colback=dh-skin!30,
-  colframe=dh-pink,
-  arc=4pt,
-  boxrule=1pt,
-  leftrule=4pt,
-  breakable
-}
-\newtcolorbox{warnbox}{
-  colback=dh-red!10,
-  colframe=dh-red,
-  arc=4pt,
-  boxrule=1pt,
-  leftrule=4pt,
-  breakable
-}
+% ── Block quotes ──
+\usepackage{etoolbox}
+\AtBeginEnvironment{quote}{\small\color{dh-navy}}
 
-% ── Metadata ──
-$if(title)$
+% ── Pandoc variables ──
 \newcommand{\mytitle}{$title$}
-$else$
-\newcommand{\mytitle}{4i\_e-acc Toolbook}
-$endif$
+\title{\mytitle}
+\author{$author$}
+\date{$date$}
 
-$if(author)$
-\newcommand{\myauthor}{$author$}
-$else$
-\newcommand{\myauthor}{}
-$endif$
+% ── Cover styling ──
+\makeatletter
+\def\@maketitle{
+  \begin{titlepage}
+    \centering
+    \vspace*{3cm}
+    {\color{dh-pink}\rule{0.5\textwidth}{2pt}\par}
+    \vspace{1cm}
+    {\Huge\bfseries\color{dh-navy}\mytitle\par}
+    \vspace{0.5cm}
+    {\Large\color{dh-bronze}$author$\par}
+    \vspace{1cm}
+    {\color{dh-pink}\rule{0.3\textwidth}{1pt}\par}
+    \vfill
+    {\large\color{dh-blossom}$date$\par}
+  \end{titlepage}
+}
+\makeatother
 
-$if(date)$
-\newcommand{\mydate}{$date$}
-$else$
-\newcommand{\mydate}{\today}
-$endif$
-
-% ═══════════════════════════════════════════
-%  DOCUMENT BODY
-% ═══════════════════════════════════════════
 \begin{document}
+\maketitle
 
-% ── Cover page ──
-\thispagestyle{empty}
-\newgeometry{top=0cm, bottom=0cm, left=0cm, right=0cm}
+$if(toc)$
+\tableofcontents
+$endif$
 
-~ % spacer
-\vfill
-\begin{center}
-{\huge\bfseries\color{dh-navy}\mytitle} \\[1.5cm]
-{\Large\color{dh-gold}\myauthor} \\[0.8cm]
-{\large\color{dh-blossom}\mydate}
-\end{center}
-\vfill
-
-\restoregeometry
-\newpage
-
-% ── Body (TOC + chapters inserted by Pandoc --toc flag) ──
 $body$
 
 \end{document}

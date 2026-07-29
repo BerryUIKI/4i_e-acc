@@ -12,7 +12,7 @@ ShortAgentID is the last 10 hex chars of the full SHA256 UID. Full algorithm: se
 | ShortAgentID | Type | Bound Main | Role | Status |
 |---|---|---|---|---|
 | `305cde212a` | MAIN | ROOT | `doc-writer` | ACTIVE |
-| *(no Sub agents registered)* | | | | |
+| `8f9b1fd0b6` | SUB | `305cde212a` | `ci-sub` | ACTIVE |
 
 ---
 
@@ -40,7 +40,31 @@ ShortAgentID is the last 10 hex chars of the full SHA256 UID. Full algorithm: se
 
 | ShortAgentID | Role | Status | Device FP | Registered (UTC ms) |
 |---|---|---|---|---|
-| *(none registered yet)* | | | | |
+| `8f9b1fd0b6` | `ci-sub` | ACTIVE | `0101aaa313a11c56` | `1785320624265` |
+
+---
+
+## Sub Agent: `8f9b1fd0b6`
+
+### Metadata
+
+| Field | Value |
+|---|---|
+| ShortAgentID | `8f9b1fd0b6` |
+| Agent Type | SUB |
+| Bound Main | `305cde212a` |
+| Agent Role Name | `ci-sub` |
+| Lifecycle Status | ACTIVE |
+| Primary Device Fingerprint | `0101aaa313a11c56` |
+| UTC Register Timestamp (ms) | `1785320624265` |
+| Allowed Workspaces | `.github/`, `skills/pdf-toolbook/` |
+| Permissions | Commit only; no push. Dispatch via `agents/dispatches/`. |
+| Git Restrictions | Sub agents SHALL NOT push; commits tagged with own ShortAgentID |
+| Human-facing name | dev-box-ci-sub |
+
+---
+
+## Multi-device binding
 
 ---
 

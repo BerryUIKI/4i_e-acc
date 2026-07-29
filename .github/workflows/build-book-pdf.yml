@@ -17,6 +17,10 @@ on:
       - 'articles/2026-quadruple-long-life/**/*.md'
       - 'skills/pdf-toolbook/**'
       - '.github/workflows/build-book-pdf.yml'
+  pull_request:
+    paths:
+      - 'skills/pdf-toolbook/**'
+      - '.github/workflows/build-book-pdf.yml'
   workflow_dispatch:  # manual trigger
 
 permissions:
