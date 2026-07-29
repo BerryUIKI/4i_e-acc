@@ -7,33 +7,40 @@ ShortAgentID is the last 10 hex chars of the full SHA256 UID. Full algorithm: se
 
 ---
 
-| ShortAgentID | Type | Bound Main | Role | Status | Device FP | Registered (UTC ms) |
-|---|---|---|---|---|---|---|
-| `305cde212a` | MAIN | ROOT | `doc-writer` | ACTIVE | `0101aaa313a11c56` | `1785297428514` |
+## Quick-lookup summary
+
+| ShortAgentID | Type | Bound Main | Role | Status |
+|---|---|---|---|---|
+| `305cde212a` | MAIN | ROOT | `doc-writer` | ACTIVE |
+| *(no Sub agents registered)* | | | | |
 
 ---
 
-## Full records
+## Main Agent: `305cde212a`
 
-### `305cde212a`
+### Metadata
 
 | Field | Value |
 |---|---|
 | ShortAgentID | `305cde212a` |
 | Full SHA256 UID | `f48eccdd8da6f61fafc44bc0cd8f7338589a645d1b056c3d5b8eb6305cde212a` |
 | Agent Type | MAIN |
-| Bound Main Agent ShortID | ROOT |
-| Desensitized Device Fingerprint | `0101aaa313a11c56` |
 | Agent Role Name | `doc-writer` |
-| UTC Register Timestamp (ms) | `1785297428514` |
 | Lifecycle Status | ACTIVE |
+| Primary Device Fingerprint | `0101aaa313a11c56` |
+| Bound Device Fingerprints | `0101aaa313a11c56` |
+| UTC Register Timestamp (ms) | `1785297428514` |
 | Allowed Workspaces | Full repo: `articles/`, `agents/`, `.github/`, `skills/`, `assets/` |
 | Permissions | Register sub-agents, generate handoff dispatch files, aggregate outputs, execute git push |
 | Git user name | `[305cde212a]` |
 | Git user email | `305cde212a@agents.local` |
-| Primary Device Fingerprint | `0101aaa313a11c56` |
-| Bound Device Fingerprints | `0101aaa313a11c56` |
 | Human-facing name | 小花蟹 (Little Flower Crab) |
+
+### Bound Sub Agents
+
+| ShortAgentID | Role | Status | Device FP | Registered (UTC ms) |
+|---|---|---|---|---|
+| *(none registered yet)* | | | | |
 
 ---
 
@@ -63,11 +70,12 @@ If the repo fixed salt (`022a2e4326219260`) is compromised or needs rotation for
 3. **Generate new salt**: `SHA256({previous_salt}|{rotation_UTC_ms})[:16]`. Record both old and new salt in this file during the transition.
 4. **Recompute all agent UIDs** using the new salt and the original registration timestamps.
 5. **Update the summary table and full records** with new ShortAgentIDs and Full UIDs.
-6. **Retain old UIDs** in an `## Archived UIDs` section for historical audit (commits tagged with old ShortAgentIDs remain traceable).
+6. **Retain old UIDs** in the `Archived UIDs` section for historical audit (commits tagged with old ShortAgentIDs remain traceable).
 7. **Update git config**: each Main agent reconfigures `user.name` / `user.email` with the new ShortAgentID.
 8. **Resume operations**: remove the freeze, announce completion via handoff.
 
 ### Current salt history
+
 | Salt | Active Period | Status |
 |---|---|---|
 | `022a2e4326219260` | 2026-07-29 – present | ACTIVE |
