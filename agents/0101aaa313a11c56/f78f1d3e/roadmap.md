@@ -9,8 +9,9 @@
 - [ ] Full proofreading pass
 
 ### Agents infrastructure
-- [x] Agent identity system deployed (SHA256 UID + roster)
-- [x] Handoff template + naming convention adopted
+- [x] Agent identity system deployed (SHA256 UID → ShortAgentID = last 8 hex)
+- [x] Handoff template + naming convention adopted (v2: 4-field metadata)
+- [x] Roster simplified (removed device FP, salt rotation, multi-device binding)
 - [ ] Sub-agent workflow validated end-to-end
 - [ ] CI validation scripts implemented
 
