@@ -4,7 +4,7 @@ A reusable mascot IP at `assets/dollarhua/` (character pack v1.4 Lite, designed 
 
 ## Before generating any visual
 
-Read `assets/dollarhua/README.md` (EN) and `assets/dollarhua/README-zh_CN.md` (中文).
+Read `assets/dollarhua/README.md` (EN) and `assets/dollarhua/README-zh_CN.md`.
 
 ## Immutable rules
 
