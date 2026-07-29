@@ -36,3 +36,7 @@ out/
 agents/handoffs/draft-*
 agents/handoffs/tmp-*
 agents/handoffs/.wip-*
+
+# ---- Temp handoff extracts (session-local only) ----
+handoff-extracted/
+handoff-*.zip
