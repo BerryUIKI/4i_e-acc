@@ -46,7 +46,8 @@ jobs:
             texlive-fonts-recommended \
             pandoc \
             python3 \
-            unzip
+            unzip \
+            poppler-utils
 
       # ── Install Source Han fonts from Adobe releases ──
       - name: Install Source Han fonts (Serif + Sans SC)
@@ -109,18 +110,19 @@ jobs:
           PDF=$(find . -name "*.pdf" | head -1)
           echo "PDF: $PDF ($(du -h "$PDF" | cut -f1))"
           echo ""
-          echo "=== CJK fonts embedded in PDF ==="
-          strings "$PDF" | grep -i "SourceHan" | sort -u
+          echo "=== All embedded fonts (pdffonts) ==="
+          pdffonts "$PDF" || true
           echo ""
-          echo "=== Non-CJK fonts ==="
-          strings "$PDF" | grep -i "LMRoman\|LMSans\|Latin" | sort -u | head -10
-          echo ""
-          # Fail if no Source Han font found in PDF
-          if ! strings "$PDF" | grep -q "SourceHan"; then
-            echo "ERROR: No Source Han CJK fonts found in PDF!"
+          # Core check: Source Han CJK fonts must be embedded
+          if ! pdffonts "$PDF" 2>/dev/null | grep -iq "SourceHan"; then
+            echo ""
+            echo "ERROR: No Source Han CJK fonts embedded in PDF!"
+            echo "Falling back to binary search..."
+            grep -aob "SourceHan" "$PDF" | head -5 || echo "  (no binary match either)"
             exit 1
           fi
-          echo "SUCCESS: CJK fonts properly embedded"
+          echo ""
+          echo "SUCCESS: Source Han CJK fonts confirmed embedded"
 
       # ── Upload artifact ─────────────────────────────
       - name: Upload PDF artifact
