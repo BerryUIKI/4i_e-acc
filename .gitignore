@@ -30,18 +30,9 @@ Thumbs.db
 dist/
 build/
 out/
-output/
 *.log
 
-# ---- LaTeX auxiliary files ----
-*.aux
-*.toc
-*.lof
-*.lot
-*.bbl
-*.blg
-*.synctex.gz
-*.fls
-*.fdb_latexmk
-*.out
-*.xdv
+# ---- Agent handoff drafts (finalized handoffs are committed via agents/handoffs/) ----
+agents/handoffs/draft-*
+agents/handoffs/tmp-*
+agents/handoffs/.wip-*

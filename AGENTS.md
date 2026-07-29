@@ -1,37 +1,106 @@
-# AGENTS.md
+# AGENTS.md — Repository Root
 
-Guidance for AI agents operating in this repo — a **bilingual investment-document workspace**. Folder names stay English; `README.md` is the English default and `README-zh_CN.md` is the Chinese version. Docs are cross-linked with relative paths.
+Baseline rules for all AI agents operating in this repo. Sub-directory `AGENTS.md` files may add module-specific rules but cannot override any hard rule below.
 
-## Hard rules (must obey)
-- **Never push to `main`.** All changes require a branch + Pull Request. Branch protection blocks direct pushes, force-pushes, and deletion of `main`.
-- **Admin self-merges** PRs (pragmatic mode) — don't wait for an external reviewer when none exists.
-- **Folder names in English**; document titles may be bilingual.
+**Inheritance priority**: current-dir `AGENTS.md` > parent-dir `AGENTS.md` > this file. Hard rules (marked 🚫) are non-overridable at any level.
 
-## How to make a change
-1. Branch per `BRANCHING.md` (prefix by intent: `docs/`, `article/`, `fix/`, `ci/`, `feat/`, `chore/`; never `main`).
-2. Edit, then commit. This repo sets `commit.gpgsign=true` via a 1Password SSH key; if signing is unavailable in the agent environment, commit with `git -c commit.gpgsign=false commit …` (don't let it fail silently).
-3. Push: `git push -u origin <branch>`.
-4. Open a PR to `main` (squash-merge) and give the user the link to merge.
+**Language**: All content under this file and `agents/` directory MUST be written in English only.
 
-## Structure pointers (read the files; don't duplicate)
-- **Doc folders** (`reports/`, `research/`, `portfolio/`, `market/`, `strategies/`, `data/`, `archive/`, `assets/`): each has a bilingual README index — drop investment docs there.
-- **`skills/`** (`skills/README.md`): project-level agent skills for specialized workflows. Not investment documents — reusable task bundles (editorial review, etc.).
-- **`articles/`**: long-form essays. One folder per essay `<yyyy>-<english-slug>/` containing `manuscript.md` (Chinese-primary, English inline), `notes.md`, `references.md`, `assets/`. Rules live in `articles/STYLE.md`; scaffold in `articles/_template/`.
-- **`CONTRIBUTING.md` / `CONTRIBUTING-zh_CN.md`**: human-facing workflow and the rationale for the PR-only policy.
+## 🚫 Hard rules
 
-## Shared IP asset — DollarHua (花有财)
-A **reusable mascot IP** lives at `assets/dollarhua/` (character pack v1.4 Lite, designed by the repo owner). It is the **single source of truth** for the workspace's friendly brand face — use it for headers, callouts, cards, article heroes, status banners, etc.
+- **Never push to `main`.** Branch + PR only. Squash-merge.
+- **Never force-push** on any shared branch. Silently erases other agents' commits.
+- **Never commit secrets.** Tokens/keys stay outside the repo tree.
+- **English folder names only.** Document content may be bilingual.
+- **ASCII-only repo paths.** No spaces, no CJK characters. Use kebab-case.
+- **Data provenance required.** Every chart, table, and data file must cite its source. See `agents/references/data-provenance.md`.
 
-- Read `assets/dollarhua/README.md` (EN) / `README-zh_CN.md` (中文) before generating anything with the character.
-- Identity, the 8-color standard, the file map, and the base prompt (`prompt_seed.txt`) are all defined there.
-- Respect the rules: keep the signature pink (`#FEC6CD`) as the primary identity color, never recolor the bronze coin pendant to bright yellow gold, and treat the reference PNGs as authoritative for rendered appearance.
-- Always pull from `assets/dollarhua/` — do not introduce a divergent copy elsewhere in the repo.
+## Workflow
 
-## Verify before pushing
-- `python .github/scripts/check_links.py` — offline relative-link check.
-- `python .github/scripts/check_style.py` — structure/style check per `STYLE.md`.
-- Both also run in CI on every PR and weekly.
+1. Branch: `article/`, `fix/`, `feat/`, `ci/`, `docs/`, `chore/` prefix — never `main`.
+2. Commit. If GPG signing unavailable: `git -c commit.gpgsign=false commit ...`.
+3. Push + open PR to `main` (squash-merge).
+4. Verify: `python .github/scripts/check_links.py` and `check_style.py` before push.
 
-## Gotchas
-- Repo is **public** — never commit secrets (keys/tokens stay in `~/.ssh`, outside the repo).
-- Top-level doc folders are one level deep: link the root with `../README.md`, **not** `../../`.
+## Agent Identity & Git Traceability
+
+### ID generation (shared algorithm for Main & Sub agents)
+SHA256 of: `[device_fp]|[role]|[bound_main_short_id]|[UTC_register_ms]|[repo_salt]`
+- `device_fp`: SHA256 of `{hostname}-{username}`, truncated to 16 hex chars (desensitized).
+- `role`: `[domain]-[task-type]` format. Domains: `code` / `ci` / `doc` / `deploy` / `audit`.
+- `bound_main_short_id`: `ROOT` for Main agents; bound Main's ShortAgentID for Sub agents.
+- `repo_salt`: See `agents/handoffs/agent-roster.md` for the fixed repo salt value.
+
+**ShortAgentID**: last 10 hex chars of the full SHA256 UID.
+
+### 🚫 Commit traceability
+Every commit message MUST start with the `[ShortAgentID]` tag. Example: `[305cde212a] docs: fix typo in README`
+
+### 🚫 Push restriction (Sub agents)
+Sub agents SHALL NOT push to remote origin. Only bound Main agents execute `git push`. All code changes and handoff archives are aggregated and pushed by the bound Main agent exclusively.
+
+### 🚫 Git local identity binding
+1. **Main agent activation**: upon activation, Main agent MUST configure repo-local git identity using:
+   ```
+   git config user.name "[{ShortAgentID}]"
+   git config user.email "{ShortAgentID}@agents.local"
+   ```
+   This is repo-local (`--local` scope). Never modify global git config.
+2. **Sub agents cannot modify git config.** Sub agents do not configure `user.name` / `user.email`; their commits are not pushed directly.
+3. **🟡 CI double validation on PR merge**: CI extracts both the git committer identity AND the `[ShortAgentID]` tag from each commit message. It then cross-references against `agents/handoffs/agent-roster.md`:
+   - If commit message tag is a Sub agent ShortAgentID → verify the git committer is its bound Main agent.
+   - If commit message tag is a Main agent ShortAgentID → verify the git committer matches that Main agent.
+   - Block merge if the binding relationship is not confirmed.
+4. **Roster record**: each agent entry in `agent-roster.md` MUST include git local identity fields (`git_user_name`, `git_user_email`).
+
+### 🚫 Agent lifecycle validation on merge
+CI pre-merge check extracts `[ShortAgentID]` from commit messages and validates against `agents/handoffs/agent-roster.md`. Merge is blocked if the ShortAgentID does not exist or its lifecycle status is `SUSPENDED`, `RETIRED`, or `DRAFT`.
+
+**Lifecycle states**: `ACTIVE` | `SUSPENDED` | `RETIRED` | `DRAFT`. See `agents/handoffs/agent-roster.md`.
+
+### Registration workflow
+1. Main agent collects device fingerprint, role, and UTC register timestamp.
+2. Compute full SHA256 UID + ShortAgentID.
+3. Insert record into `agents/handoffs/agent-roster.md` with status `DRAFT`.
+4. Main agent validates metadata and updates status to `ACTIVE`.
+
+### Handoff documents
+- All handoff documents live in `agents/handoffs/`.
+- Naming: `handoff-{ShortAgentID}-{UTC_YYYYMMDD-HHMM}.md`.
+- Template: `agents/handoffs/handoff-template.md`.
+- Roster: `agents/handoffs/agent-roster.md`.
+- Draft/temporary handoff files must be added to `.gitignore`; only finalized handoffs are committed.
+
+### Main ↔ Sub communication
+`agents/handoffs/` is the ONLY authorized communication medium between agents. Sub agents have no write access to Main agent private workspaces.
+
+## Project structure
+
+- **`articles/`**: one folder per essay `<yyyy>-<english-slug>/`. Rules in `articles/STYLE.md`.
+- **`assets/dollarhua/`**: shared mascot IP. Read `agents/references/dollarhua-ip.md` before generating visuals.
+- **Doc folders** (`reports/`, `data/`, `research/`, etc.): drop investment docs, cross-link with relative paths.
+
+## Sub-directory AGENTS.md template
+
+When creating a module-level `AGENTS.md`, open with:
+
+```markdown
+# AGENTS.md — <module-name>
+> Inherits from: `../../AGENTS.md` (non-overridable hard rules listed there).
+
+## Module-specific rules
+<!-- Only rules unique to this module. Do not repeat root rules. -->
+```
+
+## Further reference
+
+| Topic | File |
+|-------|------|
+| Agent roster & lifecycle | `agents/handoffs/agent-roster.md` |
+| Handoff template | `agents/handoffs/handoff-template.md` |
+| Long-term roadmap | `agents/handoffs/roadmap.md` |
+| IP character (DollarHua) | `agents/references/dollarhua-ip.md` |
+| Data provenance rules | `agents/references/data-provenance.md` |
+| File naming conventions | `agents/references/file-naming.md` |
+| Multi-agent workflow | `agents/workflows/multi-agent-collaboration.md` |
+| Git safety + API push | `agents/workflows/git-safety.md` |

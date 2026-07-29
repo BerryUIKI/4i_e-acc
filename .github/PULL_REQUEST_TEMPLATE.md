@@ -10,7 +10,7 @@
 
 ## Checklist / 清单
 - [ ] Branch is up to date with `main` / 分支已与 `main` 同步
-- [ ] Follows `articles/STYLE.md` (for articles) / 若为文章，已遵循 `articles/STYLE.md`
+- [ ] Follows the relevant style guide (essays → `articles/STYLE.md`; book → its `agents.md`) / 若为文章或书稿，已遵循对应样式规范
 - [ ] No direct commits to `main` / 没有直接提交到 `main`
 
 ## Notes / 备注

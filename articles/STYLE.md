@@ -1,8 +1,11 @@
 # 文章风格指南 / Article Style Guide
 
 > 中文为主 · English below
+> 
+> **适用范围：** 本指南约束 `articles/` 下所有**短篇 essay**（约 2,000–5,000 字，单文件 `manuscript.md`）。
+> **专著/书稿项目**（如 `2026-quadruple-long-life/`）使用独立的多文件结构与约定——参见该书稿的 `agents.md`。
 
-本指南保证所有长文风格一致。动笔前请先读 `_template/`。
+本指南保证所有短篇长文风格一致。动笔前请先读 `_template/`。
 
 ## 1. 语气与立场 (Voice & stance)
 - 自信、克制、有思辨，不喊口号。
