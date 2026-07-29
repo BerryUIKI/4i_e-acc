@@ -83,6 +83,28 @@ jobs:
           python3 scripts/build_pdf.py tex ../../book-task.md \
             "$(pwd)/output/toolbook.tex"
 
+      - name: Verify CJK content preserved
+        run: |
+          echo "=== Merged MD CJK check ==="
+          CJK_MD=$(python3 -c "
+          with open('output/_merged.md','r') as f: t=f.read()
+          print(len([c for c in t if '\u4e00'<=c<='\u9fff']))")
+          echo "CJK chars in _merged.md: $CJK_MD"
+
+          echo ""
+          echo "=== Generated .tex CJK check ==="
+          CJK_TEX=$(python3 -c "
+          with open('skills/pdf-toolbook/output/toolbook.tex','r') as f: t=f.read()
+          print(len([c for c in t if '\u4e00'<=c<='\u9fff']))")
+          echo "CJK chars in .tex: $CJK_TEX"
+
+          if [ "$CJK_TEX" -lt 10000 ]; then
+            echo "ERROR: .tex has < 10K CJK chars — emoji fix may not be working!"
+            head -50 output/_merged.md
+            exit 1
+          fi
+          echo "SUCCESS: CJK text preserved"
+
       # ── XeLaTeX 3-pass compilation ──────────────────
       - name: Compile PDF (xelatex × 3)
         run: |
