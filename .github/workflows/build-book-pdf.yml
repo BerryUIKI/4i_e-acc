@@ -102,6 +102,26 @@ jobs:
           # Pass 3: final — longtable widths stable, fail on real errors
           xelatex -interaction=nonstopmode -halt-on-error -output-directory="$TEX_DIR" "$MAIN"
 
+      # ── Verify PDF font embedding ──────────────────
+      - name: Verify CJK font embedding
+        run: |
+          cd skills/pdf-toolbook/output
+          PDF=$(find . -name "*.pdf" | head -1)
+          echo "PDF: $PDF ($(du -h "$PDF" | cut -f1))"
+          echo ""
+          echo "=== CJK fonts embedded in PDF ==="
+          strings "$PDF" | grep -i "SourceHan" | sort -u
+          echo ""
+          echo "=== Non-CJK fonts ==="
+          strings "$PDF" | grep -i "LMRoman\|LMSans\|Latin" | sort -u | head -10
+          echo ""
+          # Fail if no Source Han font found in PDF
+          if ! strings "$PDF" | grep -q "SourceHan"; then
+            echo "ERROR: No Source Han CJK fonts found in PDF!"
+            exit 1
+          fi
+          echo "SUCCESS: CJK fonts properly embedded"
+
       # ── Upload artifact ─────────────────────────────
       - name: Upload PDF artifact
         uses: actions/upload-artifact@v4
