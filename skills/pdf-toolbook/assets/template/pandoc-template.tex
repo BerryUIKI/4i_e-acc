@@ -1,9 +1,9 @@
 %===========================================================
 %  pandoc-template.tex — DollarHua PDF Toolbook Template
-%  Version: v1.0 · Updated: 2026-07-28
+%  Version: v1.1 · Updated: 2026-07-29
 %
 %  Used with: pandoc input.md --template=this -o output.tex
-%  Compile with: xelatex (2 passes for TOC + cross-refs)
+%  Compile with: xelatex (3 passes: TOC + cross-refs + longtable)
 %===========================================================
 
 % ── Document class (ctexbook = Chinese-enabled book) ──
@@ -29,8 +29,7 @@
 \usepackage{fontspec}
 \usepackage{xeCJK}
 \setCJKmainfont{PingFang SC}[
-    BoldFont={PingFang SC Semibold},
-    ItalicFont={STSongti-SC-Regular}
+    BoldFont={PingFang SC Semibold}
 ]
 \setCJKsansfont{PingFang SC}
 \setCJKmonofont{STSongti-SC-Regular}
@@ -38,6 +37,13 @@
 % ── Unicode character support ──
 \usepackage{newunicodechar}
 \newunicodechar{≈}{\ensuremath{\approx}}
+\newunicodechar{≥}{\ensuremath{\geq}}
+\newunicodechar{≤}{\ensuremath{\leq}}
+\newunicodechar{×}{\ensuremath{\times}}
+\newunicodechar{—}{\textemdash}
+\newunicodechar{–}{\textendash}
+\newunicodechar{…}{\dots}
+\newunicodechar{°}{\ensuremath{^{\circ}}}
 
 % ── Page style (headers / footers) ──
 \usepackage{fancyhdr}
@@ -46,8 +52,8 @@
 \renewcommand{\headrulewidth}{0.5pt}
 \renewcommand{\headrule}{\hbox to\headwidth{%
   \color{dh-pink}\leaders\hrule height \headrulewidth\hfill}}
-\fancyhead[LE,RO]{\footnotesize\color{dh-pink}\leftmark}
-\fancyhead[RE,LO]{\footnotesize\color{dh-pink}\mytitle}
+\fancyhead[L]{\footnotesize\color{dh-pink}\leftmark}
+\fancyhead[R]{\footnotesize\color{dh-pink}\mytitle}
 \fancyfoot[C]{\thepage}
 \fancypagestyle{plain}{
   \fancyhf{}
@@ -123,6 +129,9 @@
 \providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \usepackage{longtable}
 \usepackage{calc}
+% Stabilize longtable column widths across passes
+\setlength{\LTleft}{0pt}
+\setlength{\LTright}{0pt}
 
 % ── Tables ──
 \usepackage{booktabs}

@@ -74,8 +74,8 @@ jobs:
             -e 's/SF Mono/Noto Sans Mono CJK SC/g' \
             {} +
 
-      # ── XeLaTeX 2-pass compilation ──────────────────
-      - name: Compile PDF (xelatex × 2)
+      # ── XeLaTeX 3-pass compilation ──────────────────
+      - name: Compile PDF (xelatex × 3)
         run: |
           cd skills/pdf-toolbook/output
           # Locate main tex file (split → tex/main.tex, monolithic → toolbook.tex)
@@ -89,7 +89,9 @@ jobs:
           echo "Main tex: $MAIN"
           # Pass 1: generate .aux / .toc (warnings OK, don't halt)
           xelatex -interaction=nonstopmode -output-directory="$TEX_DIR" "$MAIN" || true
-          # Pass 2: resolve TOC + cross-refs (fail on real errors)
+          # Pass 2: resolve TOC + cross-refs (warnings OK, longtable needs another pass)
+          xelatex -interaction=nonstopmode -output-directory="$TEX_DIR" "$MAIN" || true
+          # Pass 3: final — longtable widths stable, fail on real errors
           xelatex -interaction=nonstopmode -halt-on-error -output-directory="$TEX_DIR" "$MAIN"
 
       # ── Upload artifact ─────────────────────────────
