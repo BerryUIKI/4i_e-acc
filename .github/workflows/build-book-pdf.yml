@@ -52,16 +52,16 @@ jobs:
       - name: Install Source Han fonts (Serif + Sans SC)
         run: |
           mkdir -p ~/.fonts
-          # Source Han Serif SC v2.003R — 宋体风格，正文用
-          curl -sSL -o /tmp/SourceHanSerifCN.zip \
-            "https://github.com/adobe-fonts/source-han-serif/releases/download/2.003R/14_SourceHanSerifCN.zip"
-          unzip -qo /tmp/SourceHanSerifCN.zip -d /tmp/serif-fonts/
+          # Source Han Serif SC v2.003R Language Specific OTFs — 宋体风格，正文用
+          curl -sSL -o /tmp/SourceHanSerifSC.zip \
+            "https://github.com/adobe-fonts/source-han-serif/releases/download/2.003R/09_SourceHanSerifSC.zip"
+          unzip -qo /tmp/SourceHanSerifSC.zip -d /tmp/serif-fonts/
           find /tmp/serif-fonts -name "*.otf" -exec cp {} ~/.fonts/ \;
 
-          # Source Han Sans SC v2.005R — 黑体风格，标题用
-          curl -sSL -o /tmp/SourceHanSansCN.zip \
-            "https://github.com/adobe-fonts/source-han-sans/releases/download/2.005R/19_SourceHanSansCN.zip"
-          unzip -qo /tmp/SourceHanSansCN.zip -d /tmp/sans-fonts/
+          # Source Han Sans SC v2.005R Language Specific OTFs — 黑体风格，标题用
+          curl -sSL -o /tmp/SourceHanSansSC.zip \
+            "https://github.com/adobe-fonts/source-han-sans/releases/download/2.005R/09_SourceHanSansSC.zip"
+          unzip -qo /tmp/SourceHanSansSC.zip -d /tmp/sans-fonts/
           find /tmp/sans-fonts -name "*.otf" -exec cp {} ~/.fonts/ \;
 
           fc-cache -fv
