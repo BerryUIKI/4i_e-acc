@@ -7,7 +7,7 @@
 %===========================================================
 
 % ── Document class (ctexbook = Chinese-enabled book) ──
-\documentclass[a4paper,12pt,oneside]{ctexbook}
+\documentclass[a4paper,12pt,oneside,fontset=none]{ctexbook}
 
 % ── Page geometry ──
 \usepackage[top=2.5cm, bottom=2.5cm, left=2.8cm, right=2.3cm,
@@ -31,6 +31,8 @@
 \setCJKmainfont{PingFang SC}[
     BoldFont={PingFang SC Semibold}
 ]
+\setCJKsansfont{PingFang SC}
+\setCJKmonofont{PingFang SC}
 
 % ── Unicode character support ──
 \usepackage{newunicodechar}
