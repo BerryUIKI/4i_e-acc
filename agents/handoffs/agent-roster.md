@@ -29,4 +29,6 @@ ShortAgentID is the last 10 hex chars of the full SHA256 UID. Full algorithm: se
 | Lifecycle Status | ACTIVE |
 | Allowed Workspaces | Full repo: `articles/`, `agents/`, `.github/`, `skills/`, `assets/` |
 | Permissions | Register sub-agents, generate handoff dispatch files, aggregate outputs, execute git push |
+| Git user name | `[305cde212a]` |
+| Git user email | `305cde212a@agents.local` |
 | Human-facing name | 小花蟹 (Little Flower Crab) |

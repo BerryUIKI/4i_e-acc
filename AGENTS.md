@@ -39,6 +39,20 @@ Every commit message MUST start with the `[ShortAgentID]` tag. Example: `[305cde
 ### 🚫 Push restriction (Sub agents)
 Sub agents SHALL NOT push to remote origin. Only bound Main agents execute `git push`. All code changes and handoff archives are aggregated and pushed by the bound Main agent exclusively.
 
+### 🚫 Git local identity binding
+1. **Main agent activation**: upon activation, Main agent MUST configure repo-local git identity using:
+   ```
+   git config user.name "[{ShortAgentID}]"
+   git config user.email "{ShortAgentID}@agents.local"
+   ```
+   This is repo-local (`--local` scope). Never modify global git config.
+2. **Sub agents cannot modify git config.** Sub agents do not configure `user.name` / `user.email`; their commits are not pushed directly.
+3. **🟡 CI double validation on PR merge**: CI extracts both the git committer identity AND the `[ShortAgentID]` tag from each commit message. It then cross-references against `agents/handoffs/agent-roster.md`:
+   - If commit message tag is a Sub agent ShortAgentID → verify the git committer is its bound Main agent.
+   - If commit message tag is a Main agent ShortAgentID → verify the git committer matches that Main agent.
+   - Block merge if the binding relationship is not confirmed.
+4. **Roster record**: each agent entry in `agent-roster.md` MUST include git local identity fields (`git_user_name`, `git_user_email`).
+
 ### 🚫 Agent lifecycle validation on merge
 CI pre-merge check extracts `[ShortAgentID]` from commit messages and validates against `agents/handoffs/agent-roster.md`. Merge is blocked if the ShortAgentID does not exist or its lifecycle status is `SUSPENDED`, `RETIRED`, or `DRAFT`.
 
