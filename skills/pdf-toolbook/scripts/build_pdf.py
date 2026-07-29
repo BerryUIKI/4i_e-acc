@@ -130,7 +130,14 @@ def escape_latex_special_chars(text):
 
 
 def remove_emoji(text):
-    """Strip Unicode emoji (LaTeX cannot render them)."""
+    """
+    Strip Unicode emoji and decorative symbols (LaTeX cannot render them).
+
+    ⚠️ CAREFUL: The regex ranges MUST NOT overlap with CJK blocks
+    (U+2E80-U+2EFF, U+3000-U+303F, U+4E00-U+9FFF, U+F900-U+FAFF,
+    U+FE30-U+FE4F, U+20000-U+2FFFF, etc.).
+    Use discrete, non-overlapping ranges only.
+    """
     emoji_pattern = re.compile(
         "["
         "\U0001F600-\U0001F64F"  # emoticons
@@ -138,7 +145,11 @@ def remove_emoji(text):
         "\U0001F680-\U0001F6FF"  # transport & map
         "\U0001F1E0-\U0001F1FF"  # flags
         "\U00002702-\U000027B0"  # dingbats
-        "\U000024C2-\U0001F251"  # misc
+        "\U0001F900-\U0001F9FF"  # supplemental symbols
+        "\U0001FA00-\U0001FA6F"  # chess symbols
+        "\U0001FA70-\U0001FAFF"  # symbols extended-A
+        "\U0001F000-\U0001F02F"  # mahjong tiles
+        "\U0001F0A0-\U0001F0FF"  # playing cards
         "]+",
         flags=re.UNICODE,
     )
@@ -164,6 +175,23 @@ def convert_task_lists(text):
     """Convert Markdown task lists to plain lists."""
     text = re.sub(r"^- \[x\] ", "- ", text, flags=re.MULTILINE)
     text = re.sub(r"^- \[ \] ", "- ", text, flags=re.MULTILINE)
+    return text
+
+
+def strip_yaml_frontmatter(text):
+    """
+    Strip YAML frontmatter (--- ... ---) from the beginning of a Markdown
+    file.  Pandoc treats text between --- delimiters as metadata; if CJK
+    body text falls inside a YAML block, it is silently discarded.
+
+    Only strips if the very first non-whitespace line is exactly '---'.
+    """
+    stripped = text.lstrip("\n")
+    if stripped.startswith("---"):
+        # Find the closing --- (must be on its own line)
+        closer = stripped.find("\n---", 3)
+        if closer != -1:
+            return stripped[closer + 4:].lstrip("\n")
     return text
 
 
@@ -327,7 +355,8 @@ def merge_markdown(entries, output_file):
     Merge indexed documents into a single Markdown file.
 
     Prepends chapter headers with page breaks.
-    Applies preprocessing: HTML→MD, task lists→plain, emoji removal.
+    Applies preprocessing: YAML frontmatter stripping, HTML→MD,
+    task lists→plain, emoji removal.
     Then resolves relative image paths to absolute.
     """
     merged_lines = []
@@ -341,6 +370,11 @@ def merge_markdown(entries, output_file):
 
         chapter_num += 1
         content = md_path.read_text(encoding="utf-8")
+
+        # Step 0: Strip YAML frontmatter (--- ... ---).
+        # Crucial: Pandoc treats --- blocks as YAML metadata; if CJK
+        # body text falls inside a YAML block, Pandoc silently discards it.
+        content = strip_yaml_frontmatter(content)
 
         # Step 1: LaTeX preprocessing (must happen before image path resolution)
         content = preprocess_markdown(content)
