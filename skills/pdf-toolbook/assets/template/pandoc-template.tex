@@ -1,6 +1,6 @@
 %===========================================================
 %  pandoc-template.tex — DollarHua PDF Toolbook Template
-%  Version: v1.1 · Updated: 2026-07-29
+%  Version: v1.2 · Updated: 2026-07-29
 %
 %  Used with: pandoc input.md --template=this -o output.tex
 %  Compile with: xelatex (3 passes: TOC + cross-refs + longtable)
@@ -25,14 +25,12 @@
 \definecolor{dh-white}{HTML}{FCFDFD}
 \definecolor{dh-red}{HTML}{E85D61}
 
-% ── CJK typography ──
+% ── CJK typography (macOS defaults; CI patches to Noto CJK) ──
 \usepackage{fontspec}
 \usepackage{xeCJK}
 \setCJKmainfont{PingFang SC}[
     BoldFont={PingFang SC Semibold}
 ]
-\setCJKsansfont{PingFang SC}
-\setCJKmonofont{STSongti-SC-Regular}
 
 % ── Unicode character support ──
 \usepackage{newunicodechar}
@@ -51,9 +49,9 @@
 \fancyhf{}
 \renewcommand{\headrulewidth}{0.5pt}
 \renewcommand{\headrule}{\hbox to\headwidth{%
-  \color{dh-pink}\leaders\hrule height \headrulewidth\hfill}}
-\fancyhead[L]{\footnotesize\color{dh-pink}\leftmark}
-\fancyhead[R]{\footnotesize\color{dh-pink}\mytitle}
+  \color{dh-blossom}\leaders\hrule height \headrulewidth\hfill}}
+\fancyhead[L]{\footnotesize\color{dh-navy}\leftmark}
+\fancyhead[R]{\footnotesize\color{dh-navy}\mytitle}
 \fancyfoot[C]{\thepage}
 \fancypagestyle{plain}{
   \fancyhf{}
@@ -70,24 +68,24 @@
 % Chapter: Bond Navy large text + pink decor rules
 \titleformat{\chapter}[display]
   {\centering\Huge\bfseries\color{dh-navy}}
-  {\color{dh-pink}\rule{0.6\textwidth}{2pt}\vspace{0.5cm}\\%
+  {\color{dh-blossom}\rule{0.6\textwidth}{2pt}\vspace{0.5cm}\\%
    \chaptertitlename\ \thechapter}
   {1em}
   {}
-  [\vspace{0.3cm}\color{dh-pink}\rule{0.3\textwidth}{1pt}]
+  [\vspace{0.3cm}\color{dh-blossom}\rule{0.3\textwidth}{1pt}]
 
 % Section
 \titleformat{\section}
   {\Large\bfseries\color{dh-navy}}
-  {\color{dh-pink}\thesection}
+  {\color{dh-blossom}\thesection}
   {1em}
   {}
-  [\vspace{-0.3cm}{\color{dh-pink}\titlerule[1pt]}]
+  [\vspace{-0.3cm}{\color{dh-blossom}\titlerule[1pt]}]
 
 % Subsection
 \titleformat{\subsection}
   {\large\bfseries\color{dh-navy}}
-  {\color{dh-pink}\thesubsection}
+  {\color{dh-blossom}\thesubsection}
   {1em}
   {}
 
@@ -95,7 +93,7 @@
 \usepackage{hyperref}
 \hypersetup{
   colorlinks=true,
-  linkcolor=dh-pink,
+  linkcolor=dh-navy,
   urlcolor=dh-gold,
   pdfborder={0 0 0}
 }
@@ -108,13 +106,12 @@
 
 % ── Code highlighting ──
 \usepackage{listings}
-% \usepackage{xcolor} (loaded above)
 \lstset{
   basicstyle=\ttfamily\footnotesize\color{dh-navy},
   backgroundcolor=\color{dh-white},
   frame=single,
   framerule=0.5pt,
-  rulecolor=\color{dh-pink},
+  rulecolor=\color{dh-blossom},
   breaklines=true,
   numbers=left,
   numberstyle=\tiny\color{dh-blossom},
@@ -129,7 +126,6 @@
 \providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \usepackage{longtable}
 \usepackage{calc}
-% Stabilize longtable column widths across passes
 \setlength{\LTleft}{0pt}
 \setlength{\LTright}{0pt}
 
@@ -137,7 +133,7 @@
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{colortbl}
-\arrayrulecolor{dh-pink}
+\arrayrulecolor{dh-blossom}
 
 % ── Block quotes ──
 \usepackage{etoolbox}
@@ -155,13 +151,13 @@
   \begin{titlepage}
     \centering
     \vspace*{3cm}
-    {\color{dh-pink}\rule{0.5\textwidth}{2pt}\par}
+    {\color{dh-blossom}\rule{0.5\textwidth}{2pt}\par}
     \vspace{1cm}
     {\Huge\bfseries\color{dh-navy}\mytitle\par}
     \vspace{0.5cm}
     {\Large\color{dh-bronze}$author$\par}
     \vspace{1cm}
-    {\color{dh-pink}\rule{0.3\textwidth}{1pt}\par}
+    {\color{dh-blossom}\rule{0.3\textwidth}{1pt}\par}
     \vfill
     {\large\color{dh-blossom}$date$\par}
   \end{titlepage}

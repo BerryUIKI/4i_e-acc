@@ -66,12 +66,11 @@ jobs:
       - name: Patch fonts for Ubuntu CI
         run: |
           cd skills/pdf-toolbook/output
-          # Find all .tex files (split: output/tex/*.tex, monolithic: output/*.tex)
+          # Replace macOS fonts with Ubuntu Noto CJK equivalents
+          # PingFang SC → Noto Serif CJK SC (serif for book body)
           find . -name "*.tex" -type f -exec sed -i \
-            -e 's/PingFang SC Semibold/Noto Sans CJK SC Bold/g' \
-            -e 's/PingFang SC/Noto Sans CJK SC/g' \
-            -e 's/STSongti-SC-Regular/Noto Serif CJK SC/g' \
-            -e 's/SF Mono/Noto Sans Mono CJK SC/g' \
+            -e 's/PingFang SC Semibold/Noto Serif CJK SC Bold/g' \
+            -e 's/PingFang SC/Noto Serif CJK SC/g' \
             {} +
 
       # ── XeLaTeX 3-pass compilation ──────────────────
