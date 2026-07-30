@@ -8,18 +8,11 @@ Copy this template for every handoff document. Generated files use naming conven
 ```markdown
 # Handoff — {ShortAgentID}
 
-## Metadata Header
-- **Issuer Main Agent ShortID:**
-- **Executor Sub Agent ShortID:**
-- **Global Full SHA256 Agent UID:**
-- **Agent Full Role Name:**
-- **Desensitized Device Fingerprint:**
-- **UTC Register Timestamp (ms):**
-- **UTC Document Created Time:**
-- **Lifecycle Type:** Task Dispatch / Task Result Delivery
-- **Related Workspace Path:**
-- **Reference Docs Path (agents/*):**
-- **Agent Lifecycle Status At Creation:**
+## Metadata
+- **Agent**: {ShortAgentID}
+- **Task**: {one-line summary}
+- **Branch**: {branch-name}
+- **Status**: DISPATCHED / IN_PROGRESS / DONE
 
 ---
 
@@ -53,7 +46,7 @@ Copy this template for every handoff document. Generated files use naming conven
 - ...
 
 ## 7. Reference Documents
-<!-- Links to agents/references/ or agents/workflows/ files. -->
+<!-- Links to agents/shared/references/ or agents/shared/workflows/ files. -->
 
 ## 8. Risk & Validation Checklist
 - [ ] All expected outputs produced
@@ -70,4 +63,4 @@ Copy this template for every handoff document. Generated files use naming conven
 handoff-{ShortAgentID}-{UTC_YYYYMMDD-HHMM}.md
 ```
 
-Example: `handoff-305cde212a-20260729-1130.md`
+Example: `handoff-f78f1d3e-20260729-2300.md`
