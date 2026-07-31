@@ -26,39 +26,39 @@
 ---
 
 
-## Appendix B · Monthly Household Cash Flow Statement
+## 附录 B · 月度家庭现金流表
 
-| Category | Amount (¥) |
+| 类别 | 金额（¥） |
 |----------|-----------|
-| **Income** | |
-| Salary (after tax) | |
-| Business/self-employment income | |
-| Rental income | |
-| Interest and dividends | |
-| Other income | |
-| **Total Income** | |
+| **收入** | |
+| 工资（税后） | |
+| 经营/自雇收入 | |
+| 租金收入 | |
+| 利息与分红 | |
+| 其他收入 | |
+| **总收入** | |
 | | |
-| **Fixed Expenses** | |
-| Housing (mortgage/rent) | |
-| Utilities | |
-| Insurance premiums | |
-| Loan repayments (excl. mortgage) | |
-| Education/tuition | |
-| Other fixed expenses | |
+| **固定支出** | |
+| 住房（房贷/房租） | |
+| 水电物业 | |
+| 保险费 | |
+| 贷款还款（不含房贷） | |
+| 教育/学费 | |
+| 其他固定支出 | |
 | | |
-| **Variable Expenses** | |
-| Food and dining | |
-| Transportation | |
-| Shopping | |
-| Entertainment | |
-| Healthcare | |
-| Other variable | |
-| **Total Expenses** | |
+| **可变支出** | |
+| 餐饮 | |
+| 交通 | |
+| 购物 | |
+| 娱乐 | |
+| 医疗 | |
+| 其他可变支出 | |
+| **总支出** | |
 | | |
-| **Monthly Surplus (Income - Expenses)** | |
-| **Savings Rate (Surplus / Income)** | _______% |
+| **月度结余（收入 - 支出）** | |
+| **储蓄率（结余 / 收入）** | _______% |
 
-Date: _________
+日期：_________
 
 ---
 

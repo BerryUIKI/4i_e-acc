@@ -224,9 +224,9 @@ def extract_title_from_md(filepath):
                 m = re.match(r"^#\s+(.+)", line)
                 if m:
                     return m.group(1).strip()
-        return filepath.stem
+        return Path(filepath).stem
     except Exception:
-        return filepath.stem
+        return Path(filepath).stem
 
 
 def scan_directory(directory, output_file=None):
@@ -321,7 +321,10 @@ def resolve_image_paths(md_content, md_dir):
     def replacer(match):
         prefix = match.group(1)  # ![alt](  or  <img src="
         img_path = match.group(2)
-        suffix = match.group(3)  # )  or  "
+        try:
+            suffix = match.group(3)  # )  or  "
+        except IndexError:
+            suffix = ""
 
         # Skip URLs and absolute paths
         if img_path.startswith(("http://", "https://", "/", "file://")):
@@ -330,7 +333,7 @@ def resolve_image_paths(md_content, md_dir):
         # Resolve relative path
         abs_img = (md_dir / img_path).resolve()
         if abs_img.exists():
-            return f'{prefix}{abs_img}{suffix}'
+            return f'{prefix}{str(abs_img).replace(chr(92), "/")}{suffix}'
         else:
             rprint(f"Image not found: {img_path} (from {md_dir})", "warn")
             return match.group(0)
@@ -379,9 +382,9 @@ def merge_markdown(entries, output_file):
         # Step 1: LaTeX preprocessing (must happen before image path resolution)
         content = preprocess_markdown(content)
 
-        # Step 2: Resolve image paths
-        md_dir = md_path.parent
-        content = resolve_image_paths(content, md_dir)
+        # Step 2: Image path resolution is skipped — Pandoc uses
+        # \graphicspath and relative paths at compile time.
+        # resolve_image_paths() would bake absolute paths into .tex output.
 
         # Add chapter separator (ctexbook auto-numbers chapters, so use title only)
         merged_lines.append("\n\n\\newpage\n\n")
@@ -400,7 +403,7 @@ def merge_markdown(entries, output_file):
 
 
 def generate_tex(template_file, merged_md_path, output_tex_path,
-                 title="4i_e-acc Toolbook", author="4i_e-acc Workspace",
+                 title="四倍做多认知，长期做多人生", author="花花 | @BerryUIKI",
                  date=None, toc=True):
     """Generate .tex source from merged Markdown via Pandoc (no compilation)."""
     if date is None:
@@ -574,17 +577,23 @@ def run_xelatex(tex_path, work_dir, passes=2):
 
     for p in range(1, passes + 1):
         rprint(f"XeLaTeX pass {p}/{passes}...", "step")
+        xelatex_args = ["xelatex", "-interaction=nonstopmode", "-halt-on-error"]
+        if str(work_dir) != str(tex_dir):
+            xelatex_args.extend(["-output-directory", str(work_dir)])
+        xelatex_args.append(tex_file)
         result = subprocess.run(
-            ["xelatex", "-interaction=nonstopmode", "-output-directory",
-             str(work_dir), tex_file],
+            xelatex_args,
             cwd=str(tex_dir),
             capture_output=True,
             text=True,
         )
 
-        # Check for fatal errors
-        if "Fatal error" in result.stdout or "Fatal error" in result.stderr:
-            rprint(f"XeLaTeX pass {p} failed with fatal error", "err")
+        # Check for fatal errors via returncode and PDF existence
+        if result.returncode != 0:
+            pdf_name = Path(tex_file).with_suffix(".pdf").name
+            generated_in_pass = work_dir / pdf_name
+            if not generated_in_pass.exists():
+                rprint(f"XeLaTeX pass {p} failed (returncode={result.returncode}) and no PDF produced", "err")
             # Try to read the .log file for detailed error info
             log_file = work_dir / Path(tex_file).with_suffix(".log").name
             if log_file.exists():
@@ -672,8 +681,13 @@ def compile_pdf(template_file, merged_md_path, output_pdf_path,
     # Step 2: Decide on splitting
     work_dir = output_dir
     if should_split(merged_md_path, chapter_count):
-        work_dir = output_dir / "tex"
-        tex_path = split_tex_into_chapters(tex_path, chapter_count, work_dir)
+        try:
+            split_result = split_tex_into_chapters(tex_path, chapter_count, output_dir / "tex")
+            if split_result:
+                work_dir = output_dir / "tex"
+                tex_path = split_result
+        except Exception as e:
+            rprint(f"Split failed (continuing with single file): {e}", "warn")
 
     # Step 3: Compile with XeLaTeX (2-pass minimum)
     rprint(f"Compiling PDF (2-pass XeLaTeX)...", "step")
@@ -755,8 +769,8 @@ def main():
 
         index_file = sys.argv[2]
         output_pdf = sys.argv[3] if len(sys.argv) > 3 else str(WORKSPACE_ROOT / "output" / "toolbook.pdf")
-        title = sys.argv[4] if len(sys.argv) > 4 else "4i_e-acc Toolbook"
-        author = sys.argv[5] if len(sys.argv) > 5 else "4i_e-acc Workspace"
+        title = sys.argv[4] if len(sys.argv) > 4 else "四倍做多认知，长期做多人生"
+        author = sys.argv[5] if len(sys.argv) > 5 else "花花 | @BerryUIKI"
         date = sys.argv[6] if len(sys.argv) > 6 else None
 
         # Parse index
@@ -771,6 +785,14 @@ def main():
         merged_path = WORKSPACE_ROOT / "output" / "_merged.md"
         merged_path.parent.mkdir(parents=True, exist_ok=True)
         merged_path, chapter_count = merge_markdown(entries, merged_path)
+
+        # Copy Chart images from book assets to output directory
+        book_chart_src = WORKSPACE_ROOT / "articles" / "2026-quadruple-long-life" / "assets"
+        if book_chart_src.exists():
+            chart_dest = merged_path.parent
+            for img in book_chart_src.glob("*.png"):
+                shutil.copy2(img, chart_dest / img.name)
+            rprint(f"Chart images copied from {book_chart_src}", "ok")
 
         # Find template
         template = TEMPLATE_DIR / "pandoc-template.tex"
@@ -804,8 +826,8 @@ def main():
 
         index_file = sys.argv[2]
         output_tex = sys.argv[3] if len(sys.argv) > 3 else str(WORKSPACE_ROOT / "output" / "toolbook.tex")
-        title = sys.argv[4] if len(sys.argv) > 4 else "4i_e-acc Toolbook"
-        author = sys.argv[5] if len(sys.argv) > 5 else "4i_e-acc Workspace"
+        title = sys.argv[4] if len(sys.argv) > 4 else "四倍做多认知，长期做多人生"
+        author = sys.argv[5] if len(sys.argv) > 5 else "花花 | @BerryUIKI"
         date = sys.argv[6] if len(sys.argv) > 6 else None
 
         idx_content = Path(index_file).read_text(encoding="utf-8")
@@ -815,6 +837,14 @@ def main():
         merged_path.parent.mkdir(parents=True, exist_ok=True)
         merged_path, chapter_count = merge_markdown(entries, merged_path)
 
+        # Copy Chart images from book assets to output directory
+        book_chart_src = WORKSPACE_ROOT / "articles" / "2026-quadruple-long-life" / "assets"
+        if book_chart_src.exists():
+            chart_dest = merged_path.parent
+            for img in book_chart_src.glob("*.png"):
+                shutil.copy2(img, chart_dest / img.name)
+            rprint(f"Chart images copied from {book_chart_src}", "ok")
+
         template = TEMPLATE_DIR / "pandoc-template.tex"
         output_path = Path(output_tex)
         output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -823,7 +853,12 @@ def main():
         # Split if needed
         if should_split(merged_path, chapter_count):
             work_dir = output_path.parent / "tex"
-            tex_path = split_tex_into_chapters(tex_path, chapter_count, work_dir)
+            try:
+                split_result = split_tex_into_chapters(tex_path, chapter_count, work_dir)
+                if split_result:
+                    tex_path = split_result
+            except Exception as e:
+                rprint(f"Split failed (continuing with single file): {e}", "warn")
 
         print(f"\nTEX_PATH:{tex_path}")
 

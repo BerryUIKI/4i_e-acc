@@ -30,6 +30,7 @@ Thumbs.db
 dist/
 build/
 out/
+output/
 *.log
 
 # ---- Agent handoff drafts (finalized handoffs are committed via agents/handoffs/) ----

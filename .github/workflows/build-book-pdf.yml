@@ -13,6 +13,7 @@ on:
   push:
     branches:
       - article/2026-quadruple-long-life
+      - article/2026-quadruple-long-life-polish
     paths:
       - 'articles/2026-quadruple-long-life/**/*.md'
       - 'skills/pdf-toolbook/**'
@@ -24,7 +25,7 @@ on:
   workflow_dispatch:  # manual trigger
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -153,3 +154,14 @@ jobs:
           name: quadruple-long-life
           path: skills/pdf-toolbook/output/**/*.pdf
           retention-days: 90
+
+      # ── Auto-commit PDF to repository ───────────────
+      - name: Commit PDF to repo
+        if: success()
+        run: |
+          cp skills/pdf-toolbook/output/toolbook.pdf articles/2026-quadruple-long-life/output/book.pdf
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add articles/2026-quadruple-long-life/output/book.pdf
+          git diff --staged --quiet || git commit -m "[CI] Auto-build PDF $(date +'%Y-%m-%d')"
+          git push
