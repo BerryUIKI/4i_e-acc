@@ -12,25 +12,34 @@
 % This ensures CJK text ALWAYS renders: if Source Han fails, Fandol takes over.
 \documentclass[a4paper,12pt,oneside]{ctexbook}
 
-% ── CJK typography: override Fandol with Source Han ──
+% ── CJK typography: cross-platform auto-detect ──
 % ctexbook has already loaded xeCJK and configured zhsong/zhhei/zhfs/zhkai
-% to Fandol.  We override each with Source Han.  body = zhsong (宋体),
-% headings = zhhei (黑体) via \sffamily in \titleformat.
-\setCJKfamilyfont{zhsong}{Source Han Serif SC}[
-    BoldFont={Source Han Serif SC Bold}
-]
-\setCJKfamilyfont{zhhei}{Source Han Sans SC}[
-    BoldFont={Source Han Sans SC Bold}
-]
-\setCJKfamilyfont{zhfs}{Source Han Serif SC}
-\setCJKfamilyfont{zhkai}{Source Han Serif SC}
-\setCJKmainfont{Source Han Serif SC}[
-    BoldFont={Source Han Serif SC Bold}
-]
-\setCJKsansfont{Source Han Sans SC}[
-    BoldFont={Source Han Sans SC Bold}
-]
-\setCJKmonofont{Source Han Sans SC}
+% to Fandol.  We try the best available font:
+%   PingFang SC (macOS) → Noto Serif CJK SC (Linux, some distros) →
+%   Source Han Serif SC (Linux CI, Adobe Language Specific OTFs) →
+%   Source Han Serif CN (Windows, older CN-subset OTFs) →
+%   Fandol (ctex built-in fallback, always available).
+\IfFontExistsTF{PingFang SC}{%
+  \setCJKmainfont{PingFang SC}[BoldFont={PingFang SC Semibold}]
+  \setCJKsansfont{PingFang SC}[BoldFont={PingFang SC Semibold}]
+  \setCJKmonofont{PingFang SC}
+}{%
+  \IfFontExistsTF{Noto Serif CJK SC}{%
+    \setCJKmainfont{Noto Serif CJK SC}[BoldFont={Noto Serif CJK SC Bold}]
+    \setCJKsansfont{Noto Sans CJK SC}[BoldFont={Noto Sans CJK SC Bold}]
+    \setCJKmonofont{Noto Sans CJK SC}
+  }{%
+    \IfFontExistsTF{Source Han Serif SC}{%
+      \setCJKmainfont{Source Han Serif SC}[BoldFont={Source Han Serif SC Bold}]
+      \setCJKsansfont{Source Han Sans SC}[BoldFont={Source Han Sans SC Bold}]
+      \setCJKmonofont{Source Han Sans SC}
+    }{%
+      \setCJKmainfont{Source Han Serif CN}[BoldFont={Source Han Serif CN Bold}]
+      \setCJKsansfont{Source Han Sans CN}[BoldFont={Source Han Sans CN Bold}]
+      \setCJKmonofont{Source Han Sans CN}
+    }%
+  }%
+}
 
 % ── Page geometry ──
 \usepackage[top=2.5cm, bottom=2.5cm, left=2.8cm, right=2.3cm,

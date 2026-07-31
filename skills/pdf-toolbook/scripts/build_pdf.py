@@ -17,6 +17,9 @@ import sys
 import shutil
 import re
 import subprocess
+import platform
+import urllib.request
+import zipfile
 from pathlib import Path
 from datetime import datetime
 
@@ -25,6 +28,17 @@ from datetime import datetime
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent.parent
 SKILL_DIR = Path(__file__).resolve().parent.parent
 TEMPLATE_DIR = SKILL_DIR / "assets" / "template"
+FONTS_DIR = SKILL_DIR / "assets" / "fonts"
+
+# Source Han font download URLs (Adobe releases, same as CI workflow)
+SOURCE_HAN_SERIF_SC_URL = (
+    "https://github.com/adobe-fonts/source-han-serif/releases/download/"
+    "2.003R/09_SourceHanSerifSC.zip"
+)
+SOURCE_HAN_SANS_SC_URL = (
+    "https://github.com/adobe-fonts/source-han-sans/releases/download/"
+    "2.005R/09_SourceHanSansSC.zip"
+)
 
 # Thresholds for file splitting
 SPLIT_SIZE_KB = 100        # Split if merged MD > 100KB
@@ -36,6 +50,153 @@ SPLIT_CHAPTER_MIN = 6       # Split if > 5 chapters (always split at 6+)
 def cmd(name):
     """Check if a CLI command is available."""
     return shutil.which(name) is not None
+
+
+# ── Font Management ──────────────────────────────────
+
+
+def _run(cmd_args, **kwargs):
+    """Run a command and return (returncode, stdout, stderr)."""
+    result = subprocess.run(cmd_args, capture_output=True, text=True, **kwargs)
+    return result.returncode, result.stdout, result.stderr
+
+
+def check_source_han_fonts():
+    """
+    Check whether any Source Han CJK font (SC or CN) is available system-wide.
+    Returns True if at least one Source Han Serif/Sans font is found.
+    """
+    if platform.system() == "Windows":
+        fonts_dir = Path(os.environ.get("WINDIR", "C:\\Windows")) / "Fonts"
+        if fonts_dir.exists():
+            for f in fonts_dir.iterdir():
+                name = f.name.lower()
+                if "sourcehanserif" in name or "sourcehansans" in name:
+                    rprint(f"Found Source Han font: {f.name}", "ok")
+                    return True
+        return False
+    else:
+        try:
+            rc, stdout, _ = _run(["fc-list", ":family"])
+            if rc == 0 and ("Source Han Serif" in stdout or "Source Han Sans" in stdout):
+                lines = [l for l in stdout.split("\n") if "Source Han" in l]
+                rprint(f"Found {len(lines)} Source Han font(s)", "ok")
+                return True
+        except FileNotFoundError:
+            pass
+        return False
+
+
+def _download_file(url, dest_path):
+    """Download a file with progress indication."""
+    rprint(f"Downloading {url.split('/')[-1]}...", "step")
+    try:
+        urllib.request.urlretrieve(url, str(dest_path))
+        rprint(f"  Saved: {dest_path}", "ok")
+        return True
+    except Exception as e:
+        rprint(f"Download failed: {e}", "err")
+        return False
+
+
+def install_source_han_fonts():
+    """
+    Download and install Source Han Serif/Sans SC fonts from GitHub releases.
+    On Linux: copies OTF files to ~/.fonts/ and runs fc-cache.
+    On macOS: copies to ~/Library/Fonts/.
+    On Windows: copies to C:\\Windows\\Fonts\\ (may require admin);
+                falls back to local assets/fonts/ dir.
+    """
+    system = platform.system()
+    FONTS_DIR.mkdir(parents=True, exist_ok=True)
+
+    if system == "Linux":
+        target_dir = Path.home() / ".fonts"
+        target_dir.mkdir(parents=True, exist_ok=True)
+        font_cmd = ["fc-cache", "-fv"]
+    elif system == "Darwin":
+        target_dir = Path.home() / "Library" / "Fonts"
+        target_dir.mkdir(parents=True, exist_ok=True)
+        font_cmd = None
+    else:
+        target_dir = Path(os.environ.get("WINDIR", "C:\\Windows")) / "Fonts"
+        try:
+            test = target_dir / ".write_test"
+            test.touch()
+            test.unlink()
+            font_cmd = None
+        except (PermissionError, OSError):
+            rprint("Cannot write to system Fonts directory (admin required)", "warn")
+            rprint(f"Installing to local: {FONTS_DIR}", "info")
+            target_dir = FONTS_DIR
+            font_cmd = None
+
+    font_urls = [
+        ("SourceHanSerifSC.zip", SOURCE_HAN_SERIF_SC_URL),
+        ("SourceHanSansSC.zip", SOURCE_HAN_SANS_SC_URL),
+    ]
+
+    for zip_name, url in font_urls:
+        zip_path = FONTS_DIR / zip_name
+        if zip_path.exists():
+            rprint(f"Using cached: {zip_name}", "info")
+        else:
+            if not _download_file(url, zip_path):
+                return False
+
+        rprint(f"Extracting {zip_name}...", "step")
+        try:
+            with zipfile.ZipFile(str(zip_path), "r") as zf:
+                for member in zf.namelist():
+                    if member.lower().endswith(".otf"):
+                        basename = os.path.basename(member)
+                        dest = target_dir / basename
+                        if not dest.exists():
+                            with zf.open(member) as src, open(str(dest), "wb") as dst:
+                                dst.write(src.read())
+            rprint(f"  OTF files installed to {target_dir}", "ok")
+        except Exception as e:
+            rprint(f"Extraction failed: {e}", "err")
+            return False
+
+    if font_cmd:
+        rprint("Refreshing font cache...", "step")
+        rc, stdout, stderr = _run(font_cmd)
+        if rc == 0:
+            rprint("Font cache refreshed", "ok")
+        else:
+            rprint(f"fc-cache warning: {stderr.strip()}", "warn")
+
+    if system == "Windows" and target_dir == FONTS_DIR:
+        rprint(
+            f"Fonts installed to {FONTS_DIR}. "
+            f"To use system-wide, copy OTF files to "
+            f"{os.environ.get('WINDIR', 'C:\\\\Windows')}\\Fonts\\ "
+            f"(requires admin).",
+            "warn"
+        )
+    return True
+
+
+def ensure_fonts():
+    """
+    Ensure Source Han fonts are available. Downloads them if missing.
+    """
+    if check_source_han_fonts():
+        return True
+    rprint("Source Han fonts not found. Downloading from GitHub...", "warn")
+    rprint("  (One-time setup, cached after first download)", "info")
+    if install_source_han_fonts():
+        if check_source_han_fonts():
+            return True
+        rprint(
+            "Fonts installed but may not be immediately available to XeLaTeX. "
+            "Try running 'fc-cache -fv' or restarting your terminal.",
+            "warn"
+        )
+        return True
+    rprint("Failed to install Source Han fonts. PDF compilation may fall back to Fandol.", "err")
+    return False
 
 
 def rprint(msg, level="info"):
@@ -794,6 +955,9 @@ def main():
                 shutil.copy2(img, chart_dest / img.name)
             rprint(f"Chart images copied from {book_chart_src}", "ok")
 
+        # Ensure Source Han fonts (download if missing)
+        ensure_fonts()
+
         # Find template
         template = TEMPLATE_DIR / "pandoc-template.tex"
         if not template.exists():
@@ -844,6 +1008,9 @@ def main():
             for img in book_chart_src.glob("*.png"):
                 shutil.copy2(img, chart_dest / img.name)
             rprint(f"Chart images copied from {book_chart_src}", "ok")
+
+        # Ensure Source Han fonts (download if missing)
+        ensure_fonts()
 
         template = TEMPLATE_DIR / "pandoc-template.tex"
         output_path = Path(output_tex)
