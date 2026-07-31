@@ -844,7 +844,7 @@ def compile_pdf(template_file, merged_md_path, output_pdf_path,
     if should_split(merged_md_path, chapter_count):
         try:
             split_result = split_tex_into_chapters(tex_path, chapter_count, output_dir / "tex")
-            if split_result:
+            if split_result and str(split_result) != str(tex_path):
                 work_dir = output_dir / "tex"
                 tex_path = split_result
         except Exception as e:
@@ -1022,7 +1022,7 @@ def main():
             work_dir = output_path.parent / "tex"
             try:
                 split_result = split_tex_into_chapters(tex_path, chapter_count, work_dir)
-                if split_result:
+                if split_result and str(split_result) != str(tex_path):
                     tex_path = split_result
             except Exception as e:
                 rprint(f"Split failed (continuing with single file): {e}", "warn")
