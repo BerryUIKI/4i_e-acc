@@ -948,7 +948,7 @@ def main():
         merged_path, chapter_count = merge_markdown(entries, merged_path)
 
         # Copy Chart images from book assets to output directory
-        book_chart_src = WORKSPACE_ROOT / "articles" / "2026-quadruple-long-life" / "assets"
+        book_chart_src = WORKSPACE_ROOT / "articles" / "2026-quadruple-long-life" / "analysis" / "output"
         if book_chart_src.exists():
             chart_dest = merged_path.parent
             for img in book_chart_src.glob("*.png"):
@@ -1002,7 +1002,7 @@ def main():
         merged_path, chapter_count = merge_markdown(entries, merged_path)
 
         # Copy Chart images from book assets to output directory
-        book_chart_src = WORKSPACE_ROOT / "articles" / "2026-quadruple-long-life" / "assets"
+        book_chart_src = WORKSPACE_ROOT / "articles" / "2026-quadruple-long-life" / "analysis" / "output"
         if book_chart_src.exists():
             chart_dest = merged_path.parent
             for img in book_chart_src.glob("*.png"):
