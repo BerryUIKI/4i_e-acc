@@ -5,10 +5,10 @@ name: Build Book PDF
 # after any PR merge into main). Uses Pandoc + XeLaTeX with DollarHua styling.
 #
 # Architecture:
-#   1. Merge book chapters via build_pdf.py tex (generate .tex only)
-#   2. Install Source Han Serif/Sans SC OTF fonts from Adobe releases
-#   3. XeLaTeX 3-pass compilation
-#   4. Upload PDF artifact (90-day retention)
+#   1. Install Source Han Serif/Sans SC OTF fonts from Adobe releases
+#   2. Merge book chapters + generate .tex via build_pdf.py tex
+#   3. XeLaTeX 3-pass compilation (all work happens in repo-root output/)
+#   4. Verify CJK font embedding, upload PDF artifact (90-day retention)
 #   5. Non-main branches: auto-commit the PDF back to the repo.
 #      main is skipped — branch protection (enforce_admins) blocks bot pushes.
 
@@ -81,12 +81,14 @@ jobs:
           echo "Source Han fonts:"
           fc-list | grep -i "source han" | head -10
 
-      # ── Generate .tex (no compilation yet) ───────────
+      # ── Generate .tex into repo-root output/ ─────────
+      # IMPORTANT: run from repo root so build_pdf.py merges MD, copies chart
+      # PNGs (from analysis/output), and writes _merged.md + toolbook.tex all
+      # into the SAME output/ dir. XeLaTeX later runs there and finds images.
       - name: Generate LaTeX source
         run: |
-          cd skills/pdf-toolbook
-          python3 scripts/build_pdf.py tex ../../book-task.md \
-            "$(pwd)/output/toolbook.tex"
+          python3 skills/pdf-toolbook/scripts/build_pdf.py tex book-task.md \
+            output/toolbook.tex
 
       - name: Verify CJK content preserved
         run: |
@@ -99,7 +101,7 @@ jobs:
           echo ""
           echo "=== Generated .tex CJK check ==="
           CJK_TEX=$(python3 -c "
-          with open('skills/pdf-toolbook/output/toolbook.tex','r') as f: t=f.read()
+          with open('output/toolbook.tex','r') as f: t=f.read()
           print(len([c for c in t if '\u4e00'<=c<='\u9fff']))")
           echo "CJK chars in .tex: $CJK_TEX"
 
@@ -113,7 +115,7 @@ jobs:
       # ── XeLaTeX 3-pass compilation ──────────────────
       - name: Compile PDF (xelatex × 3)
         run: |
-          cd skills/pdf-toolbook/output
+          cd output
           # Locate main tex file (split → tex/main.tex, monolithic → toolbook.tex)
           if [ -f "tex/main.tex" ]; then
             MAIN="tex/main.tex"
@@ -133,7 +135,7 @@ jobs:
       # ── Verify PDF font embedding ──────────────────
       - name: Verify CJK font embedding
         run: |
-          cd skills/pdf-toolbook/output
+          cd output
           PDF=$(find . -name "*.pdf" | head -1)
           echo "PDF: $PDF ($(du -h "$PDF" | cut -f1))"
           echo ""
@@ -156,14 +158,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: quadruple-long-life
-          path: skills/pdf-toolbook/output/**/*.pdf
+          path: output/**/*.pdf
           retention-days: 90
 
       # ── Auto-commit PDF to repository (non-main only) ──
       - name: Commit PDF to repo
         if: success() && github.ref != 'refs/heads/main'
         run: |
-          cp skills/pdf-toolbook/output/toolbook.pdf articles/2026-quadruple-long-life/output/book.pdf
+          cp output/toolbook.pdf articles/2026-quadruple-long-life/output/book.pdf
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add articles/2026-quadruple-long-life/output/book.pdf
