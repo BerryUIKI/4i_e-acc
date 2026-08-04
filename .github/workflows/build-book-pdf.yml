@@ -165,6 +165,7 @@ jobs:
       - name: Commit PDF to repo
         if: success() && github.ref != 'refs/heads/main'
         run: |
+          mkdir -p articles/2026-quadruple-long-life/output
           cp output/toolbook.pdf articles/2026-quadruple-long-life/output/book.pdf
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
