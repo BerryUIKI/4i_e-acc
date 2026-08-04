@@ -169,6 +169,7 @@ jobs:
           cp output/toolbook.pdf articles/2026-quadruple-long-life/output/book.pdf
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add articles/2026-quadruple-long-life/output/book.pdf
+          # -f: repo-root .gitignore has output/ pattern; force-add generated PDF
+          git add -f articles/2026-quadruple-long-life/output/book.pdf
           git diff --staged --quiet || git commit -m "[CI] Auto-build PDF $(date +'%Y-%m-%d')"
           git push
