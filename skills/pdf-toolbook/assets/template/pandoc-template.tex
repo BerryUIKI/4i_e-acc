@@ -7,7 +7,39 @@
 %===========================================================
 
 % ── Document class (ctexbook = Chinese-enabled book) ──
-\documentclass[a4paper,12pt,oneside,fontset=none]{ctexbook}
+% NO fontset=none — let ctex use Fandol as guaranteed fallback (installed
+% with texlive-lang-chinese on CI). Then override families with Source Han.
+% This ensures CJK text ALWAYS renders: if Source Han fails, Fandol takes over.
+\documentclass[a4paper,12pt,oneside]{ctexbook}
+
+% ── CJK typography: cross-platform auto-detect ──
+% ctexbook has already loaded xeCJK and configured zhsong/zhhei/zhfs/zhkai
+% to Fandol.  We try the best available font:
+%   PingFang SC (macOS) → Noto Serif CJK SC (Linux, some distros) →
+%   Source Han Serif SC (Linux CI, Adobe Language Specific OTFs) →
+%   Source Han Serif CN (Windows, older CN-subset OTFs) →
+%   Fandol (ctex built-in fallback, always available).
+\IfFontExistsTF{PingFang SC}{%
+  \setCJKmainfont{PingFang SC}[BoldFont={PingFang SC Semibold}]
+  \setCJKsansfont{PingFang SC}[BoldFont={PingFang SC Semibold}]
+  \setCJKmonofont{PingFang SC}
+}{%
+  \IfFontExistsTF{Noto Serif CJK SC}{%
+    \setCJKmainfont{Noto Serif CJK SC}[BoldFont={Noto Serif CJK SC Bold}]
+    \setCJKsansfont{Noto Sans CJK SC}[BoldFont={Noto Sans CJK SC Bold}]
+    \setCJKmonofont{Noto Sans CJK SC}
+  }{%
+    \IfFontExistsTF{Source Han Serif SC}{%
+      \setCJKmainfont{Source Han Serif SC}[BoldFont={Source Han Serif SC Bold}]
+      \setCJKsansfont{Source Han Sans SC}[BoldFont={Source Han Sans SC Bold}]
+      \setCJKmonofont{Source Han Sans SC}
+    }{%
+      \setCJKmainfont{Source Han Serif CN}[BoldFont={Source Han Serif CN Bold}]
+      \setCJKsansfont{Source Han Sans CN}[BoldFont={Source Han Sans CN Bold}]
+      \setCJKmonofont{Source Han Sans CN}
+    }%
+  }%
+}
 
 % ── Page geometry ──
 \usepackage[top=2.5cm, bottom=2.5cm, left=2.8cm, right=2.3cm,
@@ -24,15 +56,6 @@
 \definecolor{dh-skin}{HTML}{F9DECE}
 \definecolor{dh-white}{HTML}{FCFDFD}
 \definecolor{dh-red}{HTML}{E85D61}
-
-% ── CJK typography (macOS defaults; CI patches to Noto CJK) ──
-\usepackage{fontspec}
-\usepackage{xeCJK}
-\setCJKmainfont{PingFang SC}[
-    BoldFont={PingFang SC Semibold}
-]
-\setCJKsansfont{PingFang SC}
-\setCJKmonofont{PingFang SC}
 
 % ── Unicode character support ──
 \usepackage{newunicodechar}
@@ -69,7 +92,7 @@
 
 % Chapter: Bond Navy large text + pink decor rules
 \titleformat{\chapter}[display]
-  {\centering\Huge\bfseries\color{dh-navy}}
+  {\centering\Huge\bfseries\sffamily\color{dh-navy}}
   {\color{dh-blossom}\rule{0.6\textwidth}{2pt}\vspace{0.5cm}\\%
    \chaptertitlename\ \thechapter}
   {1em}
@@ -78,7 +101,7 @@
 
 % Section
 \titleformat{\section}
-  {\Large\bfseries\color{dh-navy}}
+  {\Large\bfseries\sffamily\color{dh-navy}}
   {\color{dh-blossom}\thesection}
   {1em}
   {}
@@ -86,7 +109,7 @@
 
 % Subsection
 \titleformat{\subsection}
-  {\large\bfseries\color{dh-navy}}
+  {\large\bfseries\sffamily\color{dh-navy}}
   {\color{dh-blossom}\thesubsection}
   {1em}
   {}
@@ -104,6 +127,7 @@
 \usepackage{graphicx}
 \usepackage{float}
 \graphicspath{{./}{./assets/}{./images/}}
+\providecommand{\pandocbounded}[1]{#1}
 \usepackage[export]{adjustbox}
 
 % ── Code highlighting ──

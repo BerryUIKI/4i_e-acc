@@ -1,18 +1,23 @@
 name: Build Book PDF
 
 # Auto-compile 《四倍做多认知，长期做多人生》 to PDF on every push
-# to the book branch. Uses Pandoc + XeLaTeX with DollarHua brand styling.
+# to the book branch AND on main (so the PDF is rebuilt automatically
+# after any PR merge into main). Uses Pandoc + XeLaTeX with DollarHua styling.
 #
 # Architecture:
-#   1. Merge book chapters via build_pdf.py tex (generate .tex only)
-#   2. Patch macOS fonts → Ubuntu fonts (PingFang SC → Noto CJK)
-#   3. XeLaTeX 2-pass compilation
-#   4. Upload PDF artifact (90-day retention)
+#   1. Install Source Han Serif/Sans SC OTF fonts from Adobe releases
+#   2. Merge book chapters + generate .tex via build_pdf.py tex
+#   3. XeLaTeX 3-pass compilation (all work happens in repo-root output/)
+#   4. Verify CJK font embedding, upload PDF artifact (90-day retention)
+#   5. Non-main branches: auto-commit the PDF back to the repo.
+#      main is skipped — branch protection (enforce_admins) blocks bot pushes.
 
 on:
   push:
     branches:
+      - main
       - article/2026-quadruple-long-life
+      - article/2026-quadruple-long-life-polish
     paths:
       - 'articles/2026-quadruple-long-life/**/*.md'
       - 'skills/pdf-toolbook/**'
@@ -24,7 +29,7 @@ on:
   workflow_dispatch:  # manual trigger
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -35,7 +40,7 @@ jobs:
       - uses: actions/checkout@v4
 
       # ── System dependencies ──────────────────────────
-      - name: Install texlive + pandoc + CJK fonts
+      - name: Install texlive + pandoc
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends \
@@ -45,38 +50,72 @@ jobs:
             texlive-lang-chinese \
             texlive-fonts-recommended \
             pandoc \
-            fonts-noto-cjk \
-            python3
+            python3 \
+            unzip \
+            poppler-utils
+
+      # ── Install Source Han fonts from Adobe releases ──
+      - name: Install Source Han fonts (Serif + Sans SC)
+        run: |
+          mkdir -p ~/.fonts
+          # Source Han Serif SC v2.003R Language Specific OTFs — 宋体风格，正文用
+          curl -sSL -o /tmp/SourceHanSerifSC.zip \
+            "https://github.com/adobe-fonts/source-han-serif/releases/download/2.003R/09_SourceHanSerifSC.zip"
+          unzip -qo /tmp/SourceHanSerifSC.zip -d /tmp/serif-fonts/
+          find /tmp/serif-fonts -name "*.otf" -exec cp {} ~/.fonts/ \;
+
+          # Source Han Sans SC v2.005R Language Specific OTFs — 黑体风格，标题用
+          curl -sSL -o /tmp/SourceHanSansSC.zip \
+            "https://github.com/adobe-fonts/source-han-sans/releases/download/2.005R/09_SourceHanSansSC.zip"
+          unzip -qo /tmp/SourceHanSansSC.zip -d /tmp/sans-fonts/
+          find /tmp/sans-fonts -name "*.otf" -exec cp {} ~/.fonts/ \;
+
+          fc-cache -fv
+          echo "Source Han fonts installed:"
+          fc-list | grep -i "source han" | wc -l
 
       - name: Verify dependencies
         run: |
           echo "xelatex: $(xelatex --version 2>&1 | head -1)"
           echo "pandoc:  $(pandoc --version 2>&1 | head -1)"
-          echo "CJK fonts installed:"
-          fc-list :lang=zh | head -5
+          echo "Source Han fonts:"
+          fc-list | grep -i "source han" | head -10
 
-      # ── Generate .tex (no compilation yet) ───────────
+      # ── Generate .tex into repo-root output/ ─────────
+      # IMPORTANT: run from repo root so build_pdf.py merges MD, copies chart
+      # PNGs (from analysis/output), and writes _merged.md + toolbook.tex all
+      # into the SAME output/ dir. XeLaTeX later runs there and finds images.
       - name: Generate LaTeX source
         run: |
-          cd skills/pdf-toolbook
-          python3 scripts/build_pdf.py tex ../../book-task.md \
-            "$(pwd)/output/toolbook.tex"
+          python3 skills/pdf-toolbook/scripts/build_pdf.py tex book-task.md \
+            output/toolbook.tex
 
-      # ── Patch fonts: macOS → Ubuntu ──────────────────
-      - name: Patch fonts for Ubuntu CI
+      - name: Verify CJK content preserved
         run: |
-          cd skills/pdf-toolbook/output
-          # Replace macOS fonts with Ubuntu Noto CJK equivalents
-          # PingFang SC → Noto Serif CJK SC (serif for book body)
-          find . -name "*.tex" -type f -exec sed -i \
-            -e 's/PingFang SC Semibold/Noto Serif CJK SC Bold/g' \
-            -e 's/PingFang SC/Noto Serif CJK SC/g' \
-            {} +
+          echo "=== Merged MD CJK check ==="
+          CJK_MD=$(python3 -c "
+          with open('output/_merged.md','r') as f: t=f.read()
+          print(len([c for c in t if '\u4e00'<=c<='\u9fff']))")
+          echo "CJK chars in _merged.md: $CJK_MD"
+
+          echo ""
+          echo "=== Generated .tex CJK check ==="
+          CJK_TEX=$(python3 -c "
+          with open('output/toolbook.tex','r') as f: t=f.read()
+          print(len([c for c in t if '\u4e00'<=c<='\u9fff']))")
+          echo "CJK chars in .tex: $CJK_TEX"
+
+          if [ "$CJK_TEX" -lt 10000 ]; then
+            echo "ERROR: .tex has < 10K CJK chars — emoji fix may not be working!"
+            head -50 output/_merged.md
+            exit 1
+          fi
+          echo "SUCCESS: CJK text preserved"
 
       # ── XeLaTeX 3-pass compilation ──────────────────
       - name: Compile PDF (xelatex × 3)
         run: |
-          cd skills/pdf-toolbook/output
+          cd output
           # Locate main tex file (split → tex/main.tex, monolithic → toolbook.tex)
           if [ -f "tex/main.tex" ]; then
             MAIN="tex/main.tex"
@@ -93,10 +132,44 @@ jobs:
           # Pass 3: final — longtable widths stable, fail on real errors
           xelatex -interaction=nonstopmode -halt-on-error -output-directory="$TEX_DIR" "$MAIN"
 
+      # ── Verify PDF font embedding ──────────────────
+      - name: Verify CJK font embedding
+        run: |
+          cd output
+          PDF=$(find . -name "*.pdf" | head -1)
+          echo "PDF: $PDF ($(du -h "$PDF" | cut -f1))"
+          echo ""
+          echo "=== All embedded fonts (pdffonts) ==="
+          pdffonts "$PDF" || true
+          echo ""
+          # Core check: Source Han CJK fonts must be embedded
+          if ! pdffonts "$PDF" 2>/dev/null | grep -iq "SourceHan"; then
+            echo ""
+            echo "ERROR: No Source Han CJK fonts embedded in PDF!"
+            echo "Falling back to binary search..."
+            grep -aob "SourceHan" "$PDF" | head -5 || echo "  (no binary match either)"
+            exit 1
+          fi
+          echo ""
+          echo "SUCCESS: Source Han CJK fonts confirmed embedded"
+
       # ── Upload artifact ─────────────────────────────
       - name: Upload PDF artifact
         uses: actions/upload-artifact@v4
         with:
-          name: 四倍做多认知-长期做多人生
-          path: skills/pdf-toolbook/output/**/*.pdf
+          name: quadruple-long-life
+          path: output/**/*.pdf
           retention-days: 90
+
+      # ── Auto-commit PDF to repository (non-main only) ──
+      - name: Commit PDF to repo
+        if: success() && github.ref != 'refs/heads/main'
+        run: |
+          mkdir -p articles/2026-quadruple-long-life/output
+          cp output/toolbook.pdf articles/2026-quadruple-long-life/output/book.pdf
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # -f: repo-root .gitignore has output/ pattern; force-add generated PDF
+          git add -f articles/2026-quadruple-long-life/output/book.pdf
+          git diff --staged --quiet || git commit -m "[CI] Auto-build PDF $(date +'%Y-%m-%d')"
+          git push

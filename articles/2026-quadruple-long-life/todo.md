@@ -18,7 +18,7 @@
   - `FM002-author-note.md` · 作者的话（署名 花花｜@BerryUIKI）
   - `FM003-table-of-contents.md` · 目录（待写占位）
   - `FM004-prologue.md` · 序章正文
-- [pending] 第1-15章 + 终章：全 待写（骨架在 `Main-Text/` 下 16 个文件）。每章末 茶话会 待写。
+- [done] 第1-15章 + 终章：全 已完成（骨架在 `Main-Text/` 下 16 个文件）。实际已扩展为 30 章结构。
 - 插图：旧 7 份 spec（00-06）在；15 章架构需 ~11 份新 spec。
 - **正文撰写方式已确认**：你写 MD 发我，我整理翻译配图。
 - **结构已调整**：`manuscript.md` 已拆分为 `Front-Matter/`（前置）和 `Main-Text/`（正文），原文件已删除。

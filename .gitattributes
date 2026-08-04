@@ -3,3 +3,7 @@
 *.jpeg filter=lfs diff=lfs merge=lfs -text
 *.csv filter=lfs diff=lfs merge=lfs -text
 *.pdf filter=lfs diff=lfs merge=lfs -text
+
+# Chart PNGs are small (60-140 KB) — keep as regular blobs so CI
+# (which does not fetch LFS objects) can load them in XeLaTeX.
+articles/2026-quadruple-long-life/analysis/output/*.png -filter -diff -merge

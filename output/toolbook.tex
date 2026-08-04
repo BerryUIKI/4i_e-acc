@@ -1,0 +1,3527 @@
+%===========================================================
+%  pandoc-template.tex — DollarHua PDF Toolbook Template
+%  Version: v1.3 · Updated: 2026-07-30
+%
+%  Used with: pandoc input.md --template=this -o output.tex
+%  Compile with: xelatex (3 passes: TOC + cross-refs + longtable)
+%
+%  Font strategy: auto-detect platform → macOS=PingFang, Win/Linux=Noto CJK
+%===========================================================
+
+% ── Document class (ctexbook = Chinese-enabled book) ──
+\documentclass[a4paper,12pt,oneside,fontset=none]{ctexbook}
+
+% ── Page geometry ──
+\usepackage[top=2.5cm, bottom=2.5cm, left=2.8cm, right=2.3cm,
+            headheight=23pt, headsep=8mm, footskip=12mm,
+            includeheadfoot]{geometry}
+
+% ── DollarHua brand colors ──
+\usepackage{xcolor}
+\definecolor{dh-pink}{HTML}{FEC6CD}
+\definecolor{dh-blossom}{HTML}{F3A6AF}
+\definecolor{dh-gold}{HTML}{E3A04B}
+\definecolor{dh-navy}{HTML}{1D1E50}
+\definecolor{dh-bronze}{HTML}{B86C40}
+\definecolor{dh-skin}{HTML}{F9DECE}
+\definecolor{dh-white}{HTML}{FCFDFD}
+\definecolor{dh-red}{HTML}{E85D61}
+
+% ── CJK typography (cross-platform auto-detect) ──
+\usepackage{fontspec}
+\usepackage{xeCJK}
+
+% Auto-detect available CJK fonts (macOS → PingFang, others → Noto/SimSun)
+\IfFontExistsTF{PingFang SC}{
+  \setCJKmainfont{PingFang SC}[
+    BoldFont={PingFang SC Semibold},
+    ItalicFont={PingFang SC Light}
+  ]
+  \setCJKsansfont{PingFang SC}
+  \setCJKmonofont{PingFang SC}
+}{
+  \IfFontExistsTF{Noto Serif CJK SC}{
+    \setCJKmainfont{Noto Serif CJK SC}[
+      BoldFont={Noto Serif CJK SC Bold},
+      AutoFakeSlant=0.15
+    ]
+    \setCJKsansfont{Noto Sans CJK SC}
+    \setCJKmonofont{Noto Sans Mono CJK SC}
+  }{
+    \IfFontExistsTF{Source Han Serif SC}{
+      \setCJKmainfont{Source Han Serif SC}[
+        BoldFont={Source Han Serif SC Bold},
+        AutoFakeSlant=0.15
+      ]
+      \setCJKsansfont{Source Han Sans SC}
+      \setCJKmonofont{Source Han Sans SC}
+    }{
+      % Ultimate fallback: SimSun on Windows
+      \setCJKmainfont{SimSun}[AutoFakeBold=2.5]
+      \setCJKsansfont{SimHei}
+      \setCJKmonofont{KaiTi}
+    }
+  }
+}
+
+% CJK line breaking
+\XeTeXlinebreaklocale "zh"
+\XeTeXlinebreakskip = 0pt plus 1pt
+
+% ── Unicode character support ──
+\usepackage{newunicodechar}
+\newunicodechar{≈}{\ensuremath{\approx}}
+\newunicodechar{≥}{\ensuremath{\geq}}
+\newunicodechar{≤}{\ensuremath{\leq}}
+\newunicodechar{×}{\ensuremath{\times}}
+\newunicodechar{—}{\textemdash}
+\newunicodechar{–}{\textendash}
+\newunicodechar{…}{\dots}
+\newunicodechar{°}{\ensuremath{^{\circ}}}
+
+% ── Page style (headers / footers) ──
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\headrule}{\hbox to\headwidth{%
+  \color{dh-blossom}\leaders\hrule height \headrulewidth\hfill}}
+\fancyhead[L]{\footnotesize\color{dh-navy}\leftmark}
+\fancyhead[R]{\footnotesize\color{dh-navy}\mytitle}
+\fancyfoot[C]{\thepage}
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyfoot[C]{\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+}
+
+% ── First-line indent: 2 CJK characters ──
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.3em plus 0.1em minus 0.1em}
+
+% ── Emergency stretch for CJK overfull box prevention ──
+\setlength{\emergencystretch}{1.5em}
+
+% ── Chapter/section title styling ──
+\usepackage{titlesec}
+
+% Chapter: Bond Navy large text + pink decor rules
+\titleformat{\chapter}[display]
+  {\centering\Huge\bfseries\color{dh-navy}}
+  {\color{dh-blossom}\rule{0.6\textwidth}{2pt}\vspace{0.5cm}\\%
+   \chaptertitlename\ \thechapter}
+  {1em}
+  {}
+  [\vspace{0.3cm}\color{dh-blossom}\rule{0.3\textwidth}{1pt}]
+
+% Section
+\titleformat{\section}
+  {\Large\bfseries\color{dh-navy}}
+  {\color{dh-blossom}\thesection}
+  {1em}
+  {}
+  [\vspace{-0.3cm}{\color{dh-blossom}\titlerule[1pt]}]
+
+% Subsection
+\titleformat{\subsection}
+  {\large\bfseries\color{dh-navy}}
+  {\color{dh-blossom}\thesubsection}
+  {1em}
+  {}
+
+% ── Table of contents styling ──
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=dh-navy,
+  urlcolor=dh-gold,
+  pdfborder={0 0 0}
+}
+
+% ── Image support ──
+\usepackage{graphicx}
+\usepackage{float}
+\graphicspath{{./}{./articles/2026-quadruple-long-life/analysis/output/}{./assets/}{./images/}}
+\usepackage[export]{adjustbox}
+
+% Pandoc image wrapper (required by Pandoc's LaTeX writer)
+\providecommand{\pandocbounded}[1]{#1}
+
+% ── Code highlighting ──
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\footnotesize\color{dh-navy},
+  backgroundcolor=\color{dh-white},
+  frame=single,
+  framerule=0.5pt,
+  rulecolor=\color{dh-blossom},
+  breaklines=true,
+  numbers=left,
+  numberstyle=\tiny\color{dh-blossom},
+  keywordstyle=\color{dh-navy}\bfseries,
+  commentstyle=\color{dh-bronze}\itshape,
+  stringstyle=\color{dh-red},
+  tabsize=2,
+  showstringspaces=false
+}
+
+% ── Pandoc compatibility ──
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{longtable}
+\usepackage{calc}
+\setlength{\LTleft}{0pt}
+\setlength{\LTright}{0pt}
+
+% ── Tables ──
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage{tabularx}
+\arrayrulecolor{dh-blossom}
+% Auto-fit longtable columns to page width
+\setlength{\tabcolsep}{4pt}
+
+% ── Block quotes ──
+\usepackage{etoolbox}
+\AtBeginEnvironment{quote}{\small\color{dh-navy}}
+
+% ── Pandoc variables ──
+\newcommand{\mytitle}{4i\_e-acc Toolbook}
+\title{\mytitle}
+\author{4i\_e-acc Workspace}
+\date{2026-07-30}
+
+% ── Cover styling (Chinese title page) ──
+\makeatletter
+\def\@maketitle{
+  \begin{titlepage}
+    \centering
+    % Top decorative band
+    {\color{dh-blossom}\rule{0.6\textwidth}{2pt}\par}
+    \vspace{1.5cm}
+    {\Huge\bfseries\color{dh-navy}\mytitle\par}
+    \vspace{0.8cm}
+    {\Large\color{dh-bronze}4i\_e-acc Workspace\par}
+    \vspace{1.5cm}
+    {\color{dh-blossom}\rule{0.4\textwidth}{1pt}\par}
+    \vfill
+    {\large\color{dh-blossom}2026-07-30\par}
+    \vspace{0.5cm}
+    % Bottom decorative band
+    {\color{dh-gold}\rule{0.6\textwidth}{2pt}\par}
+    \vspace{2cm}
+  \end{titlepage}
+}
+\makeatother
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+\newpage
+
+\section{扉页 · Opening Statement}\label{ux6249ux9875-opening-statement}
+
+\subsection{· Opening Statement}\label{opening-statement}
+
+\begin{quote}
+Wealth is not for showing off --- it is for the freedom to choose your
+own life. Investing is not about beating others; it is about giving your
+future self more choices.
+\end{quote}
+
+\newpage
+
+\section{阅读须知 · Reading
+Notice}\label{ux9605ux8bfbux987bux77e5-reading-notice}
+
+\subsection{· Reading Notice}\label{reading-notice}
+
+\begin{quote}
+\end{quote}
+
+**** asset allocationinvestment advice
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**** long-term investing
+
+\begin{quote}
+\emph{Reading Notice (English):} Welcome to this book. Before you begin,
+I hope you will keep a few things in mind. First, this book shares
+long-term investing philosophy, asset allocation methods, and personal
+research views for knowledge exchange and learning only. It does not
+constitute investment advice of any kind, nor should it be taken as a
+basis for buying or selling any financial product. Second, investing
+carries risk; markets fluctuate, and any investment may incur losses.
+Cases, markets, products, or historical data mentioned here serve only
+to illustrate concepts --- they do not represent future performance and
+are not a promise of returns. Third, this book is written primarily for
+investors outside mainland China. Rules on financial products,
+securities, and taxation differ by jurisdiction; please comply with the
+laws where you live and make independent decisions based on your own
+situation. Finally, I hope you read with a critical mind. Understand the
+logic behind long-term investing rather than memorizing any single
+stock, fund, or strategy. What stays with you for years is not one
+correct call, but an enduring wealth mindset. May this book be a
+starting point on your long-term investing journey.
+\end{quote}
+
+\begin{quote}
+** Footer**
+\end{quote}
+
+\newpage
+
+\section{作者的话 · A Note from the
+Author}\label{ux4f5cux8005ux7684ux8bdd-a-note-from-the-author}
+
+\subsection{· A Note from the Author}\label{a-note-from-the-author}
+
+\begin{quote}
+``\,''
+\end{quote}
+
+**** compound interest
+
+asset allocation
+
+\begin{quote}
+------ @BerryUIKI
+\end{quote}
+
+\newpage
+
+\section{目录 · Table of Contents}\label{ux76eeux5f55-table-of-contents}
+
+\section{· Table of Contents}\label{table-of-contents}
+
+\subsection{·}\label{section}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+** · **
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+\item
+\item
+\item
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+** · **
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{4}
+\tightlist
+\item
+\item
+\item
+\item
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+** · **
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{8}
+\tightlist
+\item
+\item
+\item
+\item
+  REITs
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+** · ETF**
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{12}
+\tightlist
+\item
+\item
+  ETF
+\item
+  ETF
+\item
+  ETF
+\item
+  ETF
+\item
+\item
+  QDIIFOF
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+** · **
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{19}
+\tightlist
+\item
+\item
+\item
+\item
+\item
+\item
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+** · **
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{25}
+\tightlist
+\item
+\item
+\item
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+** · **
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{28}
+\tightlist
+\item
+\item
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+** · **
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{}\label{section-1}
+
+\begin{enumerate}
+\def\labelenumi{\Alph{enumi}.}
+\tightlist
+\item
+\item
+\item
+  D. ETF
+\item
+  F. IPS
+\item
+\item
+\item
+\item
+\item
+\item
+\end{enumerate}
+
+\newpage
+
+\section{序章 ·
+为什么普通人必须理解资产}\label{ux5e8fux7ae0-ux4e3aux4ec0ux4e48ux666eux901aux4ebaux5fc5ux987bux7406ux89e3ux8d44ux4ea7}
+
+\section{·}\label{section-2}
+
+\begin{quote}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+7\%
+
+------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+``\,``------
+
+------
+
+------------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**
+
+\newpage
+
+\section{第一章 ·
+收入、资产与财富不是一回事}\label{ux7b2cux4e00ux7ae0-ux6536ux5165ux8d44ux4ea7ux4e0eux8d22ux5bccux4e0dux662fux4e00ux56deux4e8b}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+** · **
+
+\subsection{·}\label{section-3}
+
+\begin{quote}
+\textbf{------}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+------``\,``\,``\,''
+
+\subsubsection{}\label{section-4}
+
+\textbf{earned income}------------
+
+\textbf{business income}
+
+\textbf{capital income}------
+
+------------
+
+\subsubsection{}\label{section-5}
+
+``\,``\,``\,''
+
+\textbf{asset}
+
+\textbf{consumption good}------ 4S
+
+\subsubsection{}\label{section-6}
+
+``\,``\,``\,``\textbf{net worth}
+
+------
+
+\textbf{liquid asset} ETF\textbf{illiquid asset}
+
+------
+
+\subsubsection{}\label{section-7}
+
+\textbf{cash flow}
+
+\subsubsection{}\label{section-8}
+
+------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**
+
+\newpage
+
+\section{第二章 ·
+先计算自己的净资产}\label{ux7b2cux4e8cux7ae0-ux5148ux8ba1ux7b97ux81eaux5df1ux7684ux51c0ux8d44ux4ea7}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{·}\label{section-9}
+
+\begin{quote}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+------
+
+\subsubsection{}\label{section-10}
+
+\textbf{cash and cash equivalents}
+
+\textbf{financial assets}ETF
+
+\textbf{physical assets}------
+
+------ 80\%---90\%
+
+\textbf{retirement accounts}
+
+\textbf{human capital}------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{}\label{section-11}
+
+\textbf{high-interest debt} 15\% 20\% ``\,``------ 18\%''\,'' 18\%
+
+\textbf{mortgage}------``\,``\,``\,''
+
+\textbf{student loan}------``\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{}\label{section-12}
+
+------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+& \_\_\_\_\_\_\_\_\_ & & \_\_\_\_\_\_\_\_\_ \\
+& \_\_\_\_\_\_\_\_\_ & & \_\_\_\_\_\_\_\_\_ \\
+/ / ETF & \_\_\_\_\_\_\_\_\_ & & \_\_\_\_\_\_\_\_\_ \\
+& \_\_\_\_\_\_\_\_\_ & & \_\_\_\_\_\_\_\_\_ \\
+& \_\_\_\_\_\_\_\_\_ & & \_\_\_\_\_\_\_\_\_ \\
+/ & \_\_\_\_\_\_\_\_\_ & & \\
+& \_\_\_\_\_\_\_\_\_ & & \\
+**** & \_\_\_\_\_\_\_\_\_ & **** & \_\_\_\_\_\_\_\_\_ \\
+& & ** - ** & \_\_\_\_\_\_\_\_\_ \\
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+``\,``------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\newpage
+
+\section{第三章 ·
+储蓄率比收入数字更重要}\label{ux7b2cux4e09ux7ae0-ux50a8ux84c4ux7387ux6bd4ux6536ux5165ux6570ux5b57ux66f4ux91cdux8981}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{·}\label{section-13}
+
+\begin{quote}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\textbf{savings rate}
+
+\subsubsection{}\label{section-14}
+
+30\% 0\%------
+
+``\,``------\textbf{lifestyle inflation}------
+
+\subsubsection{}\label{section-15}
+
+------``\,''
+
+------``\,''
+
+------
+
+\subsubsection{}\label{section-16}
+
+20\% 30\% 10\% ------
+
+\textbf{FIREFinancial Independence, Retire Early} 50\%
+
+\subsubsection{}\label{section-17}
+
+------
+
+``\,``\,``\,''
+
+``\,``------ 30\%------''\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+------
+
+\newpage
+
+\section{第四章 ·
+投资之前，先处理负债和应急资金}\label{ux7b2cux56dbux7ae0-ux6295ux8d44ux4e4bux524dux5148ux5904ux7406ux8d1fux503aux548cux5e94ux6025ux8d44ux91d1}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{·}\label{section-18}
+
+\begin{quote}
+\textbf{------}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+``\,``------
+
+``\,''
+
+\subsubsection{}\label{section-19}
+
+------
+
+\textbf{high-interest debt}
+
+15\% 18\% 15\% 18\% ------ 7\% 18\% 11\%
+
+``\,'' 18\% 18\% ------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**** 5\% 10\% ``\,``------ 5\% 7\% 30\%
+
+**** 3\% 3\% 4\% ------
+
+\subsubsection{}\label{section-20}
+
+emergency fund
+
+------
+
+\textbf{3 6 }''\,``------
+
+\begin{itemize}
+\tightlist
+\item
+  ****3
+\item
+  **** 4 5
+\item
+  **** 6 9 12 ------``\,''
+\end{itemize}
+
+****------------
+
+\subsubsection{}\label{section-21}
+
+``\,''
+
+30\% 30\%------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{}\label{section-22}
+
+insurance------
+
+------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+------
+
+\newpage
+
+\section{第五章 ·
+复利究竟如何工作}\label{ux7b2cux4e94ux7ae0-ux590dux5229ux7a76ux7adfux5982ux4f55ux5de5ux4f5c}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+** · **
+
+\subsection{·}\label{section-23}
+
+\begin{quote}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+------compounding''\,''
+
+\subsubsection{}\label{section-24}
+
+\textbf{FV = PV × (1 + r)\^{}n}
+
+FV future valuePV present valuer n ``\,''
+
+10,000 7\%simple interest------------ 10,000 + 10,000 × 7\% × 30 =
+31,000 21,000
+
+------------ 10,000 10,000 × (1 + 7\%)\^{}30 ≈ 76,123 66,123
+
+10,000 45,000 ------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{}\label{section-25}
+
+------
+
+500 7\% 500 × 12 × 30 = 180,000 610,000 430,000
+
+1,000 122 36 86
+
+200 24.4 7.2 17.2
+
+7\% 7\% ------****
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{}\label{section-26}
+
+------ 25 500 7\% 60 35 ------ 60
+
+210,000 25 60 35 90
+
+150,000 35 60 25 41
+
+60,000 50 50 ------
+
+\textbf{72 Rule of 72} 72 7\%72 ÷ 7 ≈ 10.3 6\% 10\%72 {[}72 ·Luca
+Pacioli1494 Summa de arithmetica{]}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{}\label{section-27}
+
+------
+
+1 500 30 500 × (1+7\%)\^{}29 ≈ 3,800 29 500 30 535 500 29 ------
+
+\subsubsection{}\label{section-28}
+
+------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+'' 500 ``------''\,''
+
+\newpage
+
+\section{第六章 ·
+通货膨胀如何侵蚀购买力}\label{ux7b2cux516dux7ae0-ux901aux8d27ux81a8ux80c0ux5982ux4f55ux4fb5ux8680ux8d2dux4e70ux529b}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{·}\label{section-29}
+
+\begin{quote}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+------
+
+\textbf{inflation}------
+
+\subsubsection{}\label{section-30}
+
+1995 4,283 / 357 / 3,537 / 295 / 2025 56,502 / 4,709 / 35,869 / 2,989
+/------ 12 9 CPI 1995 2---3 2025 15---25 1995 0.5---1 2025 2---4
+
+1995 2025
+
+3\% 10 ``\,'' 10 ``\,'' 97,000 74,000 54,000 40,000
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{CPI}\label{cpi}
+
+\textbf{CPIConsumer Price Index}''\,''
+
+CPI
+
+CPI ``\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{}\label{section-31}
+
+------
+
+------ 20\% 3\%``\,''
+
+``\,''
+
+\subsubsection{}\label{section-32}
+
+\textbf{real rate of return}
+
+\textbf{Fisher Equation} ≈ -
+
+5\% 3\% 2\% 2\% 3\% 3\%------
+
+``\,``\,``\,'' 3\% 2\% 4\%
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+``\,``------
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{ch06_inflation.png}}
+\caption{1995-2025CPI}
+\end{figure}
+
+\newpage
+
+\section{第七章 ·
+风险不只是价格下跌}\label{ux7b2cux4e03ux7ae0-ux98ceux9669ux4e0dux53eaux662fux4ef7ux683cux4e0bux8dcc}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{·}\label{section-33}
+
+\begin{quote}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+``\,``\,``\,``\,``\,``------''\,``\,``\,''
+
+\subsubsection{}\label{section-34}
+
+3\% 2\%``\,''
+
+``\,'' 5\% ``\,''
+
+\textbf{volatility} ------
+
+\textbf{permanent loss of capital} ------------
+
+·Howard Marks''\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+500S\&P 500 & −56.8\% & 2007.10---2009.03 & 517 & 4.0 2013.03 \\
+500S\&P 500 & −49.1\% & 2000.03---2002.10 & 929 & 7.2 2007.05 \\
+500S\&P 500 & −33.9\% & 2020.02---2020.03 & 33 & 5 2020.08 \\
+300CSI 300 & −72.3\% & 2007.10---2008.11 & 13 & 7---10 2015 \\
+300CSI 300 & −46.1\% & 2015.06---2016.02 & 8 & 4.5 2020.12 \\
+\end{longtable}
+
+------``\,'' 2020 A ------ 60\% 30\%---40\%
+
+500 --- History of Market / S\&P Dow Jones Indices300 --- Bloomberg /
+Wind
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{}\label{section-35}
+
+\textbf{credit risk}------
+
+\textbf{interest rate risk}
+
+\textbf{liquidity risk}------
+
+\textbf{currency risk}
+
+\textbf{concentration risk}''\,``------
+
+\textbf{leverage risk}------ 10\% 20\% 10\% 20\%
+
+\textbf{maturity mismatch risk}------
+
+\textbf{custody and platform risk}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{}\label{section-36}
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+-10\% & +11.1\% \\
+-20\% & +25.0\% \\
+-30\% & +42.9\% \\
+-40\% & +66.7\% \\
+-50\% & +100.0\% \\
+-60\% & +150.0\% \\
+-70\% & +233.3\% \\
+\end{longtable}
+
+50\% 70\%------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+``\,``------
+
+\pandocbounded{\includegraphics[keepaspectratio]{ch07_drawdowns.png}}
+
+\newpage
+
+\section{第八章 ·
+你真正能承受多少风险}\label{ux7b2cux516bux7ae0-ux4f60ux771fux6b63ux80fdux627fux53d7ux591aux5c11ux98ceux9669}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{·}\label{section-37}
+
+\begin{quote}
+** 30\% **
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+------
+
+\subsubsection{}\label{section-38}
+
+\textbf{risk capacity}
+
+------
+
+30\% 30\%
+
+------------``\,''
+
+\subsubsection{}\label{section-39}
+
+\textbf{risk tolerance} 5\% 20\% ------
+
+------'' 20\% ''
+
+\subsubsection{}\label{section-40}
+
+\textbf{risk required} ------
+
+15\% 6\% 8\%------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{}\label{section-41}
+
+\textbf{1. }
+
+\begin{itemize}
+\tightlist
+\item
+  20
+\item
+  10---20
+\item
+  5---10
+\item
+  5
+\end{itemize}
+
+\textbf{2. }
+
+\begin{itemize}
+\tightlist
+\item
+\item
+\item
+\end{itemize}
+
+\textbf{3. }
+
+\begin{itemize}
+\tightlist
+\item
+\item
+\item
+\end{itemize}
+
+\textbf{4. 20\%}
+
+\begin{itemize}
+\tightlist
+\item
+\item
+\item
+\end{itemize}
+
+\textbf{5. }
+
+\begin{itemize}
+\tightlist
+\item
+\item
+\item
+  ------
+\end{itemize}
+
+\subsubsection{}\label{section-42}
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+A & & 60\%--70\% & \\
+B & & 50\%--60\% & \\
+C & & 30\%--40\% & \\
+D & & 10\% & \\
+\end{longtable}
+
+------AC''\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\newpage
+
+\section{第九章 ·
+现金、存款与货币类工具}\label{ux7b2cux4e5dux7ae0-ux73b0ux91d1ux5b58ux6b3eux4e0eux8d27ux5e01ux7c7bux5de5ux5177}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+** · **
+
+\subsection{·}\label{section-43}
+
+\begin{quote}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+------``\,''
+
+\subsubsection{}\label{section-44}
+
+\textbf{demand deposit} ------
+
+\textbf{time deposit / certificate of deposit} ------
+
+\textbf{money market fund} ------
+
+7 0001982013---2014 7 4.5\%---4.8\%2015---2018 2.5\%---3.9\% 2019---2020
+1.8\%---2.3\%2021---2026 1.4\%---2.0\% ``\,``\,``\,''
+
+000198 7 https://fund.eastmoney.com http://www.pbc.gov.cn
+
+\textbf{short-term government bond instruments}ETF
+
+\subsubsection{}\label{section-45}
+
+``\,''
+
+------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{ch09_money_market.png}}
+\caption{7}
+\end{figure}
+
+------``\,''
+
+\newpage
+
+\section{第十章 ·
+债券到底是什么}\label{ux7b2cux5341ux7ae0-ux503aux5238ux5230ux5e95ux662fux4ec0ux4e48}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{·}\label{section-46}
+
+\begin{quote}
+\textbf{``\,``}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+------
+
+------
+
+\subsubsection{}\label{section-47}
+
+------------
+
+\textbf{face value / par value} \textbf{coupon rate} \textbf{maturity
+date}
+
+100 4\% 4 100 ------
+
+\subsubsection{}\label{section-48}
+
+secondary market
+
+\textbf{Yield to Maturity YTM}
+
+100 4\% 4\% 95 4 100 ------ 5 4\% 105 4\%
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{}\label{section-49}
+
+``\,''
+
+3\% 5\% 3\% 5\% ------
+
+\textbf{interest rate risk} \textbf{duration} 1\% 7 1\% 7\%
+
+\textbf{2026 }
+
+\begin{longtable}[]{@{}lllllllll@{}}
+\toprule\noalign{}
+& 1 & 2 & 3 & 5 & 7 & 10 & 20 & 30 \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+& 1.18\% & 1.22\% & 1.28\% & 1.42\% & 1.55\% & 1.62\% & 1.80\% &
+1.88\% \\
+\end{longtable}
+
+2024 10 2.28\%2025 1.85\%------
+
+www.chinabond.com.cn2024/2025/2026 6 30
+
+\subsubsection{}\label{section-50}
+
+\textbf{government bond / sovereign bond} U.S. Treasury
+bonds''\,``------''\,``------
+
+\textbf{corporate bond} ------\textbf{credit spread}S\&PMoody'sFitchAAA
+BBB ``\,``high-yield bond''\,``junk bond------
+
+\subsubsection{}\label{section-51}
+
+bond fund''\,``------
+
+------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+``\,''
+
+\pandocbounded{\includegraphics[keepaspectratio]{ch10_bond_yields.png}}
+
+------``\,''
+
+\newpage
+
+\section{第十一章 ·
+股票收益从哪里来}\label{ux7b2cux5341ux4e00ux7ae0-ux80a1ux7968ux6536ux76caux4eceux54eaux91ccux6765}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{·}\label{section-52}
+
+\begin{quote}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+------
+
+\subsubsection{}\label{section-53}
+
+total return
+
+\textbf{dividend}------------
+
+\textbf{earnings growth}------
+
+\textbf{valuation change}''\,''
+
+500 300 20 2005---2025
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+& 500S\&P 500 & 300CSI 300 \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+earnings growth & +6.8\%/ & +8.5\%/ \\
+dividend yield & +2.0\%/ & +2.2\%/ \\
+valuation change & +1.0\%/ & −2.8\%/ \\
+\textbf{total return} & \textbf{+9.8\%/} & \textbf{+7.9\%/} \\
+\end{longtable}
+
+------ 500 9.8\% 70\% 300 100\%------ A 2007---2008 300 2.8\% ``\,''
+
+500 --- S\&P Dow Jones Indices Bloomberg 300 --- www.csindex.com.cn Wind
+EPS PE
+
+**** ------
+
+\subsubsection{}\label{section-54}
+
+------``\,``\,``\,''
+
+------ 20\% ------ 20\% ``20\%'' 25\%
+
+margin of safety
+
+\subsubsection{}\label{section-55}
+
+``\,``------
+
+10 2 100 1 ``\,``------P/E ratio
+
+\subsubsection{}\label{section-56}
+
+``\,'' 6\% 7\%
+
+``\,'' 30\% 40\%------``\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+``\,``------ ETF
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{ch11_stock_returns.png}}
+\caption{500300}
+\end{figure}
+
+------ REITs------
+
+\newpage
+
+\section{第十二章 · 黄金、REITs
+与其他资产}\label{ux7b2cux5341ux4e8cux7ae0-ux9ec4ux91d1reits-ux4e0eux5176ux4ed6ux8d44ux4ea7}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{· REITs}\label{reits}
+
+\begin{quote}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+REITs ------
+
+\subsubsection{}\label{section-57}
+
+------
+
+------------------``\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+& & USD/oz \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+2008 & 2008 & \textbf{+4.3\%}500 −38.5\% \\
+2011 & 2011 & \textbf{+9.5\%} \\
+2020 & 2020 & \textbf{+24.6\%}300 +27.2\% 3 \\
+2013 & 2013 & \textbf{−28.3\%} QE ``\,'' \\
+\end{longtable}
+
+2005---2025 21 \textbf{+10.1\%} USD/oz 500 +9.8\%``\,'' 2005---2011
+2012---2025 +5.9\% 2013 −28.3\% 2021---2022 ``\,'' CAGR
+
+LBMALondon Bullion Market Associationhttps://www.lbma.org.ukWorld Gold
+Council
+
+**** 5\% 10\%
+
+``\,``------
+
+\subsubsection{REITs}\label{reits-1}
+
+``\,''
+
+\textbf{REITsReal Estate Investment Trusts} ------------
+
+REITs REITs 90\% REITs REIT
+
+REITs REITs ------------ REITs REITs ------``\,''
+
+REITs ------``\,'' REITs
+
+\subsubsection{}\label{section-58}
+
+ETF
+
+------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{ch12_gold.png}}
+\caption{2005-2025}
+\end{figure}
+
+REITs
+
+\newpage
+
+\section{第十三章 ·
+指数是如何编制出来的}\label{ux7b2cux5341ux4e09ux7ae0-ux6307ux6570ux662fux5982ux4f55ux7f16ux5236ux51faux6765ux7684}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+** · ETF **
+
+\subsection{·}\label{section-59}
+
+\begin{quote}
+\textbf{``\,``}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+ETF ------ ETF ETF
+
+\subsubsection{}\label{section-60}
+
+300 ------ 300
+
+** 300 CSI 300 Index** 500S\&P 500 100Nasdaq-100 500
+
+\subsubsection{}\label{section-61}
+
+weighting
+
+\textbf{market-cap weighting} 300 500 ------``\,''
+
+\textbf{equal weighting} 100 1\%``\,``------
+
+\textbf{price-weighted} ------Dow Jones Industrial Average------ 1000 10
+50 5000
+
+\subsubsection{}\label{section-62}
+
+MSCIFTSE RussellS\&P Dow Jones------------
+
+``\,``------
+
+ETF ** ETF**
+
+\subsubsection{300 500}\label{section-63}
+
+``\,''
+
+** 300** 300 6 12 semi-annual review ST *ST 300 ``\,``------ 360 240
+
+300 ETF ------
+
+** 500** 300 500 Index Committee GAAP 146 50\%
+
+------``\,``Tesla 2020 500 2020 12''\,''
+
+** ETF ** 300 ETF------ 500 ETF ETF 300 ETF 500 ETF ------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+ETF ``\,``ETF ETF ------
+
+\newpage
+
+\section{第十四章 · ETF
+到底是怎么运作的}\label{ux7b2cux5341ux56dbux7ae0-etf-ux5230ux5e95ux662fux600eux4e48ux8fd0ux4f5cux7684}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{· ETF}\label{etf}
+
+\begin{quote}
+\textbf{ETF ------}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+ETFExchange-Traded Fund''\,'' ETF ETF
+
+\subsubsection{ETF}\label{etf-1}
+
+index mutual fundNAVNet Asset Value------
+
+ETF ``\,``exchange-traded
+
+\subsubsection{}\label{section-64}
+
+ETF
+
+\textbf{secondary market} ETF APP ------ ETF ------
+
+\textbf{primary market} ETF ``\,``\,``\,``\textbf{Authorized Participant
+AP} ETF
+
+AP ETF 1\%``\,'' ETF ------ ETF ------ AP
+
+ETF AP ETF ``\,''
+
+ETF \textbf{AP ETF } ``\,''
+
+\subsubsection{}\label{section-65}
+
+ETF ETF''\,''
+
+ETF ****
+
+ETF ------ 300 ------AP ETF AP ETF ------ ETF
+
+ETF ETF **** 300 ETF ETF ETF ------
+
+\subsubsection{IOPV}\label{iopv}
+
+NAV------ETF
+
+\textbf{IOPVIndicative Optimized Portfolio Value} 15 ETF ETF IOPV
+
+IOPV ------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+ETF ------ QDII ETFETF
+
+\newpage
+
+\section{第十五章 · ETF
+的溢价率与折价率}\label{ux7b2cux5341ux4e94ux7ae0-etf-ux7684ux6ea2ux4ef7ux7387ux4e0eux6298ux4ef7ux7387}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{· ETF}\label{etf-2}
+
+\begin{quote}
+** ETF 120 100 ------**
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+ETF ------ETF
+
+\subsubsection{}\label{section-66}
+
+** = ( - ) ÷ × 100\%**
+
+ETF 1.000 1.200 (1.200 - 1.000) ÷ 1.000 × 100\% = 20\% 1.20 1.00
+
+0.900 1.000 10\%------
+
+\subsubsection{}\label{section-67}
+
+1.200 20\% ETF------ 1.000
+
+20\%(1.200 - 1.000) ÷ 1.200 = 0.200 ÷ 1.200 ≈ 16.7\% 16.7\% 20\%
+
+**** ETF ------
+
+\subsubsection{}\label{section-68}
+
+AP
+
+**** QDII ETF ETF ------ETF ``\,''
+
+**** ETF ETF ------ ETF ``\,''
+
+**** QDII ETF QDII QDII ETF ETF QDII ETF 20\%
+
+**** ETF------``\,''
+
+**** ETF ETF
+
+\subsubsection{}\label{section-69}
+
+ETF
+
+15\% 25\%------
+
+1\% ------
+
+ETF ``\,''
+
+------ 10\% 20\%------
+
+\subsubsection{}\label{section-70}
+
+ETF APP ETF IOPV 3\% QDII ETF------ 3\% ``\,'' 5\% ETF
+
+------------------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{ch15_qdii_premium.png}}
+\caption{QDII ETF}
+\end{figure}
+
+ETF ``\,''
+
+\newpage
+
+\section{第十六章 · ETF
+的费率、跟踪误差与隐性成本}\label{ux7b2cux5341ux516dux7ae0-etf-ux7684ux8d39ux7387ux8ddfux8e2aux8befux5deeux4e0eux9690ux6027ux6210ux672c}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{· ETF}\label{etf-3}
+
+\begin{quote}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+ETF ------
+
+\subsubsection{}\label{section-71}
+
+ETF
+
+\textbf{management fee} ------ 0.15\% ETF 0.15\%
+
+\textbf{custodian fee} ------
+
+------``\,''
+
+\subsubsection{}\label{section-72}
+
+10 7\% ETF 0.20\% 6.8\% 72
+
+0.60\% ETF 6.4\% 64 10 0.40\% 8
+
+10 7\% 10 20 30
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule\noalign{}
+& 10 & 20 & 30 & 30 \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0.15\% ETF & ¥193,975 & ¥376,262 & ¥729,854 & ¥31,372 \\
+0.30\% ETF & ¥191,269 & ¥365,838 & ¥699,733 & ¥61,492 \\
+0.50\% ETF & ¥187,714 & ¥352,365 & ¥661,437 & ¥99,789 \\
+1.00\% & ¥179,085 & ¥320,714 & ¥574,349 & ¥186,876 \\
+0.00\% & ¥196,715 & ¥386,968 & ¥761,226 & --- \\
+\end{longtable}
+
+0.15\% 1.00\% 30 ¥155,000------ 1.55 ``\,``\,``\,``\,``\,''
+
+0.40\% ``\,``\,``\,''
+
+\subsubsection{}\label{section-73}
+
+ETF
+
+\textbf{bid-ask spread} ETF ETF
+
+``\,''
+
+\textbf{commission} ETF
+
+\subsubsection{}\label{section-74}
+
+'' 300 '' ETF ETF 300
+
+\textbf{tracking error} ------ ETF ``\,``\textbf{tracking difference}
+ETF ------ 10\%ETF 9.7\% -0.3\%
+
+ETF ETF
+
+------``\,'' ETF
+
+\subsubsection{}\label{section-75}
+
+\textbf{tax impact} ETF ETF ETF ------ ETF
+
+\textbf{currency conversion cost} QDII ETF
+
+\textbf{securities lending income} ETF ------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{ch16_etf_fees.png}}
+\caption{30}
+\end{figure}
+
+ETF ------ ETF ETF ------ ETF
+
+\newpage
+
+\section{第十七章 · 如何真正筛选一只
+ETF}\label{ux7b2cux5341ux4e03ux7ae0-ux5982ux4f55ux771fux6b63ux7b5bux9009ux4e00ux53ea-etf}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{· ETF}\label{etf-4}
+
+\begin{quote}
+** ETF ETF**
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+ETF ------ ETF
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{ETF}\label{etf-5}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\textbf{1. } ETF //
+
+\textbf{2. } ETF ETF ------
+
+\textbf{3. } ESG
+
+\textbf{4. } 50
+
+\textbf{5. } 50\% ETF ------
+
+\textbf{6. } ``\,'' 30\%
+
+\textbf{7. } ETF''\,``ETF
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\textbf{8. Total Expense Ratio} + +
+
+\textbf{9. tracking difference} ETF ------``\,''
+
+\textbf{10. bid-ask spread} ETF ETF
+
+\textbf{11. } ETF QDII ETF
+
+\textbf{12. } full replicationsampling / synthetic replication ETF
+
+\textbf{13. } ETF accumulatingdistributing
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\textbf{14. } ETF AUM ETF ------
+
+\textbf{15. } ETF ETF
+
+\textbf{16. } ETF
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\textbf{17. } ETF ETF withholding taxdue diligence
+
+\textbf{18. } ETF
+
+\textbf{19. } ETF 2x3x-1x ETF
+
+\textbf{20. } ETF ETF ETF
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{ETF}\label{etf-6}
+
+ETF ------** 300 ETF 510300**
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+& 510300 & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1. & & 300 A \\
+2. & 300 CSI 300 & \\
+3. & 300 & 360 \\
+4. & 300 & \\
+5. & 20--25\% & \\
+6. & + 40\% & 300 \\
+8. & 0.15\% + 0.05\% = \textbf{0.20\%} & ETF \\
+14. & \textasciitilde1000 & \\
+12. & full replication & 300 \\
+19. / & & ETF \\
+\end{longtable}
+
+------ ETF
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+ETF
+
+------
+
+\newpage
+
+\section{第十八章 ·
+主动基金应该怎么看}\label{ux7b2cux5341ux516bux7ae0-ux4e3bux52a8ux57faux91d1ux5e94ux8be5ux600eux4e48ux770b}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{·}\label{section-76}
+
+\begin{quote}
+\textbf{------}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+ETF''\,''
+
+\subsubsection{}\label{section-77}
+
+------ ETF
+
+------------
+
+SPIVAS\&P Indices Versus Active 2024
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+/ & & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+US Large-Cap & 1 & 51\% \\
+US Large-Cap & 5 & 75\% \\
+US Large-Cap & \textbf{10 } & \textbf{87\%} \\
+US Mid-Cap & 5 & 58\% \\
+US Small-Cap & 5 & 62\% \\
+Emerging Markets & 5 & 84\% \\
+International & 5 & 65\% \\
+A & 1 & 42\% \\
+A & 3 & 55\% \\
+A & \textbf{5 } & \textbf{68\%} \\
+\end{longtable}
+
+10 A ``\,''
+
+S\&P SPIVA
+Scorecardhttps://www.spglobal.com/spdji/en/research-insights/spiva/ A
+China Equity
+
+\subsubsection{}\label{section-78}
+
+``\,''
+
+**** ------
+
+\textbf{Alpha} Alpha 10\% 12\% Alpha -2\%------ 8\% 5\% Alpha
+
+\textbf{style drift} ``\,``------''\,``\,``\,''
+
+\textbf{maximum drawdown} ``\,'' 50\%------
+
+\textbf{turnover ratio}
+
+\subsubsection{``\,''}\label{section-79}
+
+\textbf{survivorship bias}------``\,''
+
+\subsubsection{}\label{section-80}
+
+``\,``\,``\,``\,``\,''
+
+``\,''
+
+``\,'' 1.5\% Alpha ------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+ETF ------ ETF ``\,''
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{ch18_spiva.png}}
+\caption{SPIVA}
+\end{figure}
+
+------QDIIFOF ------
+
+\newpage
+
+\section{第十九章 · 场外基金、QDII、FOF
+与养老目标基金}\label{ux7b2cux5341ux4e5dux7ae0-ux573aux5916ux57faux91d1qdiifof-ux4e0eux517bux8001ux76eeux6807ux57faux91d1}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{· QDIIFOF}\label{qdiifof}
+
+\begin{quote}
+** ETF**
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+ETF ETF------ APP ETF
+
+\subsubsection{}\label{section-81}
+
+**** ETF ------****
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule\noalign{}
+& ETF & & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+& & & ETF \\
+& & T+1 T+2 & \\
+& + A ETF & + & ETF \\
+& 100 & 10 1 & \\
+& & & \\
+\end{longtable}
+
+ETF 10
+
+\subsubsection{QDII}\label{qdii}
+
+\textbf{QDIIQualified Domestic Institutional Investor} QDII ------
+
+QDII
+
+QDII QDII QDII ETF ------
+
+QDII ------
+
+QDII QDII ------
+
+\subsubsection{FOF}\label{fof}
+
+\textbf{FOFFund of Funds}
+
+FOF FOF FOF
+
+FOF \textbf{double layer of fees}FOF ETF FOF '' ETF''
+
+\subsubsection{}\label{section-82}
+
+\textbf{target-date fund target-risk fund} ``\,``------
+
+'' 2050 '' 2050 2026 70\% 80\% 2050 2050 \textbf{glide path}
+
+``\,``------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+ETF------
+
+\newpage
+
+\section{第二十章 ·
+资产配置为什么比选股更重要}\label{ux7b2cux4e8cux5341ux7ae0-ux8d44ux4ea7ux914dux7f6eux4e3aux4ec0ux4e48ux6bd4ux9009ux80a1ux66f4ux91cdux8981}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+** · **
+
+\subsection{·}\label{section-83}
+
+\begin{quote}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+``\,``\,``\,``\textbf{asset allocation}------
+
+\subsubsection{}\label{section-84}
+
+``\,''
+
+\textbf{correlation} +1 -1
+
+20 2005---2025
+
+\begin{longtable}[]{@{}llllll@{}}
+\toprule\noalign{}
+& 300 & 500 & & & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{300} & 1.00 & 0.45 & −0.12 & 0.08 & 0.02 \\
+\textbf{500} & 0.45 & 1.00 & −0.08 & 0.15 & 0.01 \\
+**** & −0.12 & −0.08 & 1.00 & 0.22 & 0.35 \\
+**** & 0.08 & 0.15 & 0.22 & 1.00 & 0.05 \\
+**** & 0.02 & 0.01 & 0.35 & 0.05 & 1.00 \\
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{−0.12}------``\,''
+\item
+  \textbf{0.45}------
+\item
+  \textbf{/}0.08 / 0.22------``\,``\,``\,''
+\item
+  \textbf{0.35}------/
+\end{itemize}
+
+Bloomberg / Wind Pearson Portfolio
+Visualizerhttps://www.portfoliovisualizer.com300500
+
+------``\,''
+
+\subsubsection{}\label{section-85}
+
+------****
+
+------ vs vs vs ------ vs vs vs vs ------ vs vs vs vs ------ vs vs
+
+------\textbf{diworsification} ETF ``\,''
+
+\subsubsection{}\label{section-86}
+
+``\,'' 60\% 40\% 30\% 5\% 65\% 35\%------
+
+\textbf{rebalancing} ------------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+``\,``\,``\,``------------''\,``\,``\,''
+
+\pandocbounded{\includegraphics[keepaspectratio]{ch20_correlation.png}}
+
+------
+
+\newpage
+
+\section{第二十一章 ·
+家庭资金应该分成几个账户}\label{ux7b2cux4e8cux5341ux4e00ux7ae0-ux5bb6ux5eadux8d44ux91d1ux5e94ux8be5ux5206ux6210ux51e0ux4e2aux8d26ux6237}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{·}\label{section-87}
+
+\begin{quote}
+\textbf{------}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+``\,``\,``\,``------
+
+``\,``------
+
+\subsubsection{}\label{section-88}
+
+**** ------
+
+**** +
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**** ------``\,''
+
+\subsubsection{}\label{section-89}
+
+**** ------``\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**** T+0 T+1
+
+**** ------``\,``------
+
+\subsubsection{}\label{section-90}
+
+**** ------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**** ------ 20\%
+
+**** ``\,''
+
+\subsubsection{}\label{section-91}
+
+**** ------``\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**** ETF ------ ETF
+
+**** ------``\,'' 10\%
+
+\subsubsection{}\label{section-92}
+
+**** ``\,``------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**** ETF
+
+\subsubsection{}\label{section-93}
+
+**** ------ ETF''\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**** 5\%
+
+**** ------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+``\,``\,``\,``\,``\,''
+
+------
+
+\newpage
+
+\section{第二十二章 ·
+不同年龄阶段的资产配置}\label{ux7b2cux4e8cux5341ux4e8cux7ae0-ux4e0dux540cux5e74ux9f84ux9636ux6bb5ux7684ux8d44ux4ea7ux914dux7f6e}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{·}\label{section-94}
+
+\begin{quote}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+------------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{20---30}\label{section-95}
+
+**** ------------
+
+**** ``\,''
+
+**** ETF ETF 60\% 80\%------20\% 30\% 10\%
+
+**** ------
+
+**** 80\%
+
+**** ------``\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{30---40}\label{section-96}
+
+**** ------------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**** 50\% 70\% 25\% 40\% 5\% 10\% 5 6 ------
+
+**** ``\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**** ****------------------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{40---50 ``\,``\,``\,''}\label{section-97}
+
+**** ``\,``\,``\,``------
+
+**** ------
+
+**** 40\% 60\% 30\% 50\%5\% 10\% 5\% 10\%
+
+**** 2008 ``\,``------------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**** ``\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{50---60}\label{section-98}
+
+**** ``\,``\,``\,``------
+
+**** \textbf{sequence of returns risk}------
+
+**** 30\% 50\%------40\% 55\% 5\% 10\%
+
+**** ------
+
+**** ------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{60}\label{section-99}
+
+**** ``\,''
+
+**** ------------------
+
+**** 20\% 40\%------ 55\% 75\%
+
+**** ------------
+
+**** ``\,''
+
+**** 4\% 25\% 30\%
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{}\label{section-100}
+
+``\,''
+
+\begin{itemize}
+\item
+  **** ------
+\item
+  \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\item
+  \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\item
+  \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\item
+  \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+------
+
+\newpage
+
+\section{第二十三章 ·
+不同家庭状况的配置案例}\label{ux7b2cux4e8cux5341ux4e09ux7ae0-ux4e0dux540cux5bb6ux5eadux72b6ux51b5ux7684ux914dux7f6eux6848ux4f8b}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{·}\label{section-101}
+
+\begin{quote}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+``\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{· 25}\label{section-102}
+
+**** 25 12,000
+
+**** 12,000 2,500 5,000 4,500 37\%
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**** 30,000
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**** ------``\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{itemize}
+\tightlist
+\item
+  1 5,000
+\item
+  2 25,000 3-4
+\item
+  4 3,000
+\end{itemize}
+
+**** ETF 60\% ETF 40\%------``\,''
+
+**** 25 ETF 10
+
+**** ------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{· 32}\label{section-103}
+
+**** 32 30 30,000 2
+
+**** 30,000 18,000 6,000 3,000 12,000 40\%
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**** 200,000 50,000 30,000 280,000
+
+**** 300 100
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{itemize}
+\tightlist
+\item
+  1 15,000
+\item
+  2 60,000 3
+\item
+  3 280,000 8,000
+\item
+  4 4,000 30,000
+\end{itemize}
+
+**** ETF A ------``\,''
+
+**** ------ 4,000
+
+**** ``\,``------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{· 38}\label{section-104}
+
+**** 38 36 35,000 8 4
+
+**** 35,000 25,000 8,000 5,000 12,000 10,000 28\%
+
+**** 120 22 3.8\%
+
+**** 250 150,000 40,000 ETF 60,000 200,000
+
+**** 55 60
+
+**** ``\,``------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{itemize}
+\tightlist
+\item
+  1 20,000
+\item
+  2 130,000 5-6
+\item
+  3
+\item
+  4 8,000 ETF 100,000
+\item
+  5 200,000 +
+\end{itemize}
+
+**** 50\% ETFA 30\% ETF20\% ETF ETF
+
+**** 38 ------20\% ETF
+
+**** ------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{· 48}\label{section-105}
+
+**** 48 IT 40,000 100,000 46 16
+
+**** 65,000 35,000 12,000 30,000 46\%
+
+**** 150 12 3.5\%
+
+**** 350 300,000 50,000 200,000
+
+**** ------``\,'' 100---150
+
+**** ------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{itemize}
+\tightlist
+\item
+  1 30,000
+\item
+  2 180,000 5-6
+\item
+  3 300,000 200,000
+\item
+  4 20,000
+\end{itemize}
+
+**** 12---17 ------45\% ETF40\% A + 5\% 40\% ETF 10\% ETF 5\% ETF
+
+**** ``\,``30\%''\,''
+
+**** ``\,``\,``\,``------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{· 58 5}\label{section-106}
+
+**** 58 25,000 60 8,000
+
+**** 33,000 18,000 15,000 45\%
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**** 300 400,000 150,000 ETF 200,000 150,000
+
+**** 63 15,000---16,000 /``\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{itemize}
+\tightlist
+\item
+  1 15,000
+\item
+  2 60,000 3-4
+\item
+  3 vs ------ 30---40
+\item
+  4 10,000 ``\,''
+\end{itemize}
+
+**** 35\% ETFA 45\% ETF 15\% 5\% ETF
+
+**** ``\,``\,``\,'' 20\%---30\%``\,'' 35\%
+
+**** ------ 3.5\%---4\%
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{· 32}\label{section-107}
+
+**** 12---35 4,000
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**** 12 + 60\% ETF + 30\% ETF + 10\% ETF 60\%
+
+\subsubsection{· 40}\label{section-108}
+
+**** 450 + 200 3,500 180 20
+
+**** 95\% ------
+
+**** 50\% 6 50\% ETF + 40\% ETF + 10\% ETF 3\% 20\% ------``\,''
+
+\subsubsection{· 45}\label{section-109}
+
+**** + 150 500 60\% 300 50
+
+**** ``\,``------
+
+**** ------``\,``\,``\,'' 10\% 55\% ETF + 35\% ETF + 10\% ETF
+
+\subsubsection{· 100}\label{section-110}
+
+**** 30
+
+** 21 \textbf{ - 1 - 3---6 - }70\% ETFA + + 25\% ETF + 5\% ETF** - ≥25
+
+\subsubsection{· 300}\label{section-111}
+
+**** 40---45
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{itemize}
+\tightlist
+\item
+  \begin{itemize}
+  \tightlist
+  \item
+    6---12
+  \end{itemize}
+\item
+\item
+  \textbf{55\% ETFA + + 35\% ETF + 5\% ETF + 5\% REITs ETF}
+\item
+  REITs
+\end{itemize}
+
+\subsubsection{· 1,000}\label{section-112}
+
+**** 50
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{itemize}
+\tightlist
+\item
+  5 vs /------
+\item
+  \textbf{35\% ETFA + + 50\% ETF + 10\% ETF + 5\% REITs ETF}
+\item
+  3.5\%---4\% → → /REITs →
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{quote}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+``\,``------
+
+\newpage
+
+\section{第二十四章 ·
+如何建立自己的长期投资组合}\label{ux7b2cux4e8cux5341ux56dbux7ae0-ux5982ux4f55ux5efaux7acbux81eaux5df1ux7684ux957fux671fux6295ux8d44ux7ec4ux5408}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{·}\label{section-113}
+
+\begin{quote}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{}\label{section-114}
+
+APP ****
+
+``\,``\,'' 1,538,420 2047 ''
+
+------
+
+\subsubsection{}\label{section-115}
+
+``\,``\,``\,``\,``\,``------
+
+ETF
+
+\subsubsection{}\label{section-116}
+
+``\,''
+
+\subsubsection{}\label{section-117}
+
+``\,''
+
+20\% ------``\,''
+
+\subsubsection{}\label{section-118}
+
+\begin{itemize}
+\tightlist
+\item
+  ETF
+\item
+  ETF
+\item
+  ETF
+\item
+\end{itemize}
+
+``\,''
+
+\subsubsection{}\label{section-119}
+
+\begin{itemize}
+\tightlist
+\item
+  ETF65\%
+\item
+  ETF25\%
+\item
+  ETF5\%
+\item
+  5\%
+\end{itemize}
+
+------
+
+\subsubsection{}\label{section-120}
+
+'' ±5\%'' 65\% 60\% 70\%
+
+\subsubsection{}\label{section-121}
+
+'' ETF'' 300 ETF 500 ETF'' ETF'' ETF'' ETF'' ETF
+
+ETF
+
+\subsubsection{}\label{section-122}
+
+------36
+
+------------'' + ''
+
+\subsubsection{}\label{section-123}
+
+------
+
+------
+
+\subsubsection{}\label{section-124}
+
+------
+
+\subsubsection{}\label{section-125}
+
+------------``40\%5\%8\%5\%''
+
+``\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+------------
+
+------``\,''
+
+\newpage
+
+\section{第二十五章 ·
+什么时候应该再平衡}\label{ux7b2cux4e8cux5341ux4e94ux7ae0-ux4ec0ux4e48ux65f6ux5019ux5e94ux8be5ux518dux5e73ux8861}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{·}\label{section-126}
+
+\begin{quote}
+\textbf{------}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{}\label{section-127}
+
+``60\% 40\%'' 30\% 5\%------``65\% 35\%''------
+
+------``\,``\,``\,``\,``\,''
+
+\subsubsection{}\label{section-128}
+
+\textbf{calendar rebalancing}------
+
+\textbf{threshold rebalancing} ±5\% ------ 50\% ±2\%
+
+\textbf{cash flow rebalancing}''\,''
+
+\subsubsection{}\label{section-129}
+
+``\,``\,``\,''
+
+------``\,``\,``\,''
+
+ETF------------
+
+ETF ``\,``\,``\,''
+
+\subsubsection{}\label{section-130}
+
+``\,``------
+
+mean reversion''\,``------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+``\,``------
+
+\newpage
+
+\section{第二十六章 ·
+如何完成第一笔投资}\label{ux7b2cux4e8cux5341ux516dux7ae0-ux5982ux4f55ux5b8cux6210ux7b2cux4e00ux7b14ux6295ux8d44}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+** · **
+
+\subsection{·}\label{section-131}
+
+\begin{quote}
+\textbf{``\,``}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+``\,''
+
+------``\,``\,``\,''
+
+\subsubsection{}\label{section-132}
+
+**** 15\%
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**** ------------``\,''
+
+**** ------------
+
+\subsubsection{}\label{section-133}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**** ------``\,''
+
+**** ``\,``------
+
+**** ETF ``\,``------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**** ------
+
+\subsubsection{}\label{section-134}
+
+**** ``\,``\,``\,''
+
+\textbf{``\,``}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+``\,``\,``\,``------
+
+\newpage
+
+\section{第二十七章 ·
+定投、一次性投入与分批买入}\label{ux7b2cux4e8cux5341ux4e03ux7ae0-ux5b9aux6295ux4e00ux6b21ux6027ux6295ux5165ux4e0eux5206ux6279ux4e70ux5165}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{·}\label{section-135}
+
+\begin{quote}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+------
+
+\subsubsection{}\label{section-136}
+
+\textbf{Dollar-Cost Averaging DCA}
+
+``\,``\,``\,``------
+
+``\,``\,``\,''
+
+\subsubsection{vs}\label{vs}
+
+------------
+
+------'' vs ''
+
+------ 20\%``\,``------
+
+\subsubsection{}\label{section-137}
+
+smile curve U ------
+
+12 V 1.00 → 0.90 → 0.78 → 0.66 → 0.60 → 0.60 → 0.68 → 0.76 → 0.84 → 0.92
+→ 1.00 → 1.00 10 1.00 10 12 8,333
+
+\textbf{lump sum} 10 1.00 100,000 12 1.00 100,000 ------ 0\%
+
+\textbf{DCA} 8,333 5---6 0.60 8,333 13,889 ------ 1.67 12 127,545 0.784
+1.00 1.00 127,545 ------ +27.5\%
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & 1.00 & ¥100,000 & 8,333 & ¥8,333 \\
+2 & 0.90 & ¥90,000 & 9,259 & ¥15,833 \\
+3 & 0.78 & ¥78,000 & 10,684 & ¥22,056 \\
+4 & 0.66 & ¥66,000 & 12,626 & ¥26,996 \\
+5 & 0.60 & ¥60,000 & 13,889 & ¥32,875 \\
+6 & 0.60 & ¥60,000 & 13,889 & ¥41,208 \\
+7 & 0.68 & ¥68,000 & 12,255 & ¥55,036 \\
+8 & 0.76 & ¥76,000 & 10,965 & ¥69,844 \\
+9 & 0.84 & ¥84,000 & 9,921 & ¥85,530 \\
+10 & 0.92 & ¥92,000 & 9,058 & ¥102,009 \\
+11 & 1.00 & ¥100,000 & 8,333 & ¥119,212 \\
+12 & 1.00 & ¥100,000 & 8,333 & \textbf{¥127,545} \\
+\end{longtable}
+
+0\% +27.5\%------``\,''
+
+10 12 V
+
+------ ETF------``\,``------
+
+\subsubsection{}\label{section-138}
+
+1,000 ETF 1.00 1,000 0.80 1,000 1,250 2,000 2,250 2,000 ÷ 2,250 ≈ 0.889
+------
+
+``\,``------
+
+\subsubsection{}\label{section-139}
+
+------
+
+------ ETF
+
+------
+
+------``\,``------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+------
+
+------``\,''
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{ch27_smile_curve.png}}
+\caption{vs}
+\end{figure}
+
+\newpage
+
+\section{第二十八章 ·
+如何记录和复盘投资}\label{ux7b2cux4e8cux5341ux516bux7ae0-ux5982ux4f55ux8bb0ux5f55ux548cux590dux76d8ux6295ux8d44}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{·}\label{section-140}
+
+\begin{quote}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+APP 12\%------``\,'' 300 18\% 6 8\% 3\%
+
+``\,''
+
+\subsubsection{}\label{section-141}
+
+investment journal
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.0833}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.0833}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.0833}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.0833}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.2917}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.3750}}@{}}
+\toprule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+2026-03-15 & & 300 ETF & 2,000 & & \\
+2026-06-20 & & ETF & 3,500 & & --- \\
+\end{longtable}
+
+``\,``\,``\,``------''\,``------\textbf{hindsight bias}
+
+\subsubsection{}\label{section-142}
+
+**** ------ 60\% 30\% 10\% ------
+
+**** ``\,``------'' + '' 10\% 12\%------``\,''
+
+**** ------``\,``\,``\,``\,``\,''
+
+**** ------------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{}\label{section-143}
+
+ETF 30\%------``\,''
+
+ETF------
+
+\subsubsection{}\label{section-144}
+
+``\,``------------
+
+------``\,``\,``\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+------``\,``------
+
+\newpage
+
+\section{第二十九章 ·
+牛市、熊市与市场周期}\label{ux7b2cux4e8cux5341ux4e5dux7ae0-ux725bux5e02ux718aux5e02ux4e0eux5e02ux573aux5468ux671f}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+** · **
+
+\subsection{·}\label{section-145}
+
+\begin{quote}
+\textbf{------}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+``\,``2000 2008 2015 A 2020 3
+
+``\,``------''``------''\,``\,``\,''
+
+\subsubsection{}\label{section-146}
+
+``\,''
+
+20\% ------------
+
+``\,``------''\,``------------
+
+``\,``\,``\,``------''\,''
+
+\textbf{1999---2002}
+
+1995 743 2000 3 10 5,048.62 ------ 580\% 2002 10 9 1,139.90 ------
+77.4\% 2002 15 2015 4 23 5,000 2000 2000 3 15 ------
+
+** A 2006---2007**
+
+2006 1 1,180 2007 10 16 6,124.04 ------ 416\% 2008 10 28 1,664.93 ------
+72.8\%2026 6,124
+
+``\,``\,``\,''
+
+--- Nasdaq / Bloomberg --- / Wind
+
+\subsubsection{}\label{section-147}
+
+``\,``\,``\,''
+
+**** ------``\,''
+
+**** ``\,``------''\,``------
+
+**** ------
+
+\subsubsection{}\label{section-148}
+
+------``\,''
+
+500 2005---2025 ``\,''
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+252 & \textbf{9.8\%} \\
+5 & 7.1\% \\
+10 & 5.2\% \\
+20 & 2.8\% \\
+30 & 0.9\% \\
+\end{longtable}
+
+20 5,040 10 ------ 0.2\%------ 4.6 10 9.8\% 5.2\% 10 ------ 2008 2020
+3---4
+
+Bloomberg 500 2005 1 --- 2025 12 N
+
+------
+
+\subsubsection{}\label{section-149}
+
+**** ------ ETF ------------------
+
+**** ------------------------
+
+**** ------------``\,''
+
+**** ------``\,``\,``\,``------
+
+\subsubsection{}\label{section-150}
+
+``\,``\,``\,''
+
+------``\,``------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+------
+
+\pandocbounded{\includegraphics[keepaspectratio]{ch29_market_cycles.png}}
+
+\newpage
+
+\section{第三十章 ·
+投资中最难管理的是自己}\label{ux7b2cux4e09ux5341ux7ae0-ux6295ux8d44ux4e2dux6700ux96beux7ba1ux7406ux7684ux662fux81eaux5df1}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{·}\label{section-151}
+
+\begin{quote}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+------------------------cognitive bias
+
+behavioral finance------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{· Loss Aversion}\label{loss-aversion}
+
+**** 1,000 2,000
+
+**** ------``\,``\,``\,''
+
+**** ``\,``\,``\,``\,``\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{· Overconfidence}\label{overconfidence}
+
+**** ------
+
+**** ``\,''
+
+**** ------``\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{· Confirmation Bias}\label{confirmation-bias}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**** ETF ``\,``\,``\,``\,``\,''
+
+**** ``\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{· Anchoring}\label{anchoring}
+
+**** ------``\,``------
+
+**** ``\,``------'' 30 30 '' 30 ``\,``------'' ETF 2.5 1.8 ''
+
+**** ``\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{· Herding}\label{herding}
+
+**** ``\,''
+
+**** ``\,'' ETF ------------``\,''
+
+**** ``\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{· Recency Bias}\label{recency-bias}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**** ``\,``\,``\,''
+
+**** ``\,``------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{· Disposition Effect}\label{disposition-effect}
+
+**** ``\,''
+
+**** ------``\,``\,``\,''
+
+**** ------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{FOMO · Fear of Missing
+Out}\label{fomo-fear-of-missing-out}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**** '' 40\%``------''\,''
+
+**** FOMO ------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{· Gambler's Fallacy}\label{gamblers-fallacy}
+
+**** ------``\,''
+
+**** ``\,``\,``\,``\,``\,``------''\,''
+
+**** ``\ldots\ldots{}''------'' 30\% ``\,``\,``\,``\,``\,``\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{· Outcome Bias}\label{outcome-bias}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**** 50\%------ ETF ------
+
+**** ``\,``------''\,``\,``\,``\,``\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{}\label{section-152}
+
+**** ------``\,``------
+
+**** ``\,``------------''\,''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+``\,``------''\,``------
+
+------FOMO------ 24 24
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+``\,''
+
+\newpage
+
+\section{终章 ·
+财富的作用，是增加人生选择权}\label{ux7ec8ux7ae0-ux8d22ux5bccux7684ux4f5cux7528ux662fux589eux52a0ux4ebaux751fux9009ux62e9ux6743}
+
+\section{·}\label{section-153}
+
+\begin{quote}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+ETF------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+------
+
+``\,``------------
+
+\subsubsection{}\label{section-154}
+
+------
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+\item
+  ------
+\item
+\item
+  10\%
+\item
+\item
+\item
+\item
+  C
+\item
+\item
+\item
+  ETF
+\item
+\item
+  ETF
+\item
+\item
+\item
+\item
+  ------ + ±5\%
+\item
+  12 ``\,''
+\item
+\item
+\end{enumerate}
+
+\subsubsection{}\label{section-155}
+
+``\,''
+
+\subsubsection{}\label{section-156}
+
+------``\,``\,``\,``------
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**\\
+\emph{2026 4ie-acc }
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+**
+
+\newpage
+
+\section{附录 A--L ·
+模板与参考资料}\label{ux9644ux5f55-al-ux6a21ux677fux4e0eux53c2ux8003ux8d44ux6599}
+
+\section{}\label{section-157}
+
+\begin{quote}
+©
+\end{quote}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{A ·}\label{a}
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+& & & \\
+& & & \\
+& & & \\
+//ETF & & & \\
+& & & \\
+& & & \\
+& & & \\
+/ & & & \\
+& & & \\
+& & & \\
+**** & & **** & \\
+& & **** & \\
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{B ·}\label{b}
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+& ¥ \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+**** & \\
+& \\
+/ & \\
+& \\
+& \\
+& \\
+**** & \\
+& \\
+**** & \\
+/ & \\
+& \\
+& \\
+& \\
+/ & \\
+& \\
+& \\
+**** & \\
+& \\
+& \\
+& \\
+& \\
+& \\
+& \\
+**** & \\
+& \\
+** - ** & \\
+** / ** & \_\_\_\_\_\_\_\% \\
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{C ·}\label{c}
+
+\textbf{1. } A. 20 B. 10-20 C. 5-10 D. 5
+
+\textbf{2. } A. // B. C. // D.
+
+\textbf{3. } A. B. C. D.
+
+\textbf{4. 20\%?} A. B. C. D.
+
+\textbf{5. ?} A. \textgreater70\% B. 40-70\% C. 10-40\% D. \textless10\%
+
+\textbf{6. } A. B. C. D.
+
+\textbf{7. } A. 12 B. 6-12 C. 3-6 D. 3
+
+\textbf{8. \textgreater10\%} A. B. C. D.
+
+\textbf{9. } A. \textgreater30\% B. 20-30\% C. 10-20\% D. \textless10\%
+
+\textbf{10. } A. B. C. D.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{D · ETF}\label{d-etf}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+\# & & / \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & & \\
+2 & / & \\
+3 & & \\
+4 & & \\
+5 & & \\
+6 & & \\
+7 & & \\
+8 & + & \\
+9 & 3/5 & \\
+10 & bid-ask spread & \\
+11 & & \\
+12 & // & \\
+13 & / & \\
+14 & AUM & \\
+15 & & \\
+16 & & \\
+17 & & \\
+18 & & \\
+19 & & \\
+20 & & \\
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{E ·}\label{e}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+\# & & / \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & // & \\
+2 & & \\
+3 & / & \\
+4 & & \\
+5 & & \\
+6 & Alpha vs 3/5 & \\
+7 & & \\
+8 & & \\
+9 & & \\
+10 & & \\
+11 & & \\
+12 & & \\
+13 & & \\
+14 & & \\
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{F · IPS}\label{f-ips}
+
+**** \_\_\_\_\_\_\_\_\_ **** \_\_\_\_\_\_\_\_\_ **** \_\_\_\_\_\_\_\_\_
+
+**** \_\_\_\_\_\_\_\_\_ X Y
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{itemize}
+\item
+  \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\item
+  \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\item
+  \_\_\_\_\_\_\_\_\_\%
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+ETF & \_\_\_\_\% & ±\_\_\_\_\% \\
+ETF/ & \_\_\_\_\% & ±\_\_\_\_\% \\
+ETF & \_\_\_\_\% & ±\_\_\_\_\% \\
+/ & \_\_\_\_\% & ±\_\_\_\_\% \\
+\end{longtable}
+
+**** \_\_\_\_\_\_\_\_\_\_ / \_\_\_\_\_\_\_\_\_
+
+**** \_\_\_\_\_\_\_\_\_12±5\%
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\textbf{/} \_\_\_\_\_\_\_\_\_
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{G ·}\label{g}
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+& \\
+& ¥\_\_\_\_\_\_\_\_ \\
+& / / \_\_\_\_\_\_\_ \\
+& \_\_\_\_\_\_\_ \\
+& / \\
+& \\
+& \_\_\_\_\_\_\_ \\
+& \\
+& \\
+& \_\_\_\_\_\_\_ \\
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{H ·}\label{h}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0857}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1286}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1286}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1857}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1857}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0857}}@{}}
+\toprule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+& / & & & & & \\
+& & & & & & \\
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{I ·}\label{i}
+
+**** \_\_\_\_\_\_\_\_\_
+
+\textbf{1. } - \_\_\_\_\_\_\_\% - \_\_\_\_\_\_\_\% - /\_\_\_\_\_\_\_\% -
+\_\_\_\_\_\_\_\_\_
+
+\textbf{2. } - vs / - / \_\_\_\_\_\_\_\_\_
+
+\textbf{3. } - \_\_\_\_\_\_\_\_\_ - \_\_\_\_\_\_\_\_\_ -
+\_\_\_\_\_\_\_\_\_
+
+\textbf{4. } - ¥\_\_\_\_\_\_\_\_\_ - ¥\_\_\_\_\_\_\_\_\_ -
+\_\_\_\_\_\_\_\%
+
+\textbf{5. } \_\_\_\_\_\_\_\_\_
+
+\textbf{6. } \_\_\_\_\_\_\_\_\_
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{J ·}\label{j}
+
+\begin{quote}
+\end{quote}
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule\noalign{}
+& ETF & & / & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+20-30 & 60-80\% & 15-30\% & 0-5\% & 5\% \\
+30-40 & 50-70\% & 25-40\% & 5-10\% & 5\% \\
+40-50 & 40-60\% & 30-50\% & 5-10\% & 5-10\% \\
+50-60 & 30-50\% & 40-55\% & 5-10\% & 5-10\% \\
+60 & 20-40\% & 40-60\% & 5-10\% & 10-15\% \\
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{K ·}\label{k}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+& English & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+& Asset & \\
+& Liability & \\
+& Net Worth & \\
+& Liquid Asset & \\
+& Inflation & \\
+& Compounding & \\
+& Simple Interest & \\
+72 & Rule of 72 & 72÷≈ \\
+& Nominal Return & \\
+& Real Return & \\
+& Volatility & \\
+& Permanent Loss of Capital & \\
+& Dividend & \\
+& Price-to-Earnings Ratio (P/E) & ÷ \\
+& Bond & \\
+& Coupon Rate & \\
+& Yield to Maturity (YTM) & \\
+& Duration & \\
+& Credit Spread & \\
+ETF & Exchange-Traded Fund & \\
+& Net Asset Value (NAV) & \\
+& Premium Rate & (-)÷ \\
+& Discount Rate & (-)÷ \\
+& Tracking Difference & ETF \\
+& Authorized Participant (AP) & ETF \\
+& Dollar-Cost Averaging (DCA) & \\
+& Asset Allocation & \\
+& Rebalancing & \\
+& Correlation & \\
+& Alpha & \\
+& Maximum Drawdown & \\
+QDII & Qualified Domestic Institutional Investor & \\
+FOF & Fund of Funds & \\
+& Glide Path & \\
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{L ·}\label{l}
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+& / \\
+& \\
+& \\
+Withholding Tax & \\
+& \\
+QDII & QDII \\
+ETF & ETF \\
+& / \\
+& \\
+& ETF \\
+& ETF \\
+\end{longtable}
+
+\begin{quote}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+\end{quote}
+
+\end{document}

@@ -17,6 +17,9 @@ import sys
 import shutil
 import re
 import subprocess
+import platform
+import urllib.request
+import zipfile
 from pathlib import Path
 from datetime import datetime
 
@@ -25,6 +28,17 @@ from datetime import datetime
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent.parent
 SKILL_DIR = Path(__file__).resolve().parent.parent
 TEMPLATE_DIR = SKILL_DIR / "assets" / "template"
+FONTS_DIR = SKILL_DIR / "assets" / "fonts"
+
+# Source Han font download URLs (Adobe releases, same as CI workflow)
+SOURCE_HAN_SERIF_SC_URL = (
+    "https://github.com/adobe-fonts/source-han-serif/releases/download/"
+    "2.003R/09_SourceHanSerifSC.zip"
+)
+SOURCE_HAN_SANS_SC_URL = (
+    "https://github.com/adobe-fonts/source-han-sans/releases/download/"
+    "2.005R/09_SourceHanSansSC.zip"
+)
 
 # Thresholds for file splitting
 SPLIT_SIZE_KB = 100        # Split if merged MD > 100KB
@@ -36,6 +50,153 @@ SPLIT_CHAPTER_MIN = 6       # Split if > 5 chapters (always split at 6+)
 def cmd(name):
     """Check if a CLI command is available."""
     return shutil.which(name) is not None
+
+
+# ── Font Management ──────────────────────────────────
+
+
+def _run(cmd_args, **kwargs):
+    """Run a command and return (returncode, stdout, stderr)."""
+    result = subprocess.run(cmd_args, capture_output=True, text=True, **kwargs)
+    return result.returncode, result.stdout, result.stderr
+
+
+def check_source_han_fonts():
+    """
+    Check whether any Source Han CJK font (SC or CN) is available system-wide.
+    Returns True if at least one Source Han Serif/Sans font is found.
+    """
+    if platform.system() == "Windows":
+        fonts_dir = Path(os.environ.get("WINDIR", "C:\\Windows")) / "Fonts"
+        if fonts_dir.exists():
+            for f in fonts_dir.iterdir():
+                name = f.name.lower()
+                if "sourcehanserif" in name or "sourcehansans" in name:
+                    rprint(f"Found Source Han font: {f.name}", "ok")
+                    return True
+        return False
+    else:
+        try:
+            rc, stdout, _ = _run(["fc-list", ":family"])
+            if rc == 0 and ("Source Han Serif" in stdout or "Source Han Sans" in stdout):
+                lines = [l for l in stdout.split("\n") if "Source Han" in l]
+                rprint(f"Found {len(lines)} Source Han font(s)", "ok")
+                return True
+        except FileNotFoundError:
+            pass
+        return False
+
+
+def _download_file(url, dest_path):
+    """Download a file with progress indication."""
+    rprint(f"Downloading {url.split('/')[-1]}...", "step")
+    try:
+        urllib.request.urlretrieve(url, str(dest_path))
+        rprint(f"  Saved: {dest_path}", "ok")
+        return True
+    except Exception as e:
+        rprint(f"Download failed: {e}", "err")
+        return False
+
+
+def install_source_han_fonts():
+    """
+    Download and install Source Han Serif/Sans SC fonts from GitHub releases.
+    On Linux: copies OTF files to ~/.fonts/ and runs fc-cache.
+    On macOS: copies to ~/Library/Fonts/.
+    On Windows: copies to C:\\Windows\\Fonts\\ (may require admin);
+                falls back to local assets/fonts/ dir.
+    """
+    system = platform.system()
+    FONTS_DIR.mkdir(parents=True, exist_ok=True)
+
+    if system == "Linux":
+        target_dir = Path.home() / ".fonts"
+        target_dir.mkdir(parents=True, exist_ok=True)
+        font_cmd = ["fc-cache", "-fv"]
+    elif system == "Darwin":
+        target_dir = Path.home() / "Library" / "Fonts"
+        target_dir.mkdir(parents=True, exist_ok=True)
+        font_cmd = None
+    else:
+        target_dir = Path(os.environ.get("WINDIR", "C:\\Windows")) / "Fonts"
+        try:
+            test = target_dir / ".write_test"
+            test.touch()
+            test.unlink()
+            font_cmd = None
+        except (PermissionError, OSError):
+            rprint("Cannot write to system Fonts directory (admin required)", "warn")
+            rprint(f"Installing to local: {FONTS_DIR}", "info")
+            target_dir = FONTS_DIR
+            font_cmd = None
+
+    font_urls = [
+        ("SourceHanSerifSC.zip", SOURCE_HAN_SERIF_SC_URL),
+        ("SourceHanSansSC.zip", SOURCE_HAN_SANS_SC_URL),
+    ]
+
+    for zip_name, url in font_urls:
+        zip_path = FONTS_DIR / zip_name
+        if zip_path.exists():
+            rprint(f"Using cached: {zip_name}", "info")
+        else:
+            if not _download_file(url, zip_path):
+                return False
+
+        rprint(f"Extracting {zip_name}...", "step")
+        try:
+            with zipfile.ZipFile(str(zip_path), "r") as zf:
+                for member in zf.namelist():
+                    if member.lower().endswith(".otf"):
+                        basename = os.path.basename(member)
+                        dest = target_dir / basename
+                        if not dest.exists():
+                            with zf.open(member) as src, open(str(dest), "wb") as dst:
+                                dst.write(src.read())
+            rprint(f"  OTF files installed to {target_dir}", "ok")
+        except Exception as e:
+            rprint(f"Extraction failed: {e}", "err")
+            return False
+
+    if font_cmd:
+        rprint("Refreshing font cache...", "step")
+        rc, stdout, stderr = _run(font_cmd)
+        if rc == 0:
+            rprint("Font cache refreshed", "ok")
+        else:
+            rprint(f"fc-cache warning: {stderr.strip()}", "warn")
+
+    if system == "Windows" and target_dir == FONTS_DIR:
+        rprint(
+            f"Fonts installed to {FONTS_DIR}. "
+            f"To use system-wide, copy OTF files to "
+            f"{os.environ.get('WINDIR', 'C:\\\\Windows')}\\Fonts\\ "
+            f"(requires admin).",
+            "warn"
+        )
+    return True
+
+
+def ensure_fonts():
+    """
+    Ensure Source Han fonts are available. Downloads them if missing.
+    """
+    if check_source_han_fonts():
+        return True
+    rprint("Source Han fonts not found. Downloading from GitHub...", "warn")
+    rprint("  (One-time setup, cached after first download)", "info")
+    if install_source_han_fonts():
+        if check_source_han_fonts():
+            return True
+        rprint(
+            "Fonts installed but may not be immediately available to XeLaTeX. "
+            "Try running 'fc-cache -fv' or restarting your terminal.",
+            "warn"
+        )
+        return True
+    rprint("Failed to install Source Han fonts. PDF compilation may fall back to Fandol.", "err")
+    return False
 
 
 def rprint(msg, level="info"):
@@ -130,7 +291,14 @@ def escape_latex_special_chars(text):
 
 
 def remove_emoji(text):
-    """Strip Unicode emoji (LaTeX cannot render them)."""
+    """
+    Strip Unicode emoji and decorative symbols (LaTeX cannot render them).
+
+    ⚠️ CAREFUL: The regex ranges MUST NOT overlap with CJK blocks
+    (U+2E80-U+2EFF, U+3000-U+303F, U+4E00-U+9FFF, U+F900-U+FAFF,
+    U+FE30-U+FE4F, U+20000-U+2FFFF, etc.).
+    Use discrete, non-overlapping ranges only.
+    """
     emoji_pattern = re.compile(
         "["
         "\U0001F600-\U0001F64F"  # emoticons
@@ -138,7 +306,11 @@ def remove_emoji(text):
         "\U0001F680-\U0001F6FF"  # transport & map
         "\U0001F1E0-\U0001F1FF"  # flags
         "\U00002702-\U000027B0"  # dingbats
-        "\U000024C2-\U0001F251"  # misc
+        "\U0001F900-\U0001F9FF"  # supplemental symbols
+        "\U0001FA00-\U0001FA6F"  # chess symbols
+        "\U0001FA70-\U0001FAFF"  # symbols extended-A
+        "\U0001F000-\U0001F02F"  # mahjong tiles
+        "\U0001F0A0-\U0001F0FF"  # playing cards
         "]+",
         flags=re.UNICODE,
     )
@@ -164,6 +336,23 @@ def convert_task_lists(text):
     """Convert Markdown task lists to plain lists."""
     text = re.sub(r"^- \[x\] ", "- ", text, flags=re.MULTILINE)
     text = re.sub(r"^- \[ \] ", "- ", text, flags=re.MULTILINE)
+    return text
+
+
+def strip_yaml_frontmatter(text):
+    """
+    Strip YAML frontmatter (--- ... ---) from the beginning of a Markdown
+    file.  Pandoc treats text between --- delimiters as metadata; if CJK
+    body text falls inside a YAML block, it is silently discarded.
+
+    Only strips if the very first non-whitespace line is exactly '---'.
+    """
+    stripped = text.lstrip("\n")
+    if stripped.startswith("---"):
+        # Find the closing --- (must be on its own line)
+        closer = stripped.find("\n---", 3)
+        if closer != -1:
+            return stripped[closer + 4:].lstrip("\n")
     return text
 
 
@@ -196,9 +385,9 @@ def extract_title_from_md(filepath):
                 m = re.match(r"^#\s+(.+)", line)
                 if m:
                     return m.group(1).strip()
-        return filepath.stem
+        return Path(filepath).stem
     except Exception:
-        return filepath.stem
+        return Path(filepath).stem
 
 
 def scan_directory(directory, output_file=None):
@@ -293,7 +482,10 @@ def resolve_image_paths(md_content, md_dir):
     def replacer(match):
         prefix = match.group(1)  # ![alt](  or  <img src="
         img_path = match.group(2)
-        suffix = match.group(3)  # )  or  "
+        try:
+            suffix = match.group(3)  # )  or  "
+        except IndexError:
+            suffix = ""
 
         # Skip URLs and absolute paths
         if img_path.startswith(("http://", "https://", "/", "file://")):
@@ -302,7 +494,7 @@ def resolve_image_paths(md_content, md_dir):
         # Resolve relative path
         abs_img = (md_dir / img_path).resolve()
         if abs_img.exists():
-            return f'{prefix}{abs_img}{suffix}'
+            return f'{prefix}{str(abs_img).replace(chr(92), "/")}{suffix}'
         else:
             rprint(f"Image not found: {img_path} (from {md_dir})", "warn")
             return match.group(0)
@@ -327,7 +519,8 @@ def merge_markdown(entries, output_file):
     Merge indexed documents into a single Markdown file.
 
     Prepends chapter headers with page breaks.
-    Applies preprocessing: HTML→MD, task lists→plain, emoji removal.
+    Applies preprocessing: YAML frontmatter stripping, HTML→MD,
+    task lists→plain, emoji removal.
     Then resolves relative image paths to absolute.
     """
     merged_lines = []
@@ -342,12 +535,17 @@ def merge_markdown(entries, output_file):
         chapter_num += 1
         content = md_path.read_text(encoding="utf-8")
 
+        # Step 0: Strip YAML frontmatter (--- ... ---).
+        # Crucial: Pandoc treats --- blocks as YAML metadata; if CJK
+        # body text falls inside a YAML block, Pandoc silently discards it.
+        content = strip_yaml_frontmatter(content)
+
         # Step 1: LaTeX preprocessing (must happen before image path resolution)
         content = preprocess_markdown(content)
 
-        # Step 2: Resolve image paths
-        md_dir = md_path.parent
-        content = resolve_image_paths(content, md_dir)
+        # Step 2: Image path resolution is skipped — Pandoc uses
+        # \graphicspath and relative paths at compile time.
+        # resolve_image_paths() would bake absolute paths into .tex output.
 
         # Add chapter separator (ctexbook auto-numbers chapters, so use title only)
         merged_lines.append("\n\n\\newpage\n\n")
@@ -366,7 +564,7 @@ def merge_markdown(entries, output_file):
 
 
 def generate_tex(template_file, merged_md_path, output_tex_path,
-                 title="4i_e-acc Toolbook", author="4i_e-acc Workspace",
+                 title="四倍做多认知，长期做多人生", author="花花 | @BerryUIKI",
                  date=None, toc=True):
     """Generate .tex source from merged Markdown via Pandoc (no compilation)."""
     if date is None:
@@ -540,17 +738,23 @@ def run_xelatex(tex_path, work_dir, passes=2):
 
     for p in range(1, passes + 1):
         rprint(f"XeLaTeX pass {p}/{passes}...", "step")
+        xelatex_args = ["xelatex", "-interaction=nonstopmode", "-halt-on-error"]
+        if str(work_dir) != str(tex_dir):
+            xelatex_args.extend(["-output-directory", str(work_dir)])
+        xelatex_args.append(tex_file)
         result = subprocess.run(
-            ["xelatex", "-interaction=nonstopmode", "-output-directory",
-             str(work_dir), tex_file],
+            xelatex_args,
             cwd=str(tex_dir),
             capture_output=True,
             text=True,
         )
 
-        # Check for fatal errors
-        if "Fatal error" in result.stdout or "Fatal error" in result.stderr:
-            rprint(f"XeLaTeX pass {p} failed with fatal error", "err")
+        # Check for fatal errors via returncode and PDF existence
+        if result.returncode != 0:
+            pdf_name = Path(tex_file).with_suffix(".pdf").name
+            generated_in_pass = work_dir / pdf_name
+            if not generated_in_pass.exists():
+                rprint(f"XeLaTeX pass {p} failed (returncode={result.returncode}) and no PDF produced", "err")
             # Try to read the .log file for detailed error info
             log_file = work_dir / Path(tex_file).with_suffix(".log").name
             if log_file.exists():
@@ -638,8 +842,13 @@ def compile_pdf(template_file, merged_md_path, output_pdf_path,
     # Step 2: Decide on splitting
     work_dir = output_dir
     if should_split(merged_md_path, chapter_count):
-        work_dir = output_dir / "tex"
-        tex_path = split_tex_into_chapters(tex_path, chapter_count, work_dir)
+        try:
+            split_result = split_tex_into_chapters(tex_path, chapter_count, output_dir / "tex")
+            if split_result and str(split_result) != str(tex_path):
+                work_dir = output_dir / "tex"
+                tex_path = split_result
+        except Exception as e:
+            rprint(f"Split failed (continuing with single file): {e}", "warn")
 
     # Step 3: Compile with XeLaTeX (2-pass minimum)
     rprint(f"Compiling PDF (2-pass XeLaTeX)...", "step")
@@ -721,8 +930,8 @@ def main():
 
         index_file = sys.argv[2]
         output_pdf = sys.argv[3] if len(sys.argv) > 3 else str(WORKSPACE_ROOT / "output" / "toolbook.pdf")
-        title = sys.argv[4] if len(sys.argv) > 4 else "4i_e-acc Toolbook"
-        author = sys.argv[5] if len(sys.argv) > 5 else "4i_e-acc Workspace"
+        title = sys.argv[4] if len(sys.argv) > 4 else "四倍做多认知，长期做多人生"
+        author = sys.argv[5] if len(sys.argv) > 5 else "花花 | @BerryUIKI"
         date = sys.argv[6] if len(sys.argv) > 6 else None
 
         # Parse index
@@ -737,6 +946,17 @@ def main():
         merged_path = WORKSPACE_ROOT / "output" / "_merged.md"
         merged_path.parent.mkdir(parents=True, exist_ok=True)
         merged_path, chapter_count = merge_markdown(entries, merged_path)
+
+        # Copy Chart images from book assets to output directory
+        book_chart_src = WORKSPACE_ROOT / "articles" / "2026-quadruple-long-life" / "analysis" / "output"
+        if book_chart_src.exists():
+            chart_dest = merged_path.parent
+            for img in book_chart_src.glob("*.png"):
+                shutil.copy2(img, chart_dest / img.name)
+            rprint(f"Chart images copied from {book_chart_src}", "ok")
+
+        # Ensure Source Han fonts (download if missing)
+        ensure_fonts()
 
         # Find template
         template = TEMPLATE_DIR / "pandoc-template.tex"
@@ -770,8 +990,8 @@ def main():
 
         index_file = sys.argv[2]
         output_tex = sys.argv[3] if len(sys.argv) > 3 else str(WORKSPACE_ROOT / "output" / "toolbook.tex")
-        title = sys.argv[4] if len(sys.argv) > 4 else "4i_e-acc Toolbook"
-        author = sys.argv[5] if len(sys.argv) > 5 else "4i_e-acc Workspace"
+        title = sys.argv[4] if len(sys.argv) > 4 else "四倍做多认知，长期做多人生"
+        author = sys.argv[5] if len(sys.argv) > 5 else "花花 | @BerryUIKI"
         date = sys.argv[6] if len(sys.argv) > 6 else None
 
         idx_content = Path(index_file).read_text(encoding="utf-8")
@@ -781,6 +1001,17 @@ def main():
         merged_path.parent.mkdir(parents=True, exist_ok=True)
         merged_path, chapter_count = merge_markdown(entries, merged_path)
 
+        # Copy Chart images from book assets to output directory
+        book_chart_src = WORKSPACE_ROOT / "articles" / "2026-quadruple-long-life" / "analysis" / "output"
+        if book_chart_src.exists():
+            chart_dest = merged_path.parent
+            for img in book_chart_src.glob("*.png"):
+                shutil.copy2(img, chart_dest / img.name)
+            rprint(f"Chart images copied from {book_chart_src}", "ok")
+
+        # Ensure Source Han fonts (download if missing)
+        ensure_fonts()
+
         template = TEMPLATE_DIR / "pandoc-template.tex"
         output_path = Path(output_tex)
         output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -789,7 +1020,12 @@ def main():
         # Split if needed
         if should_split(merged_path, chapter_count):
             work_dir = output_path.parent / "tex"
-            tex_path = split_tex_into_chapters(tex_path, chapter_count, work_dir)
+            try:
+                split_result = split_tex_into_chapters(tex_path, chapter_count, work_dir)
+                if split_result and str(split_result) != str(tex_path):
+                    tex_path = split_result
+            except Exception as e:
+                rprint(f"Split failed (continuing with single file): {e}", "warn")
 
         print(f"\nTEX_PATH:{tex_path}")
 
