@@ -1,17 +1,21 @@
 name: Build Book PDF
 
 # Auto-compile 《四倍做多认知，长期做多人生》 to PDF on every push
-# to the book branch. Uses Pandoc + XeLaTeX with DollarHua brand styling.
+# to the book branch AND on main (so the PDF is rebuilt automatically
+# after any PR merge into main). Uses Pandoc + XeLaTeX with DollarHua styling.
 #
 # Architecture:
 #   1. Merge book chapters via build_pdf.py tex (generate .tex only)
 #   2. Install Source Han Serif/Sans SC OTF fonts from Adobe releases
-#   3. XeLaTeX 2-pass compilation
+#   3. XeLaTeX 3-pass compilation
 #   4. Upload PDF artifact (90-day retention)
+#   5. Non-main branches: auto-commit the PDF back to the repo.
+#      main is skipped — branch protection (enforce_admins) blocks bot pushes.
 
 on:
   push:
     branches:
+      - main
       - article/2026-quadruple-long-life
       - article/2026-quadruple-long-life-polish
     paths:
@@ -155,9 +159,9 @@ jobs:
           path: skills/pdf-toolbook/output/**/*.pdf
           retention-days: 90
 
-      # ── Auto-commit PDF to repository ───────────────
+      # ── Auto-commit PDF to repository (non-main only) ──
       - name: Commit PDF to repo
-        if: success()
+        if: success() && github.ref != 'refs/heads/main'
         run: |
           cp skills/pdf-toolbook/output/toolbook.pdf articles/2026-quadruple-long-life/output/book.pdf
           git config user.name "github-actions[bot]"
