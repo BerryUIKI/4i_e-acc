@@ -3,10 +3,10 @@
 ## Q3 2026
 
 ### Book: 《四倍做多认知，长期做多人生》
-- [ ] CI PDF auto-compilation passing (pandoc → xelatex)
-- [ ] PR #7 merged to main → Release published
-- [ ] 18 illustrations generated and placed in `assets/illustrations/`
-- [ ] Full proofreading pass
+- [x] CI PDF auto-compilation passing (pandoc → xelatex) — PR #14 merged, auto-compile on main verified
+- [x] PR merged to main → Release published — Release v0.1 live (quadruple-long-life.pdf 2.1MB, tag v0.1)
+- [ ] 18 illustrations generated and placed in `assets/illustrations/` — 9/18 done (00-cover ~ 08-smile-curve)
+- [ ] Full proofreading pass — editorial review done (8.0/10); 6 publication items pending → see articles/2026-quadruple-long-life/todo.md P0
 
 ### Agents infrastructure
 - [x] Agent identity system deployed (SHA256 UID → ShortAgentID = last 8 hex)
@@ -36,8 +36,8 @@ Target: Q3 2026. Exercise the complete lifecycle once:
 ## Q4 2026
 
 ### Pipeline hardening
-- [ ] `docs-checks.yml` (check_links.py, check_style.py) passing
-- [ ] CI automatically deploys PDF to Release on every main push
+- [ ] `docs-checks.yml` (check_links.py, check_style.py) passing — markdown-lint 667 pre-existing errors, cosmetic
+- [x] CI automatically deploys PDF to Release on every main push — PR #15 merged, auto-publish on main
 
 ### Content expansion
 - [ ] Supplementary appendices (tax, estate planning)

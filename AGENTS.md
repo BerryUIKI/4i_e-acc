@@ -8,7 +8,7 @@ Baseline rules for all AI agents operating in this repo. Sub-directory `AGENTS.m
 
 ## 🚫 Hard rules
 
-- **Never push to `main`.** Branch + PR only. Squash-merge.
+- **Never push to `main` or `dev` directly.** Branch + PR only. Squash-merge.
 - **Never force-push** on any shared branch. Silently erases other agents' commits.
 - **Never commit secrets.** Tokens/keys stay outside the repo tree.
 - **English folder names only.** Document content may be bilingual.
@@ -17,10 +17,11 @@ Baseline rules for all AI agents operating in this repo. Sub-directory `AGENTS.m
 
 ## Workflow
 
-1. Branch: `article/`, `fix/`, `feat/`, `ci/`, `docs/`, `chore/` prefix — never `main`.
+1. Branch: `article/`, `fix/`, `feat/`, `ci/`, `docs/`, `chore/` prefix — never `main` or `dev`.
 2. Commit. If GPG signing unavailable: `git -c commit.gpgsign=false commit ...`.
-3. Push + open PR to `main` (squash-merge).
+3. Push + open PR to `dev` (squash-merge) for normal writing/content work.
 4. Verify: `python .github/scripts/check_links.py` and `check_style.py` before push.
+5. When the milestone is release-ready, open a PR `dev` → `main` (squash-merge).
 
 ## Agent Identity & Git Traceability
 
@@ -37,7 +38,7 @@ SHA256 of: `[device_fp]|[role]|[bound_main_short_id]|[UTC_register_ms]|[repo_sal
 Every commit message MUST start with the `[ShortAgentID]` tag. Example: `[f78f1d3e] docs: fix typo in README`
 
 ### 🚫 Push restriction (Sub agents)
-Sub agents SHALL NOT push to `main` or integration branches. They MAY push to their own feature branch (`sub/{ShortAgentID}/*`). Only bound Main agents execute pushes to `main` or integration branches.
+Sub agents SHALL NOT push to `main`, `dev`, or any integration branch. They MAY push to their own feature branch (`sub/{ShortAgentID}/*`). Only bound Main agents execute pushes to integration branches (`dev`) — and even then only via PR, since both `main` and `dev` are branch-protected.
 
 ### 🚫 Git local identity binding
 1. **Main agent activation**: upon activation, Main agent MUST configure repo-local git identity using:
