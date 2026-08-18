@@ -9,7 +9,7 @@
 4. [目录 · Table of Contents](articles/2026-quadruple-long-life/Front-Matter/FM003-table-of-contents.md)
 5. [序章 · 为什么普通人必须理解资产](articles/2026-quadruple-long-life/Front-Matter/FM004-prologue.md)
 
-6. [第一章 · 收入、资产与财富不是一回事](articles/2026-quadruple-long-life/Main-Text/A001-where-wealth-comes-from.md)
+6. [第一章 · 财富从哪里来？](articles/2026-quadruple-long-life/Main-Text/A001-where-wealth-comes-from.md)
 7. [第二章 · 先计算自己的净资产](articles/2026-quadruple-long-life/Main-Text/A002-calculate-net-worth.md)
 8. [第三章 · 储蓄率比收入数字更重要](articles/2026-quadruple-long-life/Main-Text/A003-savings-rate.md)
 9. [第四章 · 投资之前，先处理负债和应急资金](articles/2026-quadruple-long-life/Main-Text/A004-debt-and-emergency-fund.md)
