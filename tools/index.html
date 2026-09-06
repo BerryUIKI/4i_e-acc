@@ -121,5 +121,17 @@ function applyLang(){
 }
 applyLang();
 </script>
+<script>
+(function(){
+  if(!window.__TAURI__) return;
+  var b=document.createElement("div");
+  b.style.cssText="position:fixed;left:16px;bottom:12px;z-index:9999;background:#E1F5EE;border:1px solid #9FE1CB;color:#085041;border-radius:999px;padding:4px 12px;font-size:11.5px;font-family:inherit";
+  document.body.appendChild(b);
+  b.textContent="桌面版 · Desktop";
+  window.__TAURI__.core.invoke("app_info").then(function(i){
+    b.textContent="桌面版 v"+i.version+" · Desktop · 数据仅存本机 / local-only";
+  }).catch(function(){});
+})();
+</script>
 </body>
 </html>
