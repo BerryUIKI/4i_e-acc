@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>复利计算器 · Compound Interest Calculator</title>
+<style>
+  :root{--cream:#FBF7F0;--paper:#FFFFFF;--pink:#FEC6CD;--pink-deep:#F3A6AF;--navy:#1D1E50;--bronze:#B86C40;--ink:#2C2C2A;--line:#E7E0D4;--muted:#6b675e}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--cream);color:var(--ink);font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;line-height:1.6;padding:24px 16px 40px}
+  .wrap{max-width:1040px;margin:0 auto}
+  header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  header h1{font-size:22px;font-weight:700;color:var(--navy)}
+  header .sub{font-size:13px;color:var(--muted);flex:1;min-width:200px}
+  .langbtn{border:1px solid var(--pink-deep);background:#fff;color:var(--navy);font-size:12px;padding:4px 10px;border-radius:999px;cursor:pointer}
+  .langbtn:hover{background:var(--pink)}
+  .disclaimer{font-size:12px;color:var(--muted);margin-bottom:18px}
+  .layout{display:grid;grid-template-columns:340px 1fr;gap:16px}
+  @media(max-width:760px){.layout{grid-template-columns:1fr}}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px}
+  .card h2{font-size:14px;color:var(--navy);margin-bottom:12px;font-weight:600}
+  .field{margin-bottom:12px}
+  .field label{display:block;font-size:13px;margin-bottom:4px}
+  .field .hint{font-size:11px;color:var(--muted)}
+  .field input{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:15px;background:#fff}
+  .field input:focus{outline:2px solid var(--pink-deep)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .btn{width:100%;padding:11px;border:none;border-radius:10px;background:var(--navy);color:#fff;font-size:15px;font-weight:600;cursor:pointer}
+  .btn:hover{opacity:.92}
+  .out{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+  @media(max-width:560px){.out{grid-template-columns:1fr 1fr}}
+  .metric{background:#FDF9F3;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .metric .k{font-size:12px;color:var(--muted)}
+  .metric .v{font-size:19px;font-weight:700;color:var(--navy);margin-top:2px}
+  .metric .v.acc{color:var(--bronze)}
+  svg{width:100%;height:auto;display:block}
+  .legend{display:flex;gap:16px;font-size:12px;color:var(--muted);margin:6px 0 2px}
+  .legend i{display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+  .note{font-size:12px;color:var(--muted);margin-top:8px}
+  .compare{margin-top:14px;border-top:1px dashed var(--line);padding-top:12px}
+  .compare h3{font-size:13px;color:var(--navy);margin-bottom:8px}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+  th,td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:left}
+  th{color:var(--muted);font-weight:500}
+  .hl{color:var(--bronze);font-weight:600}
+  footer{margin-top:22px;font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+  footer b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 data-i18n="title">复利计算器</h1>
+    <span class="sub" data-i18n="subtitle">源自《四倍做多认知，长期做多人生》第五章</span>
+    <button class="langbtn" id="langbtn" onclick="toggleLang()">English</button>
+  </header>
+  <p class="disclaimer" data-i18n="disclaimer">教学模拟工具：公式与口径见页脚。结果仅为教学假设，不构成任何投资建议。</p>
+
+  <div class="layout">
+    <div class="card">
+      <h2 data-i18n="inputTitle">输入你的参数</h2>
+      <div class="field"><label data-i18n="lPrincipal">初始本金（元）</label><input id="principal" type="number" min="0" step="1000" value="10000"></div>
+      <div class="field"><label data-i18n="lMonthly">每月追加定投（元，可为 0）</label><input id="monthly" type="number" min="0" step="100" value="500"><div class="hint" data-i18n="hMonthly">按每年年末投入一次等额（500 × 12）计算</div></div>
+      <div class="row">
+        <div class="field"><label data-i18n="lRate">年化收益率（%）</label><input id="rate" type="number" min="0" max="100" step="0.5" value="7"></div>
+        <div class="field"><label data-i18n="lYears">投资年限（年）</label><input id="years" type="number" min="1" max="60" step="1" value="30"></div>
+      </div>
+      <div class="row" style="margin-top:14px;grid-template-columns:1fr"><button class="btn" onclick="calc()" data-i18n="btnCalc">计算</button></div>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="resultTitle">结果</h2>
+      <div class="out">
+        <div class="metric"><div class="k" data-i18n="mInvested">总共投入</div><div class="v" id="m-invest">—</div></div>
+        <div class="metric"><div class="k" data-i18n="mGain">复利增长部分</div><div class="v acc" id="m-gain">—</div></div>
+        <div class="metric"><div class="k" data-i18n="mFinal">到期总额</div><div class="v" id="m-final">—</div></div>
+      </div>
+      <div class="legend"><span><i style="background:var(--navy)"></i><span data-i18n="lgTotal">账户总额（复利）</span></span><span><i style="background:var(--pink-deep)"></i><span data-i18n="lgInvested">累计投入本金</span></span></div>
+      <svg id="chart" viewBox="0 0 600 260" role="img" aria-label="Growth curve"></svg>
+      <div class="note" id="rule72"></div>
+
+      <div class="compare">
+        <h3 data-i18n="cTitle">早开始 vs 晚开始（同样每月 500 元，同样 60 岁退休）</h3>
+        <table id="tbl-compare">
+          <tr><th></th><th data-i18n="cAge25">25 岁开始（35 年）</th><th data-i18n="cAge35">35 岁开始（25 年）</th></tr>
+          <tr><td data-i18n="cFinal">到期总额</td><td id="c-early-v">—</td><td id="c-late-v">—</td></tr>
+          <tr><td data-i18n="cInvested">总共投入</td><td id="c-early-p">—</td><td id="c-late-p">—</td></tr>
+          <tr><td data-i18n="cGap">总额差距</td><td colspan="2" class="hl" id="c-gap">—</td></tr>
+        </table>
+        <div class="note" id="c-catchup"></div>
+        <div class="note" id="c-caliber" style="margin-top:6px"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div id="foot1"></div>
+    <div id="foot2"></div>
+    <div id="foot3"></div>
+    <div id="foot4"></div>
+  </footer>
+</div>
+
+<script>
+const I18N = {
+  zh: {
+    title:"复利计算器", subtitle:"源自《四倍做多认知，长期做多人生》第五章 · Compound Calculator",
+    disclaimer:"教学模拟工具：公式与口径见页脚。结果仅为教学假设，不构成任何投资建议；历史收益不代表未来表现。",
+    inputTitle:"输入你的参数", lPrincipal:"初始本金（元）", lMonthly:"每月追加定投（元，可为 0）", hMonthly:"按每年年末投入一次等额（每月追加 × 12）计算",
+    lRate:"年化收益率（%）", lYears:"投资年限（年）", btnCalc:"计算",
+    resultTitle:"结果", mInvested:"总共投入", mGain:"复利增长部分", mFinal:"到期总额",
+    lgTotal:"账户总额（复利）", lgInvested:"累计投入本金",
+    cTitle:"早开始 vs 晚开始（同样每月 500 元，同样 60 岁退休）", cAge25:"25 岁开始（35 年）", cAge35:"35 岁开始（25 年）",
+    cFinal:"到期总额", cInvested:"总共投入", cGap:"总额差距",
+    rule72:"72 法则：按 {r}% 的年化，约 {y} 年翻倍（无追加投入时）。",
+    gapFmt:"{v}（晚 10 年，少投 {less}，却少积累 {gap}）",
+    catchup:"35 岁才开始、仍想在 60 岁达到同样总额，每月需要约 {need}（而不是 500 元）——越晚开始，需要付出的越多。",
+    catchup0:"收益率 0% 时无复利差距，早开始的意义主要来自时间（此处未计通胀）。",
+    caliber:"口径注：书序章同案例（每月 500 元、25 岁至 60 岁）约得 91 万，因其按「每月投入、按月复利」计算；本工具统一按「年末投入、年复利」口径（上表约 83 万）。结论方向一致，精确数字随口径而变。",
+    foot1:"口径与来源：① 终值（一次性本金）：P × (1+r)^n；② 定投（普通年金，年末投入）：A × [(1+r)^n − 1] ÷ r，A = 每月追加 × 12，r 为年化收益率、n 为年数。",
+    foot2:"假设：年复利、每年年末投入、期间不再取出；未计税费与费率（费率影响见书第十六章）。",
+    foot3:"72 法则：资产翻倍所需年数 ≈ 72 ÷ 年化收益率（书中第五章）；精确值为 ln2 / ln(1+r)。",
+    foot4:"来源：《四倍做多认知，长期做多人生》第五章（复利）、第二十七章（定投）。本工具为「书 → 工具」系列（A1）；遵循仓库 data-provenance 规则。教学假设，不构成投资建议。"
+  },
+  en: {
+    title:"Compound Interest Calculator", subtitle:"From Chapter 5 of 《Quadruple Leverage on Cognition, Long Life》",
+    disclaimer:"Teaching simulation: formulas and caliber in footer. Results are hypothetical and not investment advice.",
+    inputTitle:"Your inputs", lPrincipal:"Initial principal (CNY)", lMonthly:"Monthly contribution (CNY, 0 allowed)", hMonthly:"Modeled as one equal annual contribution (monthly × 12) at year-end",
+    lRate:"Annual return (%)", lYears:"Years", btnCalc:"Calculate",
+    resultTitle:"Result", mInvested:"Total invested", mGain:"Growth from compounding", mFinal:"Final value",
+    lgTotal:"Account value (compounded)", lgInvested:"Cumulative contributions",
+    cTitle:"Start early vs start late (same ¥500/month, retire at 60)", cAge25:"Start at 25 (35 yrs)", cAge35:"Start at 35 (25 yrs)",
+    cFinal:"Final value", cInvested:"Total invested", cGap:"Value gap",
+    rule72:"Rule of 72: at {r}% annual return, money doubles in about {y} years (no contributions).",
+    gapFmt:"{v} — starting 10 yrs later invests {less} less yet accumulates {gap} less",
+    catchup:"To reach the same final value by 60 when starting at 35, you would need about {need} per month (not 500) — the later you start, the more it costs.",
+    catchup0:"At 0% return there is no compounding gap; the point of starting early is time (inflation not modeled).",
+    caliber:"Caliber note: the book's prologue case (¥500/month, age 25-60) yields ≈¥910k using monthly compounding; this tool uses year-end annual compounding (≈¥830k above). Direction is identical; exact figures vary by caliber.",
+    foot1:"Formulas: ① Lump sum: P × (1+r)^n. ② Periodic (ordinary annuity, year-end): A × [(1+r)^n − 1] ÷ r, A = monthly × 12, r = annual rate, n = years.",
+    foot2:"Assumptions: annual compounding, year-end contributions, no withdrawals; taxes/fees ignored (see book Ch16 for fees).",
+    foot3:"Rule of 72: years to double ≈ 72 ÷ annual return (book Ch5); exact: ln2 / ln(1+r).",
+    foot4:"Source: 《Quadruple Leverage on Cognition, Long Life》 Ch5 (compounding), Ch27 (DCA). Part of the book-to-tool series (A1); follows repo data-provenance rules. Hypothetical — not investment advice."
+  }
+};
+let LANG = "zh";
+function t(key, vars){ let s = I18N[LANG][key] || I18N.zh[key]; if(vars) for(const k in vars) s = s.replace("{"+k+"}", vars[k]); return s; }
+function applyLang(){
+  document.documentElement.lang = LANG==="zh"?"zh-CN":"en";
+  document.getElementById("langbtn").textContent = LANG==="zh"?"English":"中文";
+  document.querySelectorAll("[data-i18n]").forEach(el=>{ el.textContent = t(el.dataset.i18n); });
+  for(let i=1;i<=4;i++){ const el=document.getElementById("foot"+i); el.innerHTML = i<=2? t("foot"+i).replace(/(P|A|r|n)/g,"<i>$1</i>") : t("foot"+i); }
+  calc();
+}
+function toggleLang(){ LANG = LANG==="zh"?"en":"zh"; applyLang(); }
+function fmt(n){ return "¥" + Math.round(n).toLocaleString(LANG==="zh"?"zh-CN":"en-US"); }
+function money(n){ return Math.round(n).toLocaleString(LANG==="zh"?"zh-CN":"en-US"); }
+function totalWith(monthly, rate, years){ const A=monthly*12, r=rate/100, n=years; return A*((Math.pow(1+r,n)-1)/r); }
+function finalVals(p, monthly, rate, years){
+  const r=rate/100, n=years, fvLump=p*Math.pow(1+r,n), fvAnn=totalWith(monthly,rate,years);
+  const final=fvLump+fvAnn, invested=p+monthly*12*years;
+  return {final, invested, gain:final-invested};
+}
+function yearlySeries(p, monthly, rate, years){ const r=rate/100, arr=[]; for(let y=0;y<=years;y++){ arr.push({y, val:p*Math.pow(1+r,y)+totalWith(monthly,rate,y), inv:p+monthly*12*y}); } return arr; }
+function drawChart(series){
+  const W=600,H=260,padL=54,padR=16,padT=14,padB=30;
+  const xMax=series.length-1, yMax=Math.max(...series.map(s=>s.val))*1.06||1;
+  const x=i=>padL+(W-padL-padR)*i/xMax, y=v=>H-padB-(H-padB-padT)*v/yMax;
+  const line=series.map((s,i)=>(i?"L":"M")+x(s.y).toFixed(1)+" "+y(s.val).toFixed(1)).join(" ");
+  const lineInv=series.map((s,i)=>(i?"L":"M")+x(s.y).toFixed(1)+" "+y(s.inv).toFixed(1)).join(" ");
+  const yTicks=5; let grid="";
+  for(let i=0;i<=yTicks;i++){ const v=yMax*i/yTicks, yy=y(v); grid+=`<line x1="${padL}" y1="${yy}" x2="${W-padR}" y2="${yy}" stroke="#EFE9DC" stroke-width="1"/><text x="${padL-8}" y="${yy+4}" font-size="11" fill="#6b675e" text-anchor="end">${v>=10000?Math.round(v/10000)+"万":Math.round(v)}</text>`; }
+  for(let i=0;i<=Math.min(xMax,10);i++){ const xi=Math.round(xMax*i/10), xx=x(xi); grid+=`<text x="${xx}" y="${H-12}" font-size="11" fill="#6b675e" text-anchor="middle">${xi}y</text>`; }
+  const last=series[series.length-1], dotX=x(last.y), dotY=y(last.val);
+  return grid+`<path d="${lineInv}" fill="none" stroke="#F3A6AF" stroke-width="2.5" stroke-linecap="round"/><path d="${line}" fill="none" stroke="#1D1E50" stroke-width="3" stroke-linecap="round"/><circle cx="${dotX}" cy="${dotY}" r="4.5" fill="#B86C40"/><text x="${Math.min(dotX+8,W-padR-4)}" y="${dotY-8}" font-size="12" fill="#B86C40" font-weight="600">${fmt(last.val)}</text>`;
+}
+function calc(){
+  const p=Math.max(0,+document.getElementById("principal").value||0);
+  const m=Math.max(0,+document.getElementById("monthly").value||0);
+  const rate=+document.getElementById("rate").value||0;
+  const years=Math.min(60,Math.max(1,+document.getElementById("years").value||1));
+  const {final,invested,gain}=finalVals(p,m,rate,years);
+  document.getElementById("m-invest").textContent=fmt(invested);
+  document.getElementById("m-gain").textContent="+"+fmt(gain);
+  document.getElementById("m-final").textContent=fmt(final);
+  document.getElementById("chart").innerHTML=drawChart(yearlySeries(p,m,rate,years));
+  document.getElementById("rule72").textContent = rate>0 ? t("rule72",{r:rate, y:(72/rate).toFixed(1)}) : "";
+  const e=finalVals(0,500,rate,35), l=finalVals(0,500,rate,25);
+  document.getElementById("c-early-v").textContent=fmt(e.final);
+  document.getElementById("c-late-v").textContent=fmt(l.final);
+  document.getElementById("c-early-p").textContent=fmt(e.invested);
+  document.getElementById("c-late-p").textContent=fmt(l.invested);
+  document.getElementById("c-gap").textContent=t("gapFmt",{v:fmt(e.final-l.final), less:fmt(e.invested-l.invested), gap:fmt(e.final-l.final)});
+  if(rate>0){ const need=(e.final*rate/100)/(Math.pow(1+rate/100,25)-1)/12; document.getElementById("c-catchup").innerHTML=t("catchup",{need:fmt(need)}); }
+  else document.getElementById("c-catchup").innerHTML=t("catchup0");
+  document.getElementById("c-caliber").textContent=t("caliber");
+}
+applyLang();
+</script>
+</body>
+</html>
