@@ -148,5 +148,24 @@ applyLang();
   });
 })();
 </script>
+<script>
+(function(){
+  if(typeof localStorage==="undefined") return;
+  var KEY="ql-toolbox:"+location.pathname.replace(/[^a-z0-9]+/gi,"-");
+  function loadVals(){
+    var raw=localStorage.getItem(KEY); if(!raw) return;
+    try{ var o=JSON.parse(raw);
+      Object.keys(o).forEach(function(id){ var el=document.getElementById(id); if(el) el.value=o[id]; });
+      var fn=window.calc||window.run||window.gen||null; if(fn) fn();
+    }catch(e){}
+  }
+  function saveVals(){ var o={};
+    document.querySelectorAll("input,select").forEach(function(el){ if(el.id) o[el.id]=el.value; });
+    try{ localStorage.setItem(KEY, JSON.stringify(o)); }catch(e){}
+  }
+  document.addEventListener("input",saveVals); document.addEventListener("change",saveVals);
+  loadVals();
+})();
+</script>
 </body>
 </html>
