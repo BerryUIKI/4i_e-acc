@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>人生目标翻译器 · Goal Translator</title>
+<style>
+  :root{--cream:#FBF7F0;--paper:#FFF;--pink:#FEC6CD;--pink-deep:#F3A6AF;--navy:#1D1E50;--bronze:#B86C40;--teal:#0F6E56;--ink:#2C2C2A;--line:#E7E0D4;--muted:#6b675e}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--cream);color:var(--ink);font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;line-height:1.6;padding:24px 16px 40px}
+  .wrap{max-width:920px;margin:0 auto}
+  header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  header h1{font-size:22px;font-weight:700;color:var(--navy)} header .sub{font-size:13px;color:var(--muted);flex:1}
+  .langbtn{border:1px solid var(--pink-deep);background:#fff;color:var(--navy);font-size:12px;padding:4px 10px;border-radius:999px;cursor:pointer}
+  .disclaimer{font-size:12px;color:var(--muted);margin:6px 0 16px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+  .card h2{font-size:14px;color:var(--navy);margin-bottom:12px;font-weight:600}
+  .field{margin-bottom:11px}.field label{display:block;font-size:13px;margin-bottom:3px}.field .hint{font-size:11px;color:var(--muted)}
+  .field input,.field select{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:15px;background:#fff}
+  .btn{width:100%;padding:11px;border:none;border-radius:10px;background:var(--navy);color:#fff;font-size:15px;font-weight:600;cursor:pointer}
+  .big{font-size:30px;font-weight:700;color:var(--bronze);margin:6px 0 2px}
+  .big small{font-size:14px;color:var(--muted);font-weight:400}
+  .verdict{border-left:4px solid var(--pink-deep);background:#FDF9F3;border-radius:8px;padding:12px 14px;font-size:13.5px;margin-top:12px}
+  .alt{margin-top:14px;border-top:1px dashed var(--line);padding-top:12px}
+  .note{font-size:12px;color:var(--muted);margin-top:10px}
+  footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><h1 data-i18n="title">人生目标翻译器</h1><span class="sub" data-i18n="subtitle">把目标翻译成每月数字 · 源自第三十二章</span>
+<button class="langbtn" id="langbtn" onclick="toggleLang()">English</button></header>
+<p class="disclaimer" data-i18n="disclaimer">反向翻译工具：给定目标金额与年限，算出每月该存多少。教学假设（固定年化、年复利），不构成投资建议。</p>
+<div class="grid">
+  <div class="card">
+    <h2 data-i18n="inTitle">你的目标</h2>
+    <div class="field"><label data-i18n="lType">目标类型（参考）</label>
+      <select id="type"><option data-i18n="tp0" value="custom">自定义</option><option data-i18n="tp1" value="house">买房首付</option><option data-i18n="tp2" value="edu">子女教育</option><option data-i18n="tp3" value="retire">提前退休/自由</option></select></div>
+    <div class="field"><label data-i18n="lAmt">目标金额（元）</label><input id="amt" type="number" min="0" step="10000" value="1000000"></div>
+    <div class="row" style="display:flex;gap:8px">
+      <div class="field" style="flex:1"><label data-i18n="lYr">距离年限（年）</label><input id="yr" type="number" min="1" max="50" value="10"></div>
+      <div class="field" style="flex:1"><label data-i18n="lHave">已备金额（元）</label><input id="have" type="number" min="0" step="10000" value="0"></div>
+    </div>
+    <div class="field"><label data-i18n="lRate">预期年化（%）</label><input id="rate" type="number" min="0" max="100" step="0.5" value="5"><div class="hint" data-i18n="hRate">稳健：2–3% · 偏债：3–5% · 含权益：5–8% · 请勿用短期高收益假设</div></div>
+    <button class="btn" onclick="run()" data-i18n="btnRun">翻译成每月数字</button>
+  </div>
+  <div class="card">
+    <h2 data-i18n="outTitle">翻译结果</h2>
+    <div class="field"><label data-i18n="lSave">你每月能存（元）？</label><input id="save" type="number" min="0" step="100" value="5000" oninput="run()"></div>
+    <div class="big" id="need">—</div>
+    <div class="verdict" id="verdict"></div>
+    <div class="alt" id="alt"></div>
+    <div class="note" data-i18n="note">算法：先让已备金额按年化滚到目标日，缺口再按「每月定额 → 期末年金」反解月供。公式见页脚。</div>
+  </div>
+</div>
+<footer><div id="foot"></div></footer>
+</div>
+<script>
+const I18N={zh:{title:"人生目标翻译器",subtitle:"把目标翻译成每月数字 · 源自第三十二章",disclaimer:"反向翻译工具：给定目标金额与年限，算出每月该存多少。教学假设（固定年化、年复利），不构成投资建议。",
+inTitle:"你的目标",lType:"目标类型（参考）",tp0:"自定义",tp1:"买房首付",tp2:"子女教育",tp3:"提前退休/自由",
+lAmt:"目标金额（元）",lYr:"距离年限（年）",lHave:"已备金额（元）",lRate:"预期年化（%）",hRate:"稳健：2–3% · 偏债：3–5% · 含权益：5–8% · 请勿用短期高收益假设",btnRun:"翻译成每月数字",
+outTitle:"翻译结果",lSave:"你每月能存（元）？",
+needBig:"每月需存 {need}",
+need0:"已备金额已足够：让它继续复利即可，无需再额外储蓄。",
+verdictNeed:"距离目标还差 {gap}（已备 {have} 按 {r}% 滚 {y} 年后为 {fvHave}）。把缺口 {gap} 平摊到 {y} 年，每月需要存 {need}。",
+verdictFit:"按每月存 {save}、年化 {r}%：{y} 年后你能积累约 {acc}，达成率约 {pct}。",
+verdictShort:"按每月存 {save}，{y} 年后约积累 {acc}，距离 {target} 还差 {short} —— 需要提高月存或延长期限/调高预期（谨慎）。",
+note:"算法：先让已备金额按年化滚到目标日，缺口再按「每月定额 → 期末年金」反解月供。公式见页脚。",
+foot:"公式：F = P×(1+r)^n + A×[(1+r)^n−1]÷r，反解 A（每月 ×12）。来源：第三十二章（AI 长期规划）。书 → 工具系列（B2）。教学假设，不构成投资建议。"},
+en:{title:"Life Goal Translator",subtitle:"Turn goals into monthly numbers · from Ch32",disclaimer:"Reverse tool: given a target amount & horizon, find the monthly saving needed. Hypothetical (fixed annual return), not advice.",
+inTitle:"Your goal",lType:"Goal type (reference)",tp0:"Custom",tp1:"Home down payment",tp2:"Children's education",tp3:"Early retirement / freedom",
+lAmt:"Target amount (CNY)",lYr:"Years away",lHave:"Already saved (CNY)",lRate:"Expected annual return (%)",hRate:"Conservative 2–3% · bond-heavy 3–5% · with equity 5–8% · never assume short-term high returns",btnRun:"Translate to monthly",
+outTitle:"Result",lSave:"Your monthly saving (CNY)?",
+needBig:"Need to save {need} / month",
+need0:"Savings already suffice: let compounding work — no extra saving needed.",
+verdictNeed:"You're {gap} short (already-saved {have} grows to {fvHave} at {r}% over {y} yrs). Spreading the {gap} gap over {y} years needs {need} per month.",
+verdictFit:"Saving {save}/month at {r}%: after {y} years you'd accumulate ≈{acc} — about {pct} of your target.",
+verdictShort:"Saving {save}/month gives ≈{acc} in {y} years, still {short} short of {target} — raise the monthly amount or extend the horizon.",
+note:"Method: the saved amount compounds to the target date; the remaining gap is solved as an ordinary annuity to find the monthly amount.",
+foot:"Formula: F = P×(1+r)^n + A×[(1+r)^n−1]÷r, solve for A (per year, ÷12). Source: Ch32 (AI long-term planning). Book-to-tool series (B2). Hypothetical."}};
+let LANG="zh";function t(k,v){let s=I18N[LANG][k]||I18N.zh[k];if(v)for(const x in v)s=s.replace("{"+x+"}",v[x]);return s;}
+function fmt(n){return "¥"+Math.round(n).toLocaleString(LANG==="zh"?"zh-CN":"en-US");}
+function money(n){return Math.round(n).toLocaleString(LANG==="zh"?"zh-CN":"en-US");}
+function toggleLang(){LANG=LANG==="zh"?"en":"zh";applyLang();}
+function applyLang(){document.documentElement.lang=LANG==="zh"?"zh-CN":"en";document.getElementById("langbtn").textContent=LANG==="zh"?"English":"中文";
+document.querySelectorAll("[data-i18n]").forEach(el=>{if(el.tagName!=="OPTION")el.textContent=t(el.dataset.i18n);});
+document.getElementById("foot").innerHTML=t("foot");run();}
+function run(){
+  const target=Math.max(0,+document.getElementById("amt").value||0);
+  const y=Math.min(50,Math.max(1,+document.getElementById("yr").value||10));
+  const have=Math.max(0,+document.getElementById("have").value||0);
+  const rate=(+document.getElementById("rate").value||0)/100;
+  const save=Math.max(0,+document.getElementById("save").value||0);
+  const fvHave=have*Math.pow(1+rate,y);
+  const gap=Math.max(0,target-fvHave);
+  let need=0;
+  if(gap>0 && rate>0){need=(gap*rate)/(Math.pow(1+rate,y)-1)/12;}
+  else if(gap>0){need=gap/(y*12);}
+  const fvAnn=save>0? save*12*((Math.pow(1+rate,y)-1)/Math.max(rate,1e-9)) : 0;
+  const acc=fvHave+fvAnn;
+  const el=document.getElementById("need");
+  if(gap<=0){el.innerHTML=t("need0");document.getElementById("verdict").innerHTML="";}
+  else{el.innerHTML=t("needBig",{need:fmt(need)});document.getElementById("verdict").innerHTML=t("verdictNeed",{gap:fmt(gap),have:fmt(have),r:(rate*100).toFixed(1),y,fvHave:fmt(fvHave),need:fmt(need)});}
+  const alt=document.getElementById("alt");
+  if(save>0){
+    const pct=target>0? acc/target*100:0;
+    alt.innerHTML = acc>=target ? `<b>${t("verdictFit",{save:fmt(save),r:(rate*100).toFixed(1),y,acc:fmt(acc),pct:pct.toFixed(0)+"%"})}</b>`
+      : `<b>${t("verdictShort",{save:fmt(save),y,acc:fmt(acc),short:fmt(target-acc),target:fmt(target)})}</b>`;
+  } else alt.innerHTML="";
+}
+applyLang();
+</script>
+</body>
+</html>
