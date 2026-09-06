@@ -7,6 +7,7 @@
     "frontendDist": "../../tools"
   },
   "app": {
+    "withGlobalTauri": true,
     "windows": [
       {
         "title": "四倍做多工具箱 · Quadruple Leverage Toolbox",
