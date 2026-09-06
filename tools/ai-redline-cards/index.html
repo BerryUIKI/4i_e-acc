@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 投资红线卡 · AI Red Lines</title>
+<style>
+  :root{--cream:#FBF7F0;--paper:#FFF;--pink:#FEC6CD;--pink-deep:#F3A6AF;--navy:#1D1E50;--bronze:#B86C40;--teal:#0F6E56;--red:#A32D2D;--ink:#2C2C2A;--line:#E7E0D4;--muted:#6b675e}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--cream);color:var(--ink);font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;line-height:1.7;padding:24px 16px 40px}
+  .wrap{max-width:860px;margin:0 auto}
+  header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  header h1{font-size:22px;font-weight:700;color:var(--navy)} header .sub{font-size:13px;color:var(--muted);flex:1}
+  .langbtn{border:1px solid var(--pink-deep);background:#fff;color:var(--navy);font-size:12px;padding:4px 10px;border-radius:999px;cursor:pointer}
+  .intro{font-size:13px;color:var(--muted);margin:8px 0 18px;max-width:76ch}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+  .card{border-radius:12px;padding:18px;border:1px solid var(--line);background:var(--paper);position:relative}
+  .card.stop{background:#FCEBEB;border-color:#F7C1C1}
+  .card.stop .num{background:var(--red)}
+  .card.ok{background:#EAF3DE;border-color:#C0DD97}
+  .card.ok .num{background:#639922}
+  .num{width:26px;height:26px;border-radius:50%;color:#fff;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+  .card h2{font-size:15px;color:var(--navy);margin-bottom:6px;font-weight:600}
+  .card .zh{font-size:13px;color:var(--ink)}
+  .card .en{font-size:12px;color:var(--muted);margin-top:6px;border-top:1px dashed var(--line);padding-top:6px}
+  .card .tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;margin-bottom:8px;font-weight:500}
+  .stop .tag{background:#F7C1C1;color:var(--red)}.ok .tag{background:#C0DD97;color:#3B6D11}
+  .keep{margin-top:16px;background:#FDF6EE;border-left:4px solid var(--bronze);border-radius:8px;padding:12px 14px;font-size:13.5px}
+  footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px;margin-top:20px}
+  .w3{border:none;border-top:4px solid var(--red);background:#fff;padding:16px;grid-column:1/-1}
+  .w3 h2{color:var(--red)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><h1 data-i18n="title">AI 投资红线卡</h1><span class="sub" data-i18n="subtitle">贴在屏幕边的三条红线 · 源自第三十三章</span>
+<button class="langbtn" id="langbtn" onclick="toggleLang()">English</button></header>
+<p class="intro" data-i18n="intro">无论 AI 工具的宣传多诱人，这三件事永远别让它做。红线判断标准不是「它是不是 AI」，而是「它碰不碰你的钱、替不替你做决定」。可打印或截图贴在工位。</p>
+
+<div class="grid">
+  <div class="card stop">
+    <div class="tag" data-i18n="tagStop">红线 · 永不</div>
+    <div class="num">1</div>
+    <h2 data-i18n="c1t">不让 AI 替你选具体标的</h2>
+    <div class="zh" data-i18n="c1b">任何告诉你「这只基金值得买」「这只股票要涨」的 AI，本质上都在做预测——短期预测的准确率不会因为说话的是 AI 而提高。AI 帮你分析费率和跟踪误差可以，但「买不买」是你的决定。</div>
+    <div class="en">Never let AI pick specific investments. Anything telling you "buy this fund" is forecasting — AI doesn't forecast better. AI may analyze fees/tracking error; the buy decision is yours.</div>
+  </div>
+  <div class="card stop">
+    <div class="tag" data-i18n="tagStop2">红线 · 永不</div>
+    <div class="num">2</div>
+    <h2 data-i18n="c2t">不把账户权限交给 AI</h2>
+    <div class="zh" data-i18n="c2b">任何要求你提供交易密码、允许自动交易、代为管理账户的「AI 投资工具」，都在把你的资产置于它无法承担责任的境地。可以用 AI 记录和分析，但交易按钮永远由你自己按下。</div>
+    <div class="en">Never hand account access to AI. Tools asking for trade passwords or auto-trading put your assets where no one takes responsibility. AI records & analyzes; you press the button.</div>
+  </div>
+  <div class="card stop">
+    <div class="tag" data-i18n="tagStop3">红线 · 永不</div>
+    <div class="num">3</div>
+    <h2 data-i18n="c3t">不信「AI 保证收益」</h2>
+    <div class="zh" data-i18n="c3b">声称找到「稳赚不赔」策略的 AI——无论叫量化、智能投顾还是别的——请记住：高收益承诺往往伴随看不见的高风险。承诺收益，是投资世界里最响亮的警报。</div>
+    <div class="en">Never trust "guaranteed returns" AI. Anyone claiming a sure-fire strategy — quant, robo-advisor, whatever — is waving the loudest alarm in investing: high-yield promises hide high risk.</div>
+  </div>
+
+  <div class="card ok">
+    <div class="tag" data-i18n="tagOk">可以 · 放心用</div>
+    <div class="num" style="background:var(--teal)">✔</div>
+    <h2 data-i18n="ok1t">让 AI 做的事：信息与纪律</h2>
+    <div class="zh" data-i18n="ok1b">整理摘要、按清单核对（ETF 二十项/十二步流程）、复盘归档、纪律提醒、记账分类与汇总。研究侧的 AI（不碰账户、不喊买卖）是安全的。</div>
+    <div class="en">Let AI organize information, check your checklists, archive reviews, remind discipline, categorize bookkeeping. Research-side AI (no account, no buy/sell calls) is safe.</div>
+  </div>
+  <div class="card ok">
+    <div class="tag" data-i18n="tagOk2">可以 · 放心用</div>
+    <div class="num" style="background:var(--teal)">✔</div>
+    <h2 data-i18n="ok2t">判断标尺</h2>
+    <div class="zh" data-i18n="ok2b">一句话自检：「这个 AI 碰我的钱吗？替我做决定吗？」——两个都答「不」，它才值得留在你的流程里；研究完，自己写理由、自己按确认。</div>
+    <div class="en">Self-check: "Does this AI touch my money? Does it decide for me?" Two "no"s — keep it. Research done, you write the reason and press confirm.</div>
+  </div>
+</div>
+
+<div class="keep" data-i18n="keep">记住第三十三章那句：AI 可以帮你把信息整理清楚，但「用你的钱去冒险」这个决定，只能由你来做。工具在进化，「你自己」才是投资中最重要、最不可替代的变量。</div>
+<footer><div id="foot"></div></footer>
+</div>
+<script>
+const I18N={zh:{title:"AI 投资红线卡",subtitle:"贴在屏幕边的三条红线 · 源自第三十三章",
+intro:"无论 AI 工具的宣传多诱人，这三件事永远别让它做。红线判断标准不是「它是不是 AI」，而是「它碰不碰你的钱、替不替你做决定」。可打印或截图贴在工位。",
+tagStop:"红线 · 永不",tagStop2:"红线 · 永不",tagStop3:"红线 · 永不",tagOk:"可以 · 放心用",tagOk2:"可以 · 放心用",
+keep:"记住第三十三章那句：AI 可以帮你把信息整理清楚，但「用你的钱去冒险」这个决定，只能由你来做。工具在进化，「你自己」才是投资中最重要、最不可替代的变量。",
+foot:"来源：《四倍做多认知，长期做多人生》第三十三章（AI 投资辅助与边界）。书 → 工具系列（B4）。教学参考，不构成投资建议。"},
+en:{title:"AI Investing Red-Line Cards",subtitle:"Three red lines for your screen · from Ch33",
+intro:"No matter how seductive the marketing, never let AI do these three things. The test is not 'is it AI' but 'does it touch my money or decide for me'. Print or screenshot this.",
+tagStop:"RED LINE · NEVER",tagStop2:"RED LINE · NEVER",tagStop3:"RED LINE · NEVER",tagOk:"OK · Safe",tagOk2:"OK · Safe",
+keep:"From Ch33: AI can help you organize information, but the decision to risk your money is yours alone. Tools evolve — 'you' are the most important, irreplaceable variable in investing.",
+foot:"Source: Ch33 (AI investing boundaries) of Quadruple Leverage. Book-to-tool series (B4). Teaching reference."}};
+let LANG="zh";function t(k){return I18N[LANG][k]||I18N.zh[k];}
+function toggleLang(){LANG=LANG==="zh"?"en":"zh";applyLang();}
+function applyLang(){document.documentElement.lang=LANG==="zh"?"zh-CN":"en";document.getElementById("langbtn").textContent=LANG==="zh"?"English":"中文";
+document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=t(el.dataset.i18n));
+document.getElementById("foot").innerHTML=t("foot");}
+applyLang();
+</script>
+</body>
+</html>
