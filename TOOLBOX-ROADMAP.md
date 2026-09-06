@@ -34,26 +34,24 @@
 
 ---
 
-## C · 外部产品联动（作者自研，资料待补）
+## C · 外部产品联动（作者自研 · C 区定稿 2026-09-07）
 
 | 产品 | 仓库/形态 | 已知定位 | 进书形式 | 状态 |
 |------|----------|---------|---------|------|
-| **AlphaForge** | [BerryUIKI/alpha-forge](https://github.com/BerryUIKI/alpha-forge) · 开源 AGPLv3 · 桌面应用（Tauri + React + Rust + SQLite） | 「高端金融工具」：AI 原生投资研究工作台——workspace 管理 + Agent Runtime（任务生命周期、事件、持久化），把原始信息加工成结构化投资知识 | **位置 1（首选）**：Ch33「AI 投资辅助与边界」作「研究侧 AI」正面例证（红线内 AI 参照物）；**位置 2（配套）**：终章后「作者的工具箱」延伸小节（读者进阶路径）。纪律：明示作者自研 + 只给生态入口不教操作。**试点推进：先落位置 1 一段走审读** | 已决策 |
-| **蓝鲸记账 / BlueWhale** | BerryUIKI/berry-ledger（private，仓库工作名）· Apple 原生（iOS/iPadOS/macOS），Swift 跨平台核心 | 个人财务追踪：账户管理、自定义分类、收支记录、资金划转、数据恢复、月度统计。**产品名：蓝鲸记账（BlueWhale）** | 对应 Ch31「AI 记账」主题 + 「作者的工具箱」延伸路径一环；定位/开源闭源待补 | 已定名，资料待补 |
-| **Axiara** | [BerryUIKI/Axiara](https://github.com/BerryUIKI/Axiara) · 开源 | 估值专用 agent 工作区：archive/query/batch quote/review 四能力，三层隔离数据层，自动化 agent 无法污染官方价格基线 | 与「研究/估值」主题强相关；是否收录待花花定 | 候选 |
-| **量化研究系列** | [RegimeForgeEA](https://github.com/BerryUIKI/RegimeForgeEA)（MQL5 框架 + Python 回测）、[vectortrend-rotation](https://github.com/BerryUIKI/vectortrend-rotation)（多因子轮动研究） | 机构级量化框架/研究（公开） | 与「市场周期/行为金融」呼应；是否收录待定 | 候选 |
-| 其他 private 相关仓库 | DollarHua_AI、Berry-invest、finflow-lab（均 private） | 品牌 IP / 投资 / 金融实验室，作者生态 | 是否收录待定 | 候选 |
+| **AlphaForge** | [BerryUIKI/alpha-forge](https://github.com/BerryUIKI/alpha-forge) · 开源 AGPLv3 · 桌面应用（Tauri + React + Rust + SQLite） | 「高端金融工具」：AI 原生投资研究工作台——把原始信息加工成结构化投资知识 | **位置 1（首选）**：Ch33「AI 投资辅助与边界」作「研究侧 AI」正面例证（红线内 AI 参照物）；**位置 2（配套）**：终章后「作者的工具箱」延伸小节。纪律：明示作者自研 + 只给生态入口。试点推进：Ch33 试写段已起草，待花花确认 | 已决策 |
+| **蓝鲸记账 / BlueWhale** | BerryUIKI/berry-ledger（private，仓库工作名）· Apple 原生（iOS/iPadOS/macOS），Swift 跨平台核心 | 个人财务追踪：账户管理、自定义分类、收支记录、资金划转、数据恢复、月度统计 | 对应 Ch31「AI 记账」主题 + 「作者的工具箱」延伸路径一环；**B1 记账对话包做成其配套** | 已定名；开源/闭源与定位口径待补 |
 
-> 作者画像（GitHub profile）：Independent Researcher — AI Infrastructure / Semiconductors / Data Centers，同时是投资内容创作者（本仓库 + 书）与工具作者（上述产品矩阵）。C 区开放收录，范围由花花勾选。
+> C 区收录范围：**仅上述两条主线**（花花拍板 2026-09-07）。Axiara（销售报价库，与书无关）、RegimeForgeEA / vectortrend-rotation（量化）、DollarHua_AI / Berry-invest / finflow-lab（private 生态）等**均不收录**本路线图。
+> 作者画像（GitHub profile）：Independent Researcher — AI Infrastructure / Semiconductors / Data Centers，同时是投资内容创作者（本仓库 + 书）与工具作者（AlphaForge、BlueWhale）。
 
 ---
 
 ## 开放问题（对齐后再动手）
 
 1. **v0.2 书改版**：哪些 A/B 工具值得在书里被点名（示例/行动卡/二维码），形成 书 → 工具 → 产品 闭环？（AlphaForge 已定位置，见 C 区）
-2. **C 区补资料**：AlphaForge 位置 1 的 Ch33 试写段（等花花确认后起草）；蓝鲸记账的定位口径、开源/闭源、是否与 Ch31 深度绑定。
-3. **仓库收录范围**：除 alpha-forge 与蓝鲸记账外，还有哪些仓库要进这张图（Axiara / 量化系列是否收录）。
-4. **形态逐个定**：A/B 各项最终做网页（利于分享读者）、CLI/脚本（融入 data 工作流）还是并入桌面产品。
+2. **C 区收尾**：Ch33 试写段待花花确认 → 落盘 I003 走 PR；蓝鲸记账开源/闭源与定位口径待补（B1 已定为其配套）。
+3. ~~仓库收录范围~~ → **已定稿**：C 区仅 AlphaForge + BlueWhale。
+4. **形态逐个定**：A1 已定「网页单文件」并启动试点；其余工具做之前各确认一次。
 
 ---
 
