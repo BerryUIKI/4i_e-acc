@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>投资复盘生成器 · Review Generator</title>
+<style>
+  :root{--cream:#FBF7F0;--paper:#FFF;--pink:#FEC6CD;--pink-deep:#F3A6AF;--navy:#1D1E50;--bronze:#B86C40;--teal:#0F6E56;--ink:#2C2C2A;--line:#E7E0D4;--muted:#6b675e}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--cream);color:var(--ink);font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;line-height:1.7;padding:24px 16px 40px}
+  .wrap{max-width:920px;margin:0 auto}
+  header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  header h1{font-size:22px;font-weight:700;color:var(--navy)} header .sub{font-size:13px;color:var(--muted);flex:1}
+  .langbtn{border:1px solid var(--pink-deep);background:#fff;color:var(--navy);font-size:12px;padding:4px 10px;border-radius:999px;cursor:pointer}
+  .disclaimer{font-size:12px;color:var(--muted);margin:6px 0 16px}
+  .grid{display:grid;grid-template-columns:360px 1fr;gap:16px}@media(max-width:780px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+  .card h2{font-size:14px;color:var(--navy);margin-bottom:12px;font-weight:600}
+  .q{margin-bottom:11px}.q .ql{font-size:13px;margin-bottom:3px}.q .hint{font-size:11px;color:var(--muted)}
+  .q select,.q input{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:14px;background:#fff}
+  .q textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;min-height:52px;resize:vertical;font-family:inherit}
+  .btn{width:100%;padding:11px;border:none;border-radius:10px;background:var(--navy);color:#fff;font-size:15px;font-weight:600;cursor:pointer}
+  .out{background:#FDF9F3;border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:13px;white-space:pre-wrap;min-height:280px;line-height:1.75}
+  .copy{display:inline-block;margin-top:10px;border:1px solid var(--navy);background:#fff;color:var(--navy);font-size:13px;padding:6px 16px;border-radius:8px;cursor:pointer}
+  .copy:hover{background:var(--navy);color:#fff}.okc{font-size:12px;color:var(--teal);margin-left:8px;opacity:0}.okc.show{opacity:1}
+  .note{font-size:12px;color:var(--muted);margin-top:10px}
+  footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><h1 data-i18n="title">投资复盘生成器</h1><span class="sub" data-i18n="subtitle">源自第二十八章 + 附录 I · 引导式复盘</span>
+<button class="langbtn" id="langbtn" onclick="toggleLang()">English</button></header>
+<p class="disclaimer" data-i18n="disclaimer">通过几个问题，生成一份可贴进投资日志的结构化复盘。答案只有你自己看得到（本页无网络、无存储）。</p>
+<div class="grid">
+  <div class="card">
+    <h2 data-i18n="qTitle">回答几个问题</h2>
+    <div class="q"><div class="ql" data-i18n="qPeriod">复盘周期</div>
+      <select id="period"><option value="m" data-i18n="pm">月度复盘</option><option value="y" data-i18n="py">年度复盘</option></select></div>
+    <div class="q"><div class="ql" data-i18n="qPeriodEnd">本期区间（如 2026-09）</div><input id="when" type="text" value="2026-09"></div>
+    <div class="q"><div class="ql" data-i18n="qOps">本期操作了几次？（买入/卖出各算一次）</div><input id="ops" type="number" min="0" value="2"></div>
+    <div class="q"><div class="ql" data-i18n="qReasons">其中几次操作**事前**写下了理由？</div><input id="reasons" type="number" min="0" value="1"></div>
+    <div class="q"><div class="ql" data-i18n="qReturn">组合本期收益（%，相对你的资金加权）</div><input id="ret" type="number" step="0.5" value="2.0"></div>
+    <div class="q"><div class="ql" data-i18n="qBench">同期基准（如沪深 300，%）</div><input id="bench" type="number" step="0.5" value="1.5"></div>
+    <div class="q"><div class="ql" data-i18n="qEmo">情绪自评：冲动操作过几次？（追涨/杀跌/临时改计划）</div><input id="imp" type="number" min="0" value="0"></div>
+    <div class="q"><div class="ql" data-i18n="qLesson">这期最大的一个教训或发现（一句话）</div><textarea id="lesson"></textarea></div>
+    <button class="btn" onclick="gen()" data-i18n="btnGen">生成复盘</button>
+  </div>
+  <div class="card">
+    <h2 data-i18n="rTitle">复盘草稿</h2>
+    <div class="out" id="out"></div>
+    <button class="copy" onclick="copyOut()" data-i18n="btnCopy">复制全文</button><span class="okc" id="okc" data-i18n="copied">已复制 ✓</span>
+    <div class="note" data-i18n="note">提示：复盘的重点不是收益率高低，而是「操作有没有遵守计划」。写下理由的比例与冲动次数，比收益更能预测你的长期表现（第二十八章）。</div>
+  </div>
+</div>
+<footer><div id="foot"></div></footer>
+</div>
+<script>
+const I18N={zh:{title:"投资复盘生成器",subtitle:"源自第二十八章 + 附录 I · 引导式复盘",disclaimer:"通过几个问题，生成一份可贴进投资日志的结构化复盘。答案只有你自己看得到（本页无网络、无存储）。",
+qTitle:"回答几个问题",qPeriod:"复盘周期",pm:"月度复盘",py:"年度复盘",qPeriodEnd:"本期区间（如 2026-09）",qOps:"本期操作了几次？（买入/卖出各算一次）",qReasons:"其中几次操作在交易前就写下了理由？",
+qReturn:"组合本期收益（%，相对你的资金加权）",qBench:"同期基准（如沪深 300，%）",qEmo:"情绪自评：冲动操作过几次？（追涨/杀跌/临时改计划）",qLesson:"这期最大的一个教训或发现（一句话）",btnGen:"生成复盘",
+rTitle:"复盘草稿",btnCopy:"复制全文",copied:"已复制 ✓",
+note:"提示：复盘的重点不是收益率高低，而是「操作有没有遵守计划」。写下理由的比例与冲动次数，比收益更能预测你的长期表现（第二十八章）。",
+t1:"复盘报告 · {when}",t2:"周期",t3:"操作纪律",t4:"（{ops} 次操作，{reasons} 次事前写下理由）",t5:"收益",t6:"情绪",t7:"本期最大收获/教训：",t8:"一、操作回顾",t9:"二、纪律评分",t10:"三、收益与基准",t11:"四、情绪检查",t12:"五、下一期的一个改进",
+discOk:"理由记录率 100%：纪律优秀，继续保持。",discWarn:"理由记录率 {pct}：仍有 {n} 次操作没有事前理由。没有理由的操作，事后很难复盘——从下一笔开始，先写理由再动手。",discBad:"本期多数操作没有事前理由：复盘无从谈起。建议把「写下理由」设为下单前的强制步骤。",
+imp0:"本期无冲动操作，情绪控制良好。",impN:"本期有 {n} 次冲动操作：请对照当时的情境，标记是哪类偏差（追涨/杀跌/FOMO/频繁查看——见第三十章），下次在触发点前设一道检查。",
+retTxt:"组合 {ret}% vs 基准 {bench}%：",
+foot:"来源：第二十八章（投资日志）与附录 I（年度复盘表）。书 → 工具系列（B3）。本工具不上传任何数据。"},
+en:{title:"Investment Review Generator",subtitle:"from Ch28 + Appendix I · guided review",disclaimer:"Answer a few questions to get a structured review you can paste into your investment journal. Nothing leaves your device (no network, no storage).",
+qTitle:"Answer a few questions",qPeriod:"Period",pm:"Monthly review",py:"Annual review",qPeriodEnd:"Period label (e.g. 2026-09)",qOps:"How many trades this period?",qReasons:"Of those, how many had a reason written BEFORE the trade?",
+qReturn:"Portfolio return this period (%)",qBench:"Benchmark (e.g. CSI 300, %)",qEmo:"Impulsive moves this period? (chasing/fear-selling/plan changes)",qLesson:"Biggest lesson or finding (one line)",btnGen:"Generate",
+rTitle:"Review draft",btnCopy:"Copy all",copied:"Copied ✓",
+note:"The point of a review is not how high the return is, but whether you followed your plan. Reason-rate and impulsive count predict long-term results better than returns (Ch28).",
+t1:"Review report · {when}",t2:"Period",t3:"Trade discipline",t4:"({ops} trades, {reasons} with pre-written reasons)",t5:"Returns",t6:"Emotions",t7:"Biggest lesson this period:",t8:"1. Trade review",t9:"2. Discipline score",t10:"3. Returns vs benchmark",t11:"4. Emotion check",t12:"5. One improvement for next period",
+discOk:"Reason-rate 100%: excellent discipline — keep it up.",discWarn:"Reason-rate {pct}: {n} trade(s) had no pre-written reason. A trade without a reason can't be reviewed later — write the reason before you act.",
+discBad:"Most trades this period had no pre-written reason: there is little to review. Make 'write the reason' a mandatory pre-trade step.",
+imp0:"No impulsive moves this period — good emotional control.",impN:"{n} impulsive move(s): label the bias next to each (chasing, fear-selling, FOMO, over-checking — Ch30) and set a checkpoint before the next trigger.",
+retTxt:"Portfolio {ret}% vs benchmark {bench}%: ",
+foot:"Source: Ch28 (investment journal) & Appendix I of Quadruple Leverage. Book-to-tool series (B3). No data is uploaded."}};
+let LANG="zh";function t(k,v){let s=I18N[LANG][k]||I18N.zh[k];if(v)for(const x in v)s=s.replace("{"+x+"}",v[x]);return s;}
+function toggleLang(){LANG=LANG==="zh"?"en":"zh";applyLang();}
+function applyLang(){document.documentElement.lang=LANG==="zh"?"zh-CN":"en";document.getElementById("langbtn").textContent=LANG==="zh"?"English":"中文";
+document.querySelectorAll("[data-i18n]").forEach(el=>{if(el.tagName!=="OPTION")el.textContent=t(el.dataset.i18n);});
+document.getElementById("foot").innerHTML=t("foot");gen();}
+function copyOut(){const out=document.getElementById("out");const ta=document.createElement("textarea");ta.value=out.innerText;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");}catch(e){}document.body.removeChild(ta);
+const ok=document.getElementById("okc");ok.classList.add("show");setTimeout(()=>ok.classList.remove("show"),1600);}
+function gen(){
+  const when=document.getElementById("when").value||"";
+  const ops=+document.getElementById("ops").value||0;
+  const reasons=Math.min(ops,+document.getElementById("reasons").value||0);
+  const ret=document.getElementById("ret").value, bench=document.getElementById("bench").value;
+  const imp=+document.getElementById("imp").value||0;
+  const lesson=document.getElementById("lesson").value.trim();
+  const pr= ops>0? Math.round(reasons/ops*100):100;
+  let disc= pr>=100? t("discOk") : pr>=50? t("discWarn",{pct:pr+"%",n:ops-reasons}) : t("discBad");
+  let emo= imp===0? t("imp0") : t("impN",{n:imp});
+  const r=parseFloat(ret)||0, b=parseFloat(bench)||0;
+  const perf = r>=b? `组合 ${ret}% ≥ 基准 ${bench}%（跑赢基准，但要检查是能力还是运气——你的操作有理由支撑吗？）` : `组合 ${ret}% < 基准 ${bench}%（跑输基准：先看纪律，再看市场环境，别急着改策略）`;
+  const out=[
+  "━━━ "+t("t1",{when})+ " ━━━",
+  "◆ "+t("t8"),
+  `  ${t("t3")}：${t("t4",{ops,reasons})}`,
+  `  ${disc}`,
+  "◆ "+t("t9"),
+  `  ${emo}`,
+  "◆ "+t("t10"),
+  `  ${perf}`,
+  "◆ "+t("t11"),
+  lesson? `  ${t("t7")} ${lesson}` : `  （未填写——今天花 30 秒补上，它比收益率更重要）`,
+  "◆ "+t("t12"),
+  "  ",
+  "━━━ 本报告生成于本地，未上传任何数据 ━━━"
+  ].join("\n");
+  document.getElementById("out").textContent=out;
+}
+applyLang();
+</script>
+</body>
+</html>
