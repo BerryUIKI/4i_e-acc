@@ -35,7 +35,7 @@
 </head>
 <body>
 <div class="wrap">
-  <header><h1 data-i18n="title">定投模拟器</h1><span class="sub" data-i18n="subtitle">DCA vs Lump Sum · 源自《四倍做多认知，长期做多人生》第二十七章</span><button class="langbtn" id="langbtn" onclick="toggleLang()">English</button></header>
+  <header><a class="back" href="../index.html" data-i18n="back" style="font-size:12.5px;color:var(--bronze);text-decoration:none;flex-shrink:0;white-space:nowrap;margin-right:6px">← 返回工具箱</a><h1 data-i18n="title">定投模拟器</h1><span class="sub" data-i18n="subtitle">DCA vs Lump Sum · 源自《四倍做多认知，长期做多人生》第二十七章</span><button class="langbtn" id="langbtn" onclick="toggleLang()">English</button></header>
   <p class="disclaimer" data-i18n="disclaimer">教学模拟：价格走势为预设 U 型（微笑曲线）模型，非真实行情。结果仅为教学假设，不构成投资建议。</p>
 
   <div class="layout">
@@ -70,7 +70,7 @@
 </div>
 
 <script>
-const I18N={zh:{title:"定投模拟器",subtitle:"DCA vs Lump Sum · 源自《四倍做多认知，长期做多人生》第二十七章",
+const I18N={zh:{back:"← 返回工具箱",title:"定投模拟器",subtitle:"DCA vs Lump Sum · 源自《四倍做多认知，长期做多人生》第二十七章",
 disclaimer:"教学模拟：价格走势为预设 U 型（微笑曲线）模型，非真实行情。结果仅为教学假设，不构成投资建议。",
 pTitle:"场景参数",lTotal:"可投总金额（元）",lMonths:"定投月数",lDd:"最大回撤（%）",lEnd:"期末回升幅度（%）",hEnd:"相对期初价的期末涨跌幅，可为负",btnRun:"模拟",
 pNote:"模型：期初价 = 1.00，先线性跌至最大回撤（第 60% 时间点），再线性回升至「期末回升幅度」。",
@@ -82,7 +82,7 @@ same:"两者几乎相同（该模型下无显著差异）。",
 foot1:"模型口径：期初单价 = 1.00；价格在定投期 60% 处触底（跌幅 = 最大回撤），随后线性回升到期末价位（= 期初 × (1 + 期末回升幅度)）。一次性 = 期初全买；定投 = 每期投入 总额÷月数，期末总份额 × 期末价。未计交易费用与税费。",
 foot2:"来源：《四倍做多认知，长期做多人生》第二十七章（定投）。书 → 工具系列（A2）。教学假设，不构成投资建议。",
 unit:"（本金 ¥{p}）"},
-en:{title:"DCA Simulator",subtitle:"DCA vs Lump Sum · from Chapter 27 of Quadruple Leverage",
+en:{back:"← Toolbox",title:"DCA Simulator",subtitle:"DCA vs Lump Sum · from Chapter 27 of Quadruple Leverage",
 disclaimer:"Teaching simulation: price path is a preset U-shape (smile-curve) model, not real market data. Hypothetical only.",
 pTitle:"Scenario",lTotal:"Total amount to invest (CNY)",lMonths:"DCA months",lDd:"Max drawdown (%)",lEnd:"Final rebound (%)",hEnd:"End price change vs start; may be negative",btnRun:"Simulate",
 pNote:"Model: start price = 1.00, falls linearly to the max drawdown at 60% of the period, then recovers linearly to the final level.",

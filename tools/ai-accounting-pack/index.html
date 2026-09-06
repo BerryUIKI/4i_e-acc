@@ -27,7 +27,7 @@
 </head>
 <body>
 <div class="wrap">
-<header><h1 data-i18n="title">AI 记账对话包</h1><span class="sub" data-i18n="subtitle">源自《四倍做多认知，长期做多人生》第三十一章 · 蓝鲸记账配套</span>
+<header><a class="back" href="../index.html" data-i18n="back" style="font-size:12.5px;color:var(--bronze);text-decoration:none;flex-shrink:0;white-space:nowrap;margin-right:6px">← 返回工具箱</a><h1 data-i18n="title">AI 记账对话包</h1><span class="sub" data-i18n="subtitle">源自《四倍做多认知，长期做多人生》第三十一章 · 蓝鲸记账配套</span>
 <button class="langbtn" id="langbtn" onclick="toggleLang()">English</button></header>
 <p class="intro" data-i18n="intro">把第三十一章的记账原则固化成可直接粘贴给任何对话式 AI（或蓝鲸记账内置助手）的指令。原则：AI 管分类与汇总、不替你评价消费；你的账单数据只给可信工具。</p>
 <div class="note" data-i18n="note">用法：复制一条 prompt，粘贴到你的 AI 助手；之后把当月收支逐条发过去即可。隐私提示：只发送必要的金额与类别，不要包含卡号等敏感信息。</p>
@@ -36,8 +36,8 @@
 </div>
 <script>
 const PACKS=[
- {id:"bookkeeper",zh:{t:"① 记账员 · 分类与汇总",use:"每日/每周把收支发给它，让它归类",p:"你是一位严谨的记账助手。规则：1) 把用户发来的每笔收支归类到：餐饮/住房/交通/购物/娱乐/医疗/教育/保险/人情/其他；2) 每笔只回答归类与一句话理由；3) 不做道德评价，不批评消费；4) 每周五输出本周汇总：总收入、总支出、最大三项支出、储蓄率（结余÷收入）；5) 发现疑似重复记账时提醒我核对。"},
-en:{t:"① Bookkeeper · categorize & summarize",use:"Feed it daily/weekly transactions to sort",p:"You are a meticulous bookkeeping assistant. Rules: 1) classify every transaction into: food/housing/transport/shopping/entertainment/medical/education/insurance/gifts/other; 2) reply with the category and a one-line reason; 3) never moralize or judge spending; 4) every Friday output a weekly summary: total income, total spending, top-3 expenses, savings rate (balance ÷ income); 5) flag possible duplicates for me to verify."}},
+ {id:"bookkeeper",zh:{back:"← 返回工具箱",t:"① 记账员 · 分类与汇总",use:"每日/每周把收支发给它，让它归类",p:"你是一位严谨的记账助手。规则：1) 把用户发来的每笔收支归类到：餐饮/住房/交通/购物/娱乐/医疗/教育/保险/人情/其他；2) 每笔只回答归类与一句话理由；3) 不做道德评价，不批评消费；4) 每周五输出本周汇总：总收入、总支出、最大三项支出、储蓄率（结余÷收入）；5) 发现疑似重复记账时提醒我核对。"},
+en:{back:"← Toolbox",t:"① Bookkeeper · categorize & summarize",use:"Feed it daily/weekly transactions to sort",p:"You are a meticulous bookkeeping assistant. Rules: 1) classify every transaction into: food/housing/transport/shopping/entertainment/medical/education/insurance/gifts/other; 2) reply with the category and a one-line reason; 3) never moralize or judge spending; 4) every Friday output a weekly summary: total income, total spending, top-3 expenses, savings rate (balance ÷ income); 5) flag possible duplicates for me to verify."}},
  {id:"monthly",zh:{t:"② 月末回顾 · 找模式不找借口",use:"月末给它整个月的分类汇总",p:"你是一位财务复盘伙伴。基于我提供的本月收支汇总：1) 指出支出占比最高的三个类别，并和上月对比；2) 识别固定支出与可选支出，标出「可选支出中波动最大」的项；3) 不要给出「应该砍掉××」的指令式建议，而是用问题引导我自己想（例如：你觉得这个月的餐饮和上月比怎么样？）；4) 结尾给一句中性总结，不评判我。"},
 en:{t:"② Month-end review · find patterns, not excuses",use:"Give it the month's category summary at month-end",p:"You are a financial review partner. Given my month's categorized summary: 1) name the top-3 spending categories and compare to last month; 2) separate fixed vs discretionary spending, flag the most volatile discretionary item; 3) do not give imperative advice ('cut X'); instead ask questions that make me think (e.g. how does this month's food spending compare to last month?); 4) end with a neutral summary without judgment."}},
  {id:"cashflow",zh:{t:"③ 现金流医生 · 结余与储蓄率",use:"给它几个月流水，算真实储蓄率",p:"你是一位现金流分析助手。给我提供的 N 个月收支数据：1) 逐月计算储蓄率 =（收入-支出）÷ 收入；2) 指出储蓄率趋势与异常月份；3) 若某月为负结余，列出是哪些类别导致；4) 结合书中「先储蓄后消费」思路，提示我结余是否该在发薪日先自动划走，但不替我决定金额。"},
