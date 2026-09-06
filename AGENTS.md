@@ -18,10 +18,13 @@ Baseline rules for all AI agents operating in this repo. Sub-directory `AGENTS.m
 ## Workflow
 
 1. Branch: `article/`, `fix/`, `feat/`, `ci/`, `docs/`, `chore/` prefix — never `main` or `dev`.
+   - On-demand only (never permanent): `epic/<milestone>` for milestone-wide acceptance, `release/vX.Y` for release freeze. Delete after merge.
 2. Commit. If GPG signing unavailable: `git -c commit.gpgsign=false commit ...`.
 3. Push + open PR to `dev` (squash-merge) for normal writing/content work.
 4. Verify: `python .github/scripts/check_links.py` and `check_style.py` before push.
 5. When the milestone is release-ready, open a PR `dev` → `main` (squash-merge).
+
+Only `main` (stable release, tagged versions) and `dev` (rolling integration) are permanent trunks. `epic/` and `release/` add a temporary layer only while a milestone needs it and are deleted afterwards — see `BRANCHING.md`.
 
 ## Agent Identity & Git Traceability
 
