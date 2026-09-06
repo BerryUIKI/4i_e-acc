@@ -33,7 +33,7 @@
 </head>
 <body>
 <div class="wrap">
-<header><h1 data-i18n="title">ETF 溢价率速算</h1><span class="sub" data-i18n="subtitle">源自《四倍做多认知，长期做多人生》第十五章</span><button class="langbtn" id="langbtn" onclick="toggleLang()">English</button></header>
+<header><a class="back" href="../index.html" data-i18n="back" style="font-size:12.5px;color:var(--bronze);text-decoration:none;flex-shrink:0;white-space:nowrap;margin-right:6px">← 返回工具箱</a><h1 data-i18n="title">ETF 溢价率速算</h1><span class="sub" data-i18n="subtitle">源自《四倍做多认知，长期做多人生》第十五章</span><button class="langbtn" id="langbtn" onclick="toggleLang()">English</button></header>
 <p class="disclaimer" data-i18n="disclaimer">输入任意两项即可换算。教学工具，不构成投资建议。</p>
 <div class="grid">
   <div class="card">
@@ -67,7 +67,7 @@
 <footer><div id="foot"></div></footer>
 </div>
 <script>
-const I18N={zh:{title:"ETF 溢价率速算",subtitle:"源自《四倍做多认知，长期做多人生》第十五章",
+const I18N={zh:{back:"← 返回工具箱",title:"ETF 溢价率速算",subtitle:"源自《四倍做多认知，长期做多人生》第十五章",
 disclaimer:"输入净值与成交价即可换算。教学工具，不构成投资建议。",
 inTitle:"输入",lNav:"基金净值 NAV（元）",lPrice:"市场成交价（元）",lAmt:"拟投入金额（元）",btnRun:"计算",
 inNote:"溢价率 =（市价 − 净值）÷ 净值。当市价高于净值即「溢价买入」。",
@@ -79,7 +79,7 @@ tblTitle:"速查表：溢价率 → 回归后的实际亏损",
 tPrem:"买入时溢价率",tLoss:"溢价回归后的实际亏损",tOver:"每 1 万元篮子的多付金额",
 tblNote:"亏损 = p ÷ (1+p)（亏损以你的买入成本为分母，而非净值）。高溢价常见于跨境 ETF、新发或涨停限购场景；买入前请对照此表。",
 foot:"来源：《四倍做多认知，长期做多人生》第十五章（溢价率与折价率）+ 附录 D 速查表。书 → 工具系列（A3）。教学假设，不构成投资建议。"},
-en:{title:"ETF Premium Calculator",subtitle:"from Chapter 15 of Quadruple Leverage",
+en:{back:"← Toolbox",title:"ETF Premium Calculator",subtitle:"from Chapter 15 of Quadruple Leverage",
 disclaimer:"Enter NAV and market price. Teaching tool, not investment advice.",
 inTitle:"Inputs",lNav:"Fund NAV (CNY)",lPrice:"Market price (CNY)",lAmt:"Amount to invest (CNY)",btnRun:"Calculate",
 inNote:"Premium = (market price − NAV) ÷ NAV. Price above NAV means buying at a premium.",

@@ -29,7 +29,7 @@
 </head>
 <body>
 <div class="wrap">
-<header><h1 data-i18n="title">人生目标翻译器</h1><span class="sub" data-i18n="subtitle">把目标翻译成每月数字 · 源自第三十二章</span>
+<header><a class="back" href="../index.html" data-i18n="back" style="font-size:12.5px;color:var(--bronze);text-decoration:none;flex-shrink:0;white-space:nowrap;margin-right:6px">← 返回工具箱</a><h1 data-i18n="title">人生目标翻译器</h1><span class="sub" data-i18n="subtitle">把目标翻译成每月数字 · 源自第三十二章</span>
 <button class="langbtn" id="langbtn" onclick="toggleLang()">English</button></header>
 <p class="disclaimer" data-i18n="disclaimer">反向翻译工具：给定目标金额与年限，算出每月该存多少。教学假设（固定年化、年复利），不构成投资建议。</p>
 <div class="grid">
@@ -57,7 +57,7 @@
 <footer><div id="foot"></div></footer>
 </div>
 <script>
-const I18N={zh:{title:"人生目标翻译器",subtitle:"把目标翻译成每月数字 · 源自第三十二章",disclaimer:"反向翻译工具：给定目标金额与年限，算出每月该存多少。教学假设（固定年化、年复利），不构成投资建议。",
+const I18N={zh:{back:"← 返回工具箱",title:"人生目标翻译器",subtitle:"把目标翻译成每月数字 · 源自第三十二章",disclaimer:"反向翻译工具：给定目标金额与年限，算出每月该存多少。教学假设（固定年化、年复利），不构成投资建议。",
 inTitle:"你的目标",lType:"目标类型（参考）",tp0:"自定义",tp1:"买房首付",tp2:"子女教育",tp3:"提前退休/自由",
 lAmt:"目标金额（元）",lYr:"距离年限（年）",lHave:"已备金额（元）",lRate:"预期年化（%）",hRate:"稳健：2–3% · 偏债：3–5% · 含权益：5–8% · 请勿用短期高收益假设",btnRun:"翻译成每月数字",
 outTitle:"翻译结果",lSave:"你每月能存（元）？",
@@ -68,7 +68,7 @@ verdictFit:"按每月存 {save}、年化 {r}%：{y} 年后你能积累约 {acc}�
 verdictShort:"按每月存 {save}，{y} 年后约积累 {acc}，距离 {target} 还差 {short} —— 需要提高月存或延长期限/调高预期（谨慎）。",
 note:"算法：先让已备金额按年化滚到目标日，缺口再按「每月定额 → 期末年金」反解月供。公式见页脚。",
 foot:"公式：F = P×(1+r)^n + A×[(1+r)^n−1]÷r，反解 A（每月 ×12）。来源：第三十二章（AI 长期规划）。书 → 工具系列（B2）。教学假设，不构成投资建议。"},
-en:{title:"Life Goal Translator",subtitle:"Turn goals into monthly numbers · from Ch32",disclaimer:"Reverse tool: given a target amount & horizon, find the monthly saving needed. Hypothetical (fixed annual return), not advice.",
+en:{back:"← Toolbox",title:"Life Goal Translator",subtitle:"Turn goals into monthly numbers · from Ch32",disclaimer:"Reverse tool: given a target amount & horizon, find the monthly saving needed. Hypothetical (fixed annual return), not advice.",
 inTitle:"Your goal",lType:"Goal type (reference)",tp0:"Custom",tp1:"Home down payment",tp2:"Children's education",tp3:"Early retirement / freedom",
 lAmt:"Target amount (CNY)",lYr:"Years away",lHave:"Already saved (CNY)",lRate:"Expected annual return (%)",hRate:"Conservative 2–3% · bond-heavy 3–5% · with equity 5–8% · never assume short-term high returns",btnRun:"Translate to monthly",
 outTitle:"Result",lSave:"Your monthly saving (CNY)?",

@@ -34,7 +34,7 @@
 </head>
 <body>
 <div class="wrap">
-<header><h1 data-i18n="title">费率侵蚀对比器</h1><span class="sub" data-i18n="subtitle">源自《四倍做多认知，长期做多人生》第十六章</span><button class="langbtn" id="langbtn" onclick="toggleLang()">English</button></header>
+<header><a class="back" href="../index.html" data-i18n="back" style="font-size:12.5px;color:var(--bronze);text-decoration:none;flex-shrink:0;white-space:nowrap;margin-right:6px">← 返回工具箱</a><h1 data-i18n="title">费率侵蚀对比器</h1><span class="sub" data-i18n="subtitle">源自《四倍做多认知，长期做多人生》第十六章</span><button class="langbtn" id="langbtn" onclick="toggleLang()">English</button></header>
 <p class="disclaimer" data-i18n="disclaimer">对比两只基金的总费率对长期回报的侵蚀。教学模型，不构成投资建议。</p>
 <div class="grid">
   <div class="card">
@@ -62,14 +62,14 @@
 <footer><div id="foot"></div></footer>
 </div>
 <script>
-const I18N={zh:{title:"费率侵蚀对比器",subtitle:"源自《四倍做多认知，长期做多人生》第十六章",disclaimer:"对比两只基金的总费率对长期回报的侵蚀。教学模型，不构成投资建议。",
+const I18N={zh:{back:"← 返回工具箱",title:"费率侵蚀对比器",subtitle:"源自《四倍做多认知，长期做多人生》第十六章",disclaimer:"对比两只基金的总费率对长期回报的侵蚀。教学模型，不构成投资建议。",
 inTitle:"输入",lP:"初始本金（元）",lR:"市场年化（%）",lY:"年限（年）",lFA:"基金 A 总费率（%/年）",hFA:"例：低费率指数基金 ≈ 0.15–0.5%",lFB:"基金 B 总费率（%/年）",hFB:"例：部分主动/销售费基金 ≈ 1–1.5%",btnRun:"对比",
 outTitle:"终值对比",mA:"基金 A（低费率）终值",mB:"基金 B（高费率）终值",
 diffFmt:"{y} 年后，低费率基金多出约 <b>{gap}</b>（是初始本金的 {pct} 倍）。看似每年只差 {df}%，复利之下差距被放大成倍数级——这正是第十六章说的「费率是唯一确定的成本」。",
 note:"模型：净年化 = 市场年化 − 总费率，按年复利；未计申购赎回费与税费（那些只会加大差距）。费率看「总费率 = 管理费 + 托管费 + 销售服务费」，别只看管理费。",
 foot:"来源：《四倍做多认知，长期做多人生》第十六章（费率、跟踪误差与隐性成本）。书 → 工具系列（A4）。教学假设，不构成投资建议。",
 lblA:"基金 A",lblB:"基金 B",scale:"相对本金倍数"},
-en:{title:"Fee Erosion Comparator",subtitle:"from Chapter 16 of Quadruple Leverage",disclaimer:"Compare how total fees erode long-term returns. Teaching model, not investment advice.",
+en:{back:"← Toolbox",title:"Fee Erosion Comparator",subtitle:"from Chapter 16 of Quadruple Leverage",disclaimer:"Compare how total fees erode long-term returns. Teaching model, not investment advice.",
 inTitle:"Inputs",lP:"Initial capital (CNY)",lR:"Market return (%/yr)",lY:"Years",lFA:"Fund A total fee (%/yr)",hFA:"e.g. low-cost index ≈ 0.15–0.5%",lFB:"Fund B total fee (%/yr)",hFB:"e.g. some active/front-load ≈ 1–1.5%",btnRun:"Compare",
 outTitle:"Final values",mA:"Fund A (low fee)",mB:"Fund B (high fee)",
 diffFmt:"After {y} years the low-fee fund ends with about <b>{gap}</b> more ({pct}× the initial capital). A {df}% yearly gap becomes multiples over time — Ch16's point that fees are the one certain cost.",
