@@ -2,7 +2,7 @@
 
 > **内部规划文档**（非发布资产）。这张图把「书 → 工具 → 产品」串起来：以《四倍做多认知，长期做多人生》为内容底座，衍生可用的投资小工具，并联动作者的自研产品（开源/闭源）。
 >
-> 状态：**2026-09-07 花花确认方向与优先级**（A + B，P0–P2）；工具形态（网页 / CLI / 桌面）逐项待定；C 区产品资料待补充。
+> 状态：**2026-09-07 花花确认方向与优先级**（A + B，P0–P2）；工具形态（网页 / CLI / 桌面）逐项待定；C 区：BlueWhale 定名 ✅、AlphaForge 进书方式已定 ✅。
 
 ---
 
@@ -36,10 +36,10 @@
 
 ## C · 外部产品联动（作者自研，资料待补）
 
-| 产品 | 仓库/形态 | 已知定位 | 进书形式（待补） | 状态 |
-|------|----------|---------|-----------------|------|
-| **AlphaForge** | [BerryUIKI/alpha-forge](https://github.com/BerryUIKI/alpha-forge) · 开源 AGPLv3 · 桌面应用（Tauri + React + Rust + SQLite） | 「高端金融工具」：AI 原生投资研究工作台——workspace 管理 + Agent Runtime（任务生命周期、事件、持久化），把原始信息加工成结构化投资知识 | 待花花确认（案例/行动卡/附录/仅联动引用…） | 已收录 |
-| **记账软件** | BerryUIKI/berry-ledger（private）· Apple 原生（iOS/iPadOS/macOS），Swift 跨平台核心 | 个人财务追踪：账户管理、自定义分类、收支记录、资金划转、数据恢复、月度统计。**产品名未定（berry-ledger 为仓库工作名）** | 对应 Ch31「AI 记账」主题；待起名 + 资料 | 预留 |
+| 产品 | 仓库/形态 | 已知定位 | 进书形式 | 状态 |
+|------|----------|---------|---------|------|
+| **AlphaForge** | [BerryUIKI/alpha-forge](https://github.com/BerryUIKI/alpha-forge) · 开源 AGPLv3 · 桌面应用（Tauri + React + Rust + SQLite） | 「高端金融工具」：AI 原生投资研究工作台——workspace 管理 + Agent Runtime（任务生命周期、事件、持久化），把原始信息加工成结构化投资知识 | **位置 1（首选）**：Ch33「AI 投资辅助与边界」作「研究侧 AI」正面例证（红线内 AI 参照物）；**位置 2（配套）**：终章后「作者的工具箱」延伸小节（读者进阶路径）。纪律：明示作者自研 + 只给生态入口不教操作。**试点推进：先落位置 1 一段走审读** | 已决策 |
+| **蓝鲸记账 / BlueWhale** | BerryUIKI/berry-ledger（private，仓库工作名）· Apple 原生（iOS/iPadOS/macOS），Swift 跨平台核心 | 个人财务追踪：账户管理、自定义分类、收支记录、资金划转、数据恢复、月度统计。**产品名：蓝鲸记账（BlueWhale）** | 对应 Ch31「AI 记账」主题 + 「作者的工具箱」延伸路径一环；定位/开源闭源待补 | 已定名，资料待补 |
 | **Axiara** | [BerryUIKI/Axiara](https://github.com/BerryUIKI/Axiara) · 开源 | 估值专用 agent 工作区：archive/query/batch quote/review 四能力，三层隔离数据层，自动化 agent 无法污染官方价格基线 | 与「研究/估值」主题强相关；是否收录待花花定 | 候选 |
 | **量化研究系列** | [RegimeForgeEA](https://github.com/BerryUIKI/RegimeForgeEA)（MQL5 框架 + Python 回测）、[vectortrend-rotation](https://github.com/BerryUIKI/vectortrend-rotation)（多因子轮动研究） | 机构级量化框架/研究（公开） | 与「市场周期/行为金融」呼应；是否收录待定 | 候选 |
 | 其他 private 相关仓库 | DollarHua_AI、Berry-invest、finflow-lab（均 private） | 品牌 IP / 投资 / 金融实验室，作者生态 | 是否收录待定 | 候选 |
@@ -50,9 +50,9 @@
 
 ## 开放问题（对齐后再动手）
 
-1. **v0.2 书改版**：哪些 A/B 工具值得在书里被点名（示例/行动卡/二维码），形成 书 → 工具 → 产品 闭环？
-2. **C 区补资料**：AlphaForge 希望以什么形式进书；记账软件的命名、定位、开源/闭源。
-3. **仓库收录范围**：除 alpha-forge 与记账软件外，还有哪些仓库要进这张图（如 Axiara）。
+1. **v0.2 书改版**：哪些 A/B 工具值得在书里被点名（示例/行动卡/二维码），形成 书 → 工具 → 产品 闭环？（AlphaForge 已定位置，见 C 区）
+2. **C 区补资料**：AlphaForge 位置 1 的 Ch33 试写段（等花花确认后起草）；蓝鲸记账的定位口径、开源/闭源、是否与 Ch31 深度绑定。
+3. **仓库收录范围**：除 alpha-forge 与蓝鲸记账外，还有哪些仓库要进这张图（Axiara / 量化系列是否收录）。
 4. **形态逐个定**：A/B 各项最终做网页（利于分享读者）、CLI/脚本（融入 data 工作流）还是并入桌面产品。
 
 ---
@@ -60,3 +60,4 @@
 ## 修订记录
 
 - 2026-09-07：初版。花花确认方向 A+B、优先级 P0–P2；AlphaForge 与记账软件（未命名）纳入 C 区。
+- 2026-09-07（二版）：AlphaForge 进书方式定案（Ch33 研究侧 AI 例证 + 终章「作者工具箱」，试点推进）；记账软件正式命名 **蓝鲸记账 / BlueWhale**（仓库工作名 berry-ledger）。
