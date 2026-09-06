@@ -38,11 +38,13 @@
 
 | 产品 | 仓库/形态 | 已知定位 | 进书形式（待补） | 状态 |
 |------|----------|---------|-----------------|------|
-| **AlphaForge** | [BerryUIKI/alpha-forge](https://github.com/BerryUIKI/alpha-forge) · 开源 AGPLv3 · 桌面应用（Tauri + React + Rust + SQLite） | 「高端金融工具」：AI 原生投资研究工作台——workspace 管理 + Agent Runtime（任务生命周期、事件、持久化），把原始信息加工成结构化投资知识 | 待花花确认（案例/行动卡/附录/仅联动引用…） | 待补资料 |
-| **记账软件** | 未命名 · 开源/闭源未定 | AI 记账（对应 Ch31「AI 记账」主题） | 待起名 + 资料 | 预留 |
-| 其他 BerryUIKI 仓库 | 见作者 GitHub（当前因网络未能全量拉取） | 已知有 Axiara 等 | — | 待花花列出想收录的 |
+| **AlphaForge** | [BerryUIKI/alpha-forge](https://github.com/BerryUIKI/alpha-forge) · 开源 AGPLv3 · 桌面应用（Tauri + React + Rust + SQLite） | 「高端金融工具」：AI 原生投资研究工作台——workspace 管理 + Agent Runtime（任务生命周期、事件、持久化），把原始信息加工成结构化投资知识 | 待花花确认（案例/行动卡/附录/仅联动引用…） | 已收录 |
+| **记账软件** | BerryUIKI/berry-ledger（private）· Apple 原生（iOS/iPadOS/macOS），Swift 跨平台核心 | 个人财务追踪：账户管理、自定义分类、收支记录、资金划转、数据恢复、月度统计。**产品名未定（berry-ledger 为仓库工作名）** | 对应 Ch31「AI 记账」主题；待起名 + 资料 | 预留 |
+| **Axiara** | [BerryUIKI/Axiara](https://github.com/BerryUIKI/Axiara) · 开源 | 估值专用 agent 工作区：archive/query/batch quote/review 四能力，三层隔离数据层，自动化 agent 无法污染官方价格基线 | 与「研究/估值」主题强相关；是否收录待花花定 | 候选 |
+| **量化研究系列** | [RegimeForgeEA](https://github.com/BerryUIKI/RegimeForgeEA)（MQL5 框架 + Python 回测）、[vectortrend-rotation](https://github.com/BerryUIKI/vectortrend-rotation)（多因子轮动研究） | 机构级量化框架/研究（公开） | 与「市场周期/行为金融」呼应；是否收录待定 | 候选 |
+| 其他 private 相关仓库 | DollarHua_AI、Berry-invest、finflow-lab（均 private） | 品牌 IP / 投资 / 金融实验室，作者生态 | 是否收录待定 | 候选 |
 
-> 作者画像（GitHub profile）：Independent Researcher — AI Infrastructure / Semiconductors / Data Centers，同时是投资内容创作者（本仓库 + 书）。产品联动可能跨越这两个领域，C 区开放收录。
+> 作者画像（GitHub profile）：Independent Researcher — AI Infrastructure / Semiconductors / Data Centers，同时是投资内容创作者（本仓库 + 书）与工具作者（上述产品矩阵）。C 区开放收录，范围由花花勾选。
 
 ---
 
