@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>四倍做多工具箱 · Quadruple Leverage Toolbox</title>
+<style>
+  :root{--cream:#FBF7F0;--paper:#FFF;--pink:#FEC6CD;--pink-deep:#F3A6AF;--navy:#1D1E50;--bronze:#B86C40;--teal:#0F6E56;--ink:#2C2C2A;--line:#E7E0D4;--muted:#6b675e}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--cream);color:var(--ink);font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;line-height:1.6;padding:28px 16px 48px}
+  .wrap{max-width:960px;margin:0 auto}
+  header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+  header h1{font-size:24px;font-weight:700;color:var(--navy)} header .sub{font-size:13px;color:var(--muted);flex:1}
+  .langbtn{border:1px solid var(--pink-deep);background:#fff;color:var(--navy);font-size:12px;padding:4px 10px;border-radius:999px;cursor:pointer}
+  .intro{font-size:13.5px;color:var(--muted);margin:10px 0 6px;max-width:82ch}
+  .booklink{font-size:12px;color:var(--bronze);text-decoration:none}
+  h2.sec{font-size:15px;color:var(--navy);margin:22px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--pink-deep)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+  a.tile{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 16px;text-decoration:none;color:var(--ink);transition:border-color .15s}
+  a.tile:hover{border-color:var(--pink-deep)}
+  .tile .id{font-size:11px;font-weight:600;color:var(--bronze);letter-spacing:.5px}
+  .tile .nm{font-size:15px;font-weight:600;color:var(--navy);margin:3px 0 4px}
+  .tile .ds{font-size:12.5px;color:var(--muted)}
+  .tile .ch{font-size:11.5px;color:var(--teal);margin-top:6px}
+  footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px;margin-top:28px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><h1 data-i18n="title">四倍做多工具箱</h1><span class="sub" data-i18n="subtitle">书里公式，变成工具 · 双语 / Bilingual</span>
+<button class="langbtn" id="langbtn" onclick="toggleLang()">English</button></header>
+<p class="intro" data-i18n="intro">《四倍做多认知，长期做多人生》的配套工具集：每一件都能在书中找到对应的公式与边界（来源标注在页脚）。所有工具本地运行、无数据上传。</p>
+<a class="booklink" id="booklink" data-i18n="booklink">→ 关于这本书（Book repo）</a>
+
+<h2 class="sec" data-i18n="secA">A · 数字工具箱</h2>
+<div class="grid" id="gridA"></div>
+<h2 class="sec" data-i18n="secB">B · AI 财务副驾驶</h2>
+<div class="grid" id="gridB"></div>
+<footer><div id="foot"></div></footer>
+</div>
+<script>
+const TOOLS=[
+ {id:"compound-calculator",grp:"A",n:1,zh:{nm:"复利计算器",ds:"本金+定投+年化 → 终值、增长曲线与 72 法则；25 vs 35 岁对比"},en:{nm:"Compound Calculator",ds:"Principal + contributions + return → final value, growth curve, Rule of 72; age 25 vs 35"},ch:"Ch5 · Ch27"},
+ {id:"dca-simulator",grp:"A",n:2,zh:{nm:"定投模拟器",ds:"一次性 vs 每月定投，微笑曲线（先跌后涨）里的低成本优势"},en:{nm:"DCA Simulator",ds:"Lump sum vs monthly DCA; the cost-averaging edge in a smile-curve dip"},ch:"Ch27"},
+ {id:"etf-premium-calculator",grp:"A",n:3,zh:{nm:"ETF 溢价率速算",ds:"市价/净值 → 溢价率、回归亏损与多付金额，附 10 档速查表"},en:{nm:"ETF Premium Calculator",ds:"Price/NAV → premium rate, reversion loss & overpayment; 10-step lookup"},ch:"Ch15 · App.D"},
+ {id:"fee-erosion-calculator",grp:"A",n:4,zh:{nm:"费率侵蚀对比器",ds:"两只基金的费率差，复利 N 年后的终值差距可视化"},en:{nm:"Fee Erosion Comparator",ds:"Visualize how a fee gap compounds into a value gap over N years"},ch:"Ch16"},
+ {id:"age-allocation-advisor",grp:"A",n:5,zh:{nm:"年龄配置建议器",ds:"年龄段 + 4 问 → 参考配置区间与「不适用情形」提示"},en:{nm:"Age Allocation Advisor",ds:"Age band + 4 questions → reference ranges & 'not applicable' caveats"},ch:"Ch22 · App.J"},
+ {id:"five-year-rule-checker",grp:"A",n:6,zh:{nm:"五年规则检查器",ds:"期限 × 当前资产 → 匹配度判定；五年内要用的钱别放高波动权益"},en:{nm:"Five-Year Rule Checker",ds:"Horizon × current asset → fit check; money needed in 5 yrs ≠ volatile equity"},ch:"Ch4"},
+ {id:"ai-accounting-pack",grp:"B",n:1,zh:{nm:"AI 记账对话包",ds:"4 条可复制记账 prompt（分类/复盘/现金流/边界守护），蓝鲸记账配套"},en:{nm:"AI Accounting Prompt Pack",ds:"4 copy-ready bookkeeping prompts; companion to BlueWhale"},ch:"Ch31"},
+ {id:"goal-translator",grp:"B",n:2,zh:{nm:"人生目标翻译器",ds:"把「想买房/教育/自由」翻译成每月该存多少"},en:{nm:"Life Goal Translator",ds:"Translate a home/education/freedom goal into a monthly saving number"},ch:"Ch32"},
+ {id:"review-generator",grp:"B",n:3,zh:{nm:"投资复盘生成器",ds:"几问生成结构化复盘草稿：纪律、收益、情绪、改进"},en:{nm:"Investment Review Generator",ds:"Answer a few questions → structured review: discipline, returns, emotions, next step"},ch:"Ch28 · App.I"},
+ {id:"ai-redline-cards",grp:"B",n:4,zh:{nm:"AI 投资红线卡",ds:"三条永不红线的可打印卡片，贴屏幕边上提醒自己"},en:{nm:"AI Investing Red-Line Cards",ds:"Three never-cross red lines on printable cards for your desk"},ch:"Ch33"}
+];
+const I18N={zh:{title:"四倍做多工具箱",subtitle:"书里公式，变成工具 · 双语",
+intro:"《四倍做多认知，长期做多人生》的配套工具集：每一件都能在书中找到对应的公式与边界。所有工具本地运行、无数据上传。",
+booklink:"→ 关于这本书",secA:"A · 数字工具箱",secB:"B · AI 财务副驾驶",
+foot:"工具来源章节见各卡片；完整路线图见仓库 TOOLBOX-ROADMAP.md。所有工具为教学假设，不构成投资建议。"},
+en:{title:"Quadruple Leverage Toolbox",subtitle:"Book formulas, turned into tools · 双语",
+intro:"Companion tools for 'Quadruple Leverage on Cognition, Long Life': every tool maps to a formula & boundary in the book. All run locally — no data leaves your device.",
+booklink:"→ About the book",secA:"A · Numeric toolbox",secB:"B · AI co-pilot",
+foot:"Source chapters on each card; full roadmap in TOOLBOX-ROADMAP.md. All tools are hypothetical teaching aids, not investment advice."}};
+let LANG="zh";
+function t(k){return I18N[LANG][k]||I18N.zh[k];}
+function tz(o){return LANG==="zh"?o:o.en;}
+function render(){
+  const card=x=>`<a class="tile" href="${x.id}/index.html"><div class="id">${x.grp}${x.n} · ${LANG==="zh"?"书→工具":"book→tool"}</div><div class="nm">${tz(x).nm}</div><div class="ds">${tz(x).ds}</div><div class="ch">${x.ch}</div></a>`;
+  document.getElementById("gridA").innerHTML=TOOLS.filter(x=>x.grp==="A").map(card).join("");
+  document.getElementById("gridB").innerHTML=TOOLS.filter(x=>x.grp==="B").map(card).join("");
+}
+function toggleLang(){LANG=LANG==="zh"?"en":"zh";applyLang();}
+function applyLang(){document.documentElement.lang=LANG==="zh"?"zh-CN":"en";document.getElementById("langbtn").textContent=LANG==="zh"?"English":"中文";
+document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=t(el.dataset.i18n));
+render();document.getElementById("foot").innerHTML=t("foot");}
+applyLang();
+</script>
+</body>
+</html>
