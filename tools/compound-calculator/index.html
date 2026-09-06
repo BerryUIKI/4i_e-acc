@@ -49,7 +49,7 @@
 </head>
 <body>
 <div class="wrap">
-  <header>
+  <header><a class="back" href="../index.html" data-i18n="back" style="font-size:12.5px;color:var(--bronze);text-decoration:none;flex-shrink:0;white-space:nowrap;margin-right:6px">← 返回工具箱</a>
     <h1 data-i18n="title">复利计算器</h1>
     <span class="sub" data-i18n="subtitle">源自《四倍做多认知，长期做多人生》第五章</span>
     <button class="langbtn" id="langbtn" onclick="toggleLang()">English</button>
@@ -103,7 +103,7 @@
 
 <script>
 const I18N = {
-  zh: {
+  zh:{back:"← 返回工具箱",
     title:"复利计算器", subtitle:"源自《四倍做多认知，长期做多人生》第五章 · Compound Calculator",
     disclaimer:"教学模拟工具：公式与口径见页脚。结果仅为教学假设，不构成任何投资建议；历史收益不代表未来表现。",
     inputTitle:"输入你的参数", lPrincipal:"初始本金（元）", lMonthly:"每月追加定投（元，可为 0）", hMonthly:"按每年年末投入一次等额（每月追加 × 12）计算",
@@ -122,7 +122,7 @@ const I18N = {
     foot3:"72 法则：资产翻倍所需年数 ≈ 72 ÷ 年化收益率（书中第五章）；精确值为 ln2 / ln(1+r)。",
     foot4:"来源：《四倍做多认知，长期做多人生》第五章（复利）、第二十七章（定投）。本工具为「书 → 工具」系列（A1）；遵循仓库 data-provenance 规则。教学假设，不构成投资建议。"
   },
-  en: {
+  en:{back:"← Toolbox",
     title:"Compound Interest Calculator", subtitle:"From Chapter 5 of 《Quadruple Leverage on Cognition, Long Life》",
     disclaimer:"Teaching simulation: formulas and caliber in footer. Results are hypothetical and not investment advice.",
     inputTitle:"Your inputs", lPrincipal:"Initial principal (CNY)", lMonthly:"Monthly contribution (CNY, 0 allowed)", hMonthly:"Modeled as one equal annual contribution (monthly × 12) at year-end",

@@ -29,7 +29,7 @@
 </head>
 <body>
 <div class="wrap">
-<header><h1 data-i18n="title">投资复盘生成器</h1><span class="sub" data-i18n="subtitle">源自第二十八章 + 附录 I · 引导式复盘</span>
+<header><a class="back" href="../index.html" data-i18n="back" style="font-size:12.5px;color:var(--bronze);text-decoration:none;flex-shrink:0;white-space:nowrap;margin-right:6px">← 返回工具箱</a><h1 data-i18n="title">投资复盘生成器</h1><span class="sub" data-i18n="subtitle">源自第二十八章 + 附录 I · 引导式复盘</span>
 <button class="langbtn" id="langbtn" onclick="toggleLang()">English</button></header>
 <p class="disclaimer" data-i18n="disclaimer">通过几个问题，生成一份可贴进投资日志的结构化复盘。答案只有你自己看得到（本页无网络、无存储）。</p>
 <div class="grid">
@@ -56,7 +56,7 @@
 <footer><div id="foot"></div></footer>
 </div>
 <script>
-const I18N={zh:{title:"投资复盘生成器",subtitle:"源自第二十八章 + 附录 I · 引导式复盘",disclaimer:"通过几个问题，生成一份可贴进投资日志的结构化复盘。答案只有你自己看得到（本页无网络、无存储）。",
+const I18N={zh:{back:"← 返回工具箱",title:"投资复盘生成器",subtitle:"源自第二十八章 + 附录 I · 引导式复盘",disclaimer:"通过几个问题，生成一份可贴进投资日志的结构化复盘。答案只有你自己看得到（本页无网络、无存储）。",
 qTitle:"回答几个问题",qPeriod:"复盘周期",pm:"月度复盘",py:"年度复盘",qPeriodEnd:"本期区间（如 2026-09）",qOps:"本期操作了几次？（买入/卖出各算一次）",qReasons:"其中几次操作在交易前就写下了理由？",
 qReturn:"组合本期收益（%，相对你的资金加权）",qBench:"同期基准（如沪深 300，%）",qEmo:"情绪自评：冲动操作过几次？（追涨/杀跌/临时改计划）",qLesson:"这期最大的一个教训或发现（一句话）",btnGen:"生成复盘",
 rTitle:"复盘草稿",btnCopy:"复制全文",copied:"已复制 ✓",
@@ -66,7 +66,7 @@ discOk:"理由记录率 100%：纪律优秀，继续保持。",discWarn:"理由�
 imp0:"本期无冲动操作，情绪控制良好。",impN:"本期有 {n} 次冲动操作：请对照当时的情境，标记是哪类偏差（追涨/杀跌/FOMO/频繁查看——见第三十章），下次在触发点前设一道检查。",
 retTxt:"组合 {ret}% vs 基准 {bench}%：",
 foot:"来源：第二十八章（投资日志）与附录 I（年度复盘表）。书 → 工具系列（B3）。本工具不上传任何数据。"},
-en:{title:"Investment Review Generator",subtitle:"from Ch28 + Appendix I · guided review",disclaimer:"Answer a few questions to get a structured review you can paste into your investment journal. Nothing leaves your device (no network, no storage).",
+en:{back:"← Toolbox",title:"Investment Review Generator",subtitle:"from Ch28 + Appendix I · guided review",disclaimer:"Answer a few questions to get a structured review you can paste into your investment journal. Nothing leaves your device (no network, no storage).",
 qTitle:"Answer a few questions",qPeriod:"Period",pm:"Monthly review",py:"Annual review",qPeriodEnd:"Period label (e.g. 2026-09)",qOps:"How many trades this period?",qReasons:"Of those, how many had a reason written BEFORE the trade?",
 qReturn:"Portfolio return this period (%)",qBench:"Benchmark (e.g. CSI 300, %)",qEmo:"Impulsive moves this period? (chasing/fear-selling/plan changes)",qLesson:"Biggest lesson or finding (one line)",btnGen:"Generate",
 rTitle:"Review draft",btnCopy:"Copy all",copied:"Copied ✓",
