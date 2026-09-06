@@ -40,8 +40,8 @@
 
 | 产品 | 仓库/形态 | 已知定位 | 进书形式 | 状态 |
 |------|----------|---------|---------|------|
-| **AlphaForge** | [BerryUIKI/alpha-forge](https://github.com/BerryUIKI/alpha-forge) · 开源 AGPLv3 · 桌面应用（Tauri + React + Rust + SQLite） | 「高端金融工具」：AI 原生投资研究工作台——把原始信息加工成结构化投资知识 | **位置 1（首选）**：Ch33「AI 投资辅助与边界」作「研究侧 AI」正面例证（红线内 AI 参照物）；**位置 2（配套）**：终章后「作者的工具箱」延伸小节。纪律：明示作者自研 + 只给生态入口。试点推进：Ch33 试写段已起草，待花花确认 | 已决策 |
-| **蓝鲸记账 / BlueWhale** | BerryUIKI/berry-ledger（private，仓库工作名）· Apple 原生（iOS/iPadOS/macOS），Swift 跨平台核心 | 个人财务追踪：账户管理、自定义分类、收支记录、资金划转、数据恢复、月度统计 | 对应 Ch31「AI 记账」主题 + 「作者的工具箱」延伸路径一环；**B1 记账对话包做成其配套** | 已定名；开源/闭源与定位口径待补 |
+| **AlphaForge** | [BerryUIKI/alpha-forge](https://github.com/BerryUIKI/alpha-forge) · 开源 AGPLv3 · 桌面应用（Tauri + React + Rust + SQLite） | 「高端金融工具」：AI 原生投资研究工作台——把原始信息加工成结构化投资知识 | **位置 1（首选）**：Ch33「研究侧的 AI」小节 **✅ 已落盘**（PR #39）；**位置 2（配套）**：终章后「作者的工具箱」延伸小节（待写） | 已决策 |
+| **蓝鲸记账 / BlueWhale** | BerryUIKI/berry-ledger（private，仓库工作名）· Apple 原生（iOS/iPadOS/macOS），Swift 跨平台核心 · **闭源** | 个人财务追踪：账户管理、自定义分类、收支记录、资金划转、数据恢复、月度统计。**标语：记好当下，岁岁有余**（定位口径暂不写） | 对应 Ch31「AI 记账」主题 + 「作者的工具箱」延伸路径一环；**B1 记账对话包做成其配套** | 已定名·闭源·标语✅ |
 
 > C 区收录范围：**仅上述两条主线**（花花拍板 2026-09-07）。Axiara（销售报价库，与书无关）、RegimeForgeEA / vectortrend-rotation（量化）、DollarHua_AI / Berry-invest / finflow-lab（private 生态）等**均不收录**本路线图。
 > 作者画像（GitHub profile）：Independent Researcher — AI Infrastructure / Semiconductors / Data Centers，同时是投资内容创作者（本仓库 + 书）与工具作者（AlphaForge、BlueWhale）。
@@ -50,8 +50,8 @@
 
 ## 开放问题（对齐后再动手）
 
-1. **v0.2 书改版**：哪些 A/B 工具值得在书里被点名（示例/行动卡/二维码），形成 书 → 工具 → 产品 闭环？（AlphaForge 已定位置，见 C 区）
-2. **C 区收尾**：Ch33 试写段待花花确认 → 落盘 I003 走 PR；蓝鲸记账开源/闭源与定位口径待补（B1 已定为其配套）。
+1. **v0.2 书改版**：**暂缓**（花花拍板 2026-09-07：dev → main 以后再说）。插图 P0-6 由花花**自行补充**，补好后交给小花蟹入库。
+2. **C 区收尾**：AlphaForge 位置 1 ✅（Ch33，PR #39）；位置 2「终章作者工具箱」待写；BlueWhale = 闭源 + 标语「记好当下，岁岁有余」（定位口径不写）。
 3. ~~仓库收录范围~~ → **已定稿**：C 区仅 AlphaForge + BlueWhale。
 4. **形态逐个定**：A1 已定「网页单文件」并启动试点；其余工具做之前各确认一次。
 
@@ -62,3 +62,4 @@
 - 2026-09-07：初版。花花确认方向 A+B、优先级 P0–P2；AlphaForge 与记账软件（未命名）纳入 C 区。
 - 2026-09-07（二版）：AlphaForge 进书方式定案（Ch33 研究侧 AI 例证 + 终章「作者工具箱」，试点推进）；记账软件正式命名 **蓝鲸记账 / BlueWhale**（仓库工作名 berry-ledger）。
 - 2026-09-07（三版）：**A1–A6 与 B1–B4 全部交付**（双语网页，PR #26–36，含 `tools/index.html` 导航）；C 区定稿（仅 AlphaForge + BlueWhale）。
+- 2026-09-07（四版）：AlphaForge 位置 1 ✅（Ch33，PR #39）；BlueWhale = **闭源** + 标语「记好当下，岁岁有余」（定位不写）；v0.2 暂缓；插图由花花自补。
