@@ -97,5 +97,32 @@ document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=t(el.dataset
 document.getElementById("foot").innerHTML=t("foot");}
 applyLang();
 </script>
+<script>
+(function(){
+  if(!window.__TAURI__) return;
+  var b=document.createElement("button");
+  b.textContent="导出结果 / Export";
+  b.style.cssText="position:fixed;right:16px;bottom:14px;z-index:9999;border:none;border-radius:10px;background:#1D1E50;color:#fff;padding:9px 16px;font-size:13px;cursor:pointer;font-family:inherit";
+  document.body.appendChild(b);
+  b.addEventListener("click",function(){
+    var lines=[document.title,""];
+    lines.push("INPUTS");
+    document.querySelectorAll("input").forEach(function(inp){
+      var lab=(inp.labels&&inp.labels[0])?inp.labels[0].textContent.trim()+" = ":"";
+      if(!lab && inp.id){var l=document.querySelector('label[for="'+inp.id+'"]');if(l)lab=l.textContent.trim()+" = ";}
+      lines.push((lab||"")+inp.value);
+    });
+    lines.push("");lines.push("RESULT");
+    document.querySelectorAll(".metric,.verdict,.diff,.big,.out").forEach(function(el){
+      var txt=el.textContent.trim().replace(/\s+/g," ");
+      if(txt) lines.push(txt);
+    });
+    var content=lines.join("\n");
+    var name=(document.title.replace(/[^a-zA-Z0-9]+/g,"-").replace(/^-|-$/g,"")||"tool")+"-result.txt";
+    window.__TAURI__.core.invoke("export_result",{content:content,defaultName:name})
+      .catch(function(e){window.alert("Export failed: "+e);});
+  });
+})();
+</script>
 </body>
 </html>
