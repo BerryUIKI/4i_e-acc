@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="《四倍做多认知，长期做多人生》配套工具箱：复利、定投、溢价率、费率、配置建议、记账与复盘等 10 件双语小工具。Companion tools for the Quadruple Leverage book — bilingual, local-only.">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#1D1E50">
+<meta property="og:title" content="四倍做多工具箱 · Quadruple Leverage Toolbox">
+<meta property="og:description" content="《四倍做多认知，长期做多人生》配套工具箱：复利、定投、溢价率、费率、配置建议、记账与复盘等 10 件双语小工具。">
+<meta property="og:type" content="website">
 <title data-i18n="title">四倍做多工具箱 · Quadruple Leverage Toolbox</title>
 <style>
   :root{--cream:#FBF7F0;--paper:#FFF;--pink:#FEC6CD;--pink-deep:#F3A6AF;--navy:#1D1E50;--bronze:#B86C40;--teal:#0F6E56;--ink:#2C2C2A;--line:#E7E0D4;--muted:#6b675e}
@@ -16,6 +21,9 @@
   header .sub{font-size:13px;color:var(--muted);display:block}
   .langbtn{border:1px solid var(--pink-deep);background:#fff;color:var(--navy);font-size:12px;padding:5px 12px;border-radius:999px;cursor:pointer}
   .langbtn:hover{background:var(--pink)}
+  .nav-home{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--bronze);text-decoration:none;background:#FDF2E6;border-radius:999px;padding:3px 12px;font-weight:600;margin-bottom:8px;transition:background .15s}
+  .nav-home:hover{background:#fae5d0}
+
   .intro{font-size:13.5px;color:var(--ink);margin:8px 0 10px;max-width:82ch;background:#FFFDF7;border:1px solid var(--line);border-left:4px solid var(--pink-deep);border-radius:8px;padding:10px 14px}
   .stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:4px}
   .stat{background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:5px 14px;font-size:12.5px;color:var(--muted)}
@@ -42,6 +50,7 @@
 <div class="wrap">
   <header>
     <div class="titles">
+      <a class="nav-home" href="../index.html"><span style="margin-right:4px">🏠</span><span data-i18n="backHome">返回图书主页</span></a>
       <h1 data-i18n="title">四倍做多工具箱</h1>
       <span class="sub" data-i18n="subtitle">书里公式，变成工具 · All run locally, nothing is uploaded</span>
     </div>
@@ -84,6 +93,7 @@ const TOOLS=[
 ];
 const I18N={zh:{title:"四倍做多工具箱 · Quadruple Leverage Toolbox",
 subtitle:"书里公式，变成工具 · 全部本地运行、不上传数据",
+backHome:"返回图书主页",
 intro:"《四倍做多认知，长期做多人生》的配套工具集：每一件都能在书中找到对应的公式与边界（卡片标注来源章节）。所有工具本地运行、不上传任何数据，适合分享给读者。",
 sTools:"共 {n} 件工具",sLocal:"100% 本地运行 · 无追踪",sCh:"覆盖：Ch4/5/15/16/22/27/28/31/32/33 + 附录 D/I/J",
 booklink:"→ 关于这本书（GitHub 仓库）",secA:"A · 数字工具箱",secB:"B · AI 财务副驾驶",open:"打开 →",
@@ -91,6 +101,7 @@ foot:"工具来源章节见各卡片；内容为教学假设，不构成投资�
 roadlink:"完整产品路线图 TOOLBOX-ROADMAP.md →"},
 en:{title:"Quadruple Leverage Toolbox · 四倍做多工具箱",
 subtitle:"Book formulas, turned into tools · All local, nothing uploaded",
+backHome:"Back to Book Home",
 intro:"Companion tools for 'Quadruple Leverage on Cognition, Long Life': every tool maps to a formula and its boundary in the book (chapter source on each card). All run locally, no data uploaded — share them with readers.",
 sTools:"{n} tools",sLocal:"100% local · no tracking",sCh:"Covers: Ch4/5/15/16/22/27/28/31/32/33 + App.D/I/J",
 booklink:"→ About the book (GitHub repo)",secA:"A · Numeric toolbox",secB:"B · AI co-pilot",open:"Open →",
@@ -113,12 +124,17 @@ function applyLang(){
   document.getElementById("langbtn").textContent=LANG==="zh"?"English":"中文";
   document.title=t("title");
   document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=t(el.dataset.i18n));
-  document.getElementById("booklink").href=LANG==="zh"?"../articles/2026-quadruple-long-life/README-zh_CN.md":"../articles/2026-quadruple-long-life/README.md";
+  var isWeb = location.protocol === "http:" || location.protocol === "https:";
+  var repoBase = "https://github.com/BerryUIKI/4i_e-acc";
+  var bookFile = LANG === "zh" ? "articles/2026-quadruple-long-life/README-zh_CN.md" : "articles/2026-quadruple-long-life/README.md";
+  document.getElementById("booklink").href = isWeb ? (repoBase + "/blob/main/" + bookFile) : ("../" + bookFile);
+  document.getElementById("roadlink").href = isWeb ? (repoBase + "/blob/dev/TOOLBOX-ROADMAP.md") : "../TOOLBOX-ROADMAP.md";
   document.getElementById("st-count").textContent=TOOLS.length;
   render();
   document.getElementById("foot").innerHTML=t("foot");
   document.getElementById("roadlink").textContent=t("roadlink");
 }
+
 applyLang();
 </script>
 <script>

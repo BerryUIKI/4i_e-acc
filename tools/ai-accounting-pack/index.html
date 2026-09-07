@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#1D1E50">
 <title>AI 记账对话包 · Accounting Prompt Pack</title>
 <style>
   :root{--cream:#FBF7F0;--paper:#FFF;--pink:#FEC6CD;--pink-deep:#F3A6AF;--navy:#1D1E50;--bronze:#B86C40;--teal:#0F6E56;--ink:#2C2C2A;--line:#E7E0D4;--muted:#6b675e}
@@ -27,7 +29,26 @@
 </head>
 <body>
 <div class="wrap">
-<header><a class="back" href="../index.html" data-i18n="back" style="font-size:12.5px;color:var(--bronze);text-decoration:none;flex-shrink:0;white-space:nowrap;margin-right:6px">← 返回工具箱</a><h1 data-i18n="title">AI 记账对话包</h1><span class="sub" data-i18n="subtitle">源自《四倍做多认知，长期做多人生》第三十一章 · 蓝鲸记账配套</span>
+<header><div class="nav-bar" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px;width:100%;font-size:12px">
+    <a class="nav-home" href="../../index.html" style="color:var(--muted);text-decoration:none;background:#FFFDF8;border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-weight:500">🏠 <span data-i18n="navHome">首页</span></a>
+    <a class="nav-tools" href="../index.html" style="color:var(--bronze);text-decoration:none;background:#FFFDF8;border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-weight:600">🧰 <span data-i18n="navTools">工具箱</span></a>
+    <select class="tool-select" onchange="if(this.value)location.href=this.value" aria-label="Switch tool" style="border:1px solid var(--line);border-radius:6px;padding:3px 6px;font-size:11.5px;background:#FFFDF8;color:var(--navy);cursor:pointer;font-family:inherit">
+      <optgroup label="A · 数字工具箱">
+        <option value="../compound-calculator/index.html">A1 复利计算器 · Compound Calculator</option>
+        <option value="../dca-simulator/index.html">A2 定投模拟器 · DCA Simulator</option>
+        <option value="../etf-premium-calculator/index.html">A3 ETF 溢价率速算 · Premium Calculator</option>
+        <option value="../fee-erosion-calculator/index.html">A4 费率侵蚀对比器 · Fee Erosion</option>
+        <option value="../age-allocation-advisor/index.html">A5 年龄配置建议器 · Allocation Advisor</option>
+        <option value="../five-year-rule-checker/index.html">A6 五年规则检查器 · 5-Year Rule</option>
+      </optgroup>
+      <optgroup label="B · AI 财务副驾驶">
+        <option value="../ai-accounting-pack/index.html" selected>B1 AI 记账对话包 · Prompt Pack</option>
+        <option value="../goal-translator/index.html">B2 人生目标翻译器 · Goal Translator</option>
+        <option value="../review-generator/index.html">B3 投资复盘生成器 · Review Generator</option>
+        <option value="../ai-redline-cards/index.html">B4 AI 投资红线卡 · Red-Line Cards</option>
+      </optgroup>
+    </select>
+  </div><h1 data-i18n="title">AI 记账对话包</h1><span class="sub" data-i18n="subtitle">源自《四倍做多认知，长期做多人生》第三十一章 · 蓝鲸记账配套</span>
 <button class="langbtn" id="langbtn" onclick="toggleLang()">English</button></header>
 <p class="intro" data-i18n="intro">把第三十一章的记账原则固化成可直接粘贴给任何对话式 AI（或蓝鲸记账内置助手）的指令。原则：AI 管分类与汇总、不替你评价消费；你的账单数据只给可信工具。</p>
 <div class="note" data-i18n="note">用法：复制一条 prompt，粘贴到你的 AI 助手；之后把当月收支逐条发过去即可。隐私提示：只发送必要的金额与类别，不要包含卡号等敏感信息。</p>
@@ -79,36 +100,103 @@ function copyTxt(i){
 applyLang();
 </script>
 <script>
+// Universal Web & Desktop Export + Toast
 (function(){
-  if(!window.__TAURI__) return;
   var b=document.createElement("button");
-  b.textContent="导出结果 / Export";
-  b.style.cssText="position:fixed;right:16px;bottom:14px;z-index:9999;border:none;border-radius:10px;background:#1D1E50;color:#fff;padding:9px 16px;font-size:13px;cursor:pointer;font-family:inherit";
+  b.className="export-fab-btn";
+  b.innerHTML='<span style="margin-right:4px">📥</span>'+(window.LANG==="zh"?"导出结果 / Export":"Export");
+  b.style.cssText="position:fixed;right:16px;bottom:14px;z-index:9999;border:none;border-radius:10px;background:#1D1E50;color:#fff;padding:9px 16px;font-size:13px;cursor:pointer;font-family:inherit;box-shadow:0 3px 12px rgba(29,30,80,0.25);transition:all .15s";
+  b.onmouseenter=function(){b.style.transform="translateY(-1px)";b.style.boxShadow="0 5px 16px rgba(29,30,80,0.35)";};
+  b.onmouseleave=function(){b.style.transform="none";b.style.boxShadow="0 3px 12px rgba(29,30,80,0.25)";};
   document.body.appendChild(b);
+
+  function showToast(msg){
+    var t=document.getElementById("tool-toast");
+    if(!t){
+      t=document.createElement("div");
+      t.id="tool-toast";
+      t.style.cssText="position:fixed;left:50%;bottom:64px;transform:translateX(-50%);z-index:10000;background:#1D1E50;color:#FFF;padding:8px 18px;border-radius:999px;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,0.25);opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap";
+      document.body.appendChild(t);
+    }
+    t.textContent=msg;
+    t.style.opacity="1";
+    t.style.transform="translateX(-50%) translateY(0)";
+    clearTimeout(t._timer);
+    t._timer=setTimeout(function(){
+      t.style.opacity="0";
+      t.style.transform="translateX(-50%) translateY(6px)";
+    },2400);
+  }
+
   b.addEventListener("click",function(){
     var lines=[document.title,""];
-    lines.push("INPUTS");
-    document.querySelectorAll("input").forEach(function(inp){
+    lines.push("--- INPUTS ---");
+    document.querySelectorAll("input,select,textarea").forEach(function(inp){
+      if(inp.type==="button"||inp.type==="submit") return;
       var lab=(inp.labels&&inp.labels[0])?inp.labels[0].textContent.trim()+" = ":"";
-      if(!lab && inp.id){var l=document.querySelector('label[for="'+inp.id+'"]');if(l)lab=l.textContent.trim()+" = ";}
+      if(!lab&&inp.id){var l=document.querySelector('label[for="'+inp.id+'"]');if(l)lab=l.textContent.trim()+" = ";}
       lines.push((lab||"")+inp.value);
     });
-    lines.push("");lines.push("RESULT");
-    document.querySelectorAll(".metric,.verdict,.diff,.big,.out").forEach(function(el){
+    lines.push("");lines.push("--- RESULT ---");
+    document.querySelectorAll(".metric,.verdict,.diff,.big,.out,.res,#res,#output").forEach(function(el){
       var txt=el.textContent.trim().replace(/\s+/g," ");
       if(txt) lines.push(txt);
     });
     var content=lines.join("\n");
-    var name=(document.title.replace(/[^a-zA-Z0-9]+/g,"-").replace(/^-|-$/g,"")||"tool")+"-result.txt";
-    window.__TAURI__.core.invoke("export_result",{content:content,defaultName:name})
-      .catch(function(e){window.alert("Export failed: "+e);});
+    var safeTitle=(document.title.split("·")[0]||document.title).trim().replace(/[^a-zA-Z0-9\u4e00-\u9fa5]+/g,"-").replace(/^-|-$/g,"")||"tool";
+    var name=safeTitle+"-result.txt";
+
+    if(window.__TAURI__){
+      window.__TAURI__.core.invoke("export_result",{content:content,defaultName:name})
+        .then(function(res){
+          if(res!=="cancelled") showToast((window.LANG==="zh"?"已保存至: ":"Saved to: ")+res);
+        })
+        .catch(function(e){window.alert("Export failed: "+e);});
+    }else{
+      var blob=new Blob([content],{type:"text/plain;charset=utf-8"});
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement("a");
+      a.href=url;
+      a.download=name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast(window.LANG==="zh"?"已下载计算结果文本":"Result file downloaded");
+    }
   });
 })();
 </script>
 <script>
+// LocalStorage Persistence + Reactive Input Calculation + Reset
 (function(){
   if(typeof localStorage==="undefined") return;
   var KEY="ql-toolbox:"+location.pathname.replace(/[^a-z0-9]+/gi,"-");
+  function getDefaults(){
+    var o={};
+    document.querySelectorAll("input,select,textarea").forEach(function(el){
+      if(el.id && el.defaultValue!==undefined) o[el.id]=el.defaultValue;
+    });
+    return o;
+  }
+  var defaults=getDefaults();
+
+  window.resetDefaults=function(){
+    localStorage.removeItem(KEY);
+    Object.keys(defaults).forEach(function(id){
+      var el=document.getElementById(id);
+      if(el) el.value=defaults[id];
+    });
+    var fn=window.calc||window.run||window.gen||null;
+    if(fn) fn();
+    var t=document.getElementById("tool-toast");
+    if(t){
+      t.textContent=window.LANG==="zh"?"已恢复默认参数":"Defaults restored";
+      t.style.opacity="1";
+      setTimeout(function(){t.style.opacity="0";},2000);
+    }
+  };
+
   function loadVals(){
     var raw=localStorage.getItem(KEY); if(!raw) return;
     try{ var o=JSON.parse(raw);
@@ -117,10 +205,12 @@ applyLang();
     }catch(e){}
   }
   function saveVals(){ var o={};
-    document.querySelectorAll("input,select").forEach(function(el){ if(el.id) o[el.id]=el.value; });
+    document.querySelectorAll("input,select,textarea").forEach(function(el){ if(el.id) o[el.id]=el.value; });
     try{ localStorage.setItem(KEY, JSON.stringify(o)); }catch(e){}
+    var fn=window.calc||window.run||window.gen||null; if(fn) fn();
   }
-  document.addEventListener("input",saveVals); document.addEventListener("change",saveVals);
+  document.addEventListener("input",saveVals);
+  document.addEventListener("change",saveVals);
   loadVals();
 })();
 </script>
