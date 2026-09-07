@@ -40,6 +40,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true   # cover illustration (00-cover.png) is an LFS asset
 
       # ── System dependencies ──────────────────────────
       - name: Install texlive + pandoc
