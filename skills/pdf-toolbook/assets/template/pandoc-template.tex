@@ -135,6 +135,9 @@
 \setlength{\parindent}{2em}
 \setlength{\parskip}{0.4em plus 0.1em minus 0.1em}
 \setlength{\emergencystretch}{1.5em}
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
 
 % ── Chapter/section title styling ──
 \usepackage{titlesec}
@@ -160,7 +163,8 @@
 
 \titlespacing*{\chapter}{0pt}{50pt}{40pt}
 
-% Section: large bold with blossom number prefix
+% Section: large bold with blossom number prefix (each section starts on a new page)
+\newcommand{\sectionbreak}{\clearpage}
 \titleformat{\section}
   {\Large\bfseries\sffamily\color{dh-navy}}
   {\color{dh-blossom}\thesection}
@@ -302,17 +306,20 @@
 }
 \renewenvironment{quote}{\begin{dhquote}}{\end{dhquote}}
 
-% ── Part divider macro (for "第N部分" banners inserted before chapters) ──
+% ── Part divider macro (standalone full-page banner for "第N部分") ──
 \newcommand{\partdivider}[1]{%
-  \par\vspace{0.4em}%
+  \clearpage
+  \thispagestyle{empty}%
+  \vspace*{5.0cm}%
   \begin{center}%
-    {\color{dh-blossom}\rule{0.2\textwidth}{0.8pt}}%
-    \hspace{1.2em}%
-    {\Large\bfseries\sffamily\color{dh-navy} #1}%
-    \hspace{1.2em}%
-    {\color{dh-blossom}\rule{0.2\textwidth}{0.8pt}}%
+    {\color{dh-blossom}\rule{0.35\textwidth}{1.5pt}\par}%
+    \vspace{1.2cm}%
+    {\Huge\bfseries\sffamily\color{dh-navy} #1\par}%
+    \vspace{1.2cm}%
+    {\color{dh-blossom}\rule{0.35\textwidth}{1.5pt}\par}%
   \end{center}%
-  \vspace{0.2em}%
+  \vfill
+  \clearpage
 }
 
 % ── Pandoc variables (filled in by metadata flags) ──
@@ -330,18 +337,16 @@
 \begin{titlepage}
 \thispagestyle{empty}
 \centering
-\vspace*{2.5cm}
+\vspace*{3.5cm}
 
 % Top decorative band
 {\color{dh-blossom}\rule{0.55\textwidth}{2pt}\par}
-\vspace{1.2cm}
+\vspace{2.2cm}
 
-% Subtitle / brand line
-{\Large\color{dh-bronze}四爱工作室 · 4i\_e-acc\par}
-\vspace{1.6cm}
-
-% Main title
-{\fontsize{36pt}{44pt}\selectfont\bfseries\color{dh-navy}\mytitle\par}
+% Main title (symmetrical 6+6 two-line title for elegant cover typography)
+{\fontsize{34pt}{48pt}\selectfont\bfseries\color{dh-navy}%
+四倍做多认知\\[0.35em]%
+长期做多人生\par}
 
 \vspace{0.6cm}
 
@@ -351,11 +356,11 @@
 
 % Subtitle (English)
 {\Large\color{dh-navy!85}Long-Term Investing Handbook\par}
-\vspace{1.0cm}
+\vspace{1.5cm}
 
 % Author
 {\large\color{dh-bronze}$author$\par}
-\vspace{1.0cm}
+\vspace{1.2cm}
 
 % Mid decorative band
 {\color{dh-blossom}\rule{0.35\textwidth}{1pt}\par}
