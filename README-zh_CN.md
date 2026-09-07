@@ -8,6 +8,9 @@
 [![Toolbox](https://img.shields.io/badge/Toolbox-10%20Bilingual%20Tools-E3A04B?style=flat-square)](https://berryuiki.github.io/4i_e-acc/tools/)
 [![Desktop](https://img.shields.io/badge/Desktop-Tauri%202%20%7C%20Rust-FEC6CD?logo=tauri&logoColor=1D1E50&style=flat-square)](./desktop/)
 [![Latest PDF](https://img.shields.io/github/v/release/BerryUIKI/4i_e-acc?label=PDF%20Release&color=1D1E50&style=flat-square)](https://github.com/BerryUIKI/4i_e-acc/releases)
+[![Code License: Apache 2.0](https://img.shields.io/badge/Code%20License-Apache%202.0-blue?style=flat-square)](./LICENSE)
+[![Book: All Rights Reserved](https://img.shields.io/badge/Book-All%20Rights%20Reserved-B86C40?style=flat-square)](./LICENSE)
+
 
 **给普通人的长期投资指南 · FREE · 开放内容 · 纯本地运行**
 
@@ -342,9 +345,10 @@ pnpm tauri build
 
 ### 8.2 知识产权与许可
 
-- **书籍文稿内容**（`articles/`、`reports/` 等）：遵循 [知识共享 署名-非商业性使用-相同方式共享 4.0 国际许可协议 (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)。欢迎自由转载与引用，但必须注明原作者署名，且不得用于任何商业盈利目的。
-- **源代码与小工具工程**（`tools/`、`desktop/`、`scripts/`）：遵循 [MIT License](./LICENSE) 开源许可。
-- **吉祥物 IP**（DollarHua / 花有财形象）：版权由作者花花所有，保留一切商业衍生权益。
+- **代码与小工具工程**（`tools/`、`desktop/`、`scripts/`）：遵循 [Apache License, Version 2.0](./LICENSE) 开源许可。允许自由使用、修改与分发，同时附带明确的专利反制与商标保护条款。
+- **书籍文稿与核心内容**（`articles/`、`reports/`、`research/` 等）：**作者花花保留所有版权 (Copyright © 2026 Huahua (@BerryUIKI). All rights reserved.)**。读者可在非商业前提下免费阅读、自学或引用参考，但**严禁任何未经授权的商业出版、改编、批量抓取或盈利性传播**。
+- **吉祥物 IP**（DollarHua / 花有财形象）：版权归作者花花所有，保留全部衍生品与商业化权益。
+
 
 ---
 
