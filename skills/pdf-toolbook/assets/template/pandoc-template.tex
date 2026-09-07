@@ -161,7 +161,10 @@
   {}
   [\vskip 0.6cm{\color{dh-blossom}\hrule height 2pt}]
 
-\titlespacing*{\chapter}{0pt}{50pt}{40pt}
+% Chapter top spacing: 50pt left a ~4.4cm blank band at the top of every
+% chapter-opening page (2.6cm margin + 50pt before-spacing) — tightened
+% to 14pt so the chapter title sits near the top of the text block.
+\titlespacing*{\chapter}{0pt}{14pt}{34pt}
 
 % Section: large bold with blossom number prefix (each section starts on a new page)
 \newcommand{\sectionbreak}{\clearpage}
