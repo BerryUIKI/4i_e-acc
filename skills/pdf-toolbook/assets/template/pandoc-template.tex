@@ -87,7 +87,8 @@
 % CJK line breaking + spacing
 \XeTeXlinebreaklocale "zh"
 \XeTeXlinebreakskip = 0pt plus 1pt
-\xeCJKsetup{CJKecglue=\hskip 0.15em plus 0.05em minus 0.05em}
+\xeCJKsetup{CJKecglue=\hskip 0.15em plus 0.05em minus 0.05em,
+            PunctStyle=quanjiao}  % full-width CJK punctuation (publishing standard)
 
 % Line spreading for CJK body text readability
 \linespread{1.45}\selectfont
@@ -116,17 +117,17 @@
 \fancyhead[L]{\footnotesize\color{dh-navy}\leftmark}
 \fancyhead[R]{\footnotesize\color{dh-navy}\mytitle}
 \newcommand{\footerdisclaimer}{{\tiny\color{dh-navy-muted}投资有风险，入市需谨慎}}
-\fancyfoot[C]{\thepage\\[1pt]\footerdisclaimer}
+\fancyfoot[C]{\small\color{dh-navy-soft}\thepage}
 \fancypagestyle{plain}{
   \fancyhf{}
-  \fancyfoot[C]{\thepage\\[1pt]\footerdisclaimer}
+  \fancyfoot[C]{\small\color{dh-navy-soft}\thepage}
   \renewcommand{\headrulewidth}{0pt}
   \renewcommand{\headrule}{}
 }
 % Chapter starts: show only page number and disclaimer, no header
 \fancypagestyle{chapterstart}{
   \fancyhf{}
-  \fancyfoot[C]{\thepage\\[1pt]\footerdisclaimer}
+  \fancyfoot[C]{\small\color{dh-navy-soft}\thepage}
   \renewcommand{\headrulewidth}{0pt}
   \renewcommand{\headrule}{}
 }
@@ -240,10 +241,20 @@
   {../articles/2026-quadruple-long-life/analysis/output/}%
   {./assets/}%
   {../assets/}%
+  {./assets/illustrations/}%
+  {../assets/illustrations/}%
   {./images/}%
   {../images/}%
 }
 \usepackage[export]{adjustbox}
+\usepackage{eso-pic}   % full-bleed cover image
+
+% ── Caption styling: small, centered, bronze figure/table labels ──
+\usepackage{caption}
+\captionsetup{font=small, labelfont={bf,color=dh-bronze}, labelsep=quad,
+              justification=centering, skip=6pt}
+\renewcommand{\figurename}{图}
+\renewcommand{\tablename}{表}
 
 % Pandoc image wrapper: ensure images fit within page width and height
 \makeatletter
@@ -348,45 +359,67 @@
 % ────────────────────────────────────────────────────────────
 \begin{document}
 
-% ---- Custom Title Page (literal, bypasses ctex's maketitle) ----
+% ---- Cover: full-bleed DollarHua illustration (LFS asset 00-cover.png) ----
+\begin{titlepage}
+\thispagestyle{empty}
+\AddToShipoutPictureBG*{%
+  \AtPageLowerLeft{%
+    \includegraphics[width=\paperwidth,height=\paperheight]{00-cover.png}%
+  }%
+}
+\mbox{}% force the shipout
+\end{titlepage}
+
+% ---- Half title (扉页) ----
 \begin{titlepage}
 \thispagestyle{empty}
 \centering
-\vspace*{3.5cm}
+\vspace*{4.2cm}
 
-% Top decorative band
 {\color{dh-blossom}\rule{0.55\textwidth}{2pt}\par}
-\vspace{2.2cm}
+\vspace{2.0cm}
 
-% Main title (symmetrical 6+6 two-line title for elegant cover typography)
-{\fontsize{34pt}{48pt}\selectfont\bfseries\color{dh-navy}%
+{\fontsize{30pt}{44pt}\selectfont\bfseries\color{dh-navy}%
 四倍做多认知\\[0.35em]%
 长期做多人生\par}
 
-\vspace{0.6cm}
+\vspace{0.7cm}
 
-% Decorative divider
 {\color{dh-gold}\rule{0.25\textwidth}{1.2pt}\par}
-\vspace{0.4cm}
+\vspace{0.5cm}
 
-% Subtitle (English)
-{\Large\color{dh-navy!85}Long-Term Investing Handbook\par}
-\vspace{1.5cm}
+{\large\color{dh-navy!85}Quadruple Leverage on Cognition, Long Life\par}
+\vspace{1.4cm}
 
-% Author
 {\large\color{dh-bronze}$author$\par}
-\vspace{1.2cm}
-
-% Mid decorative band
-{\color{dh-blossom}\rule{0.35\textwidth}{1pt}\par}
 \vfill
 
-% Bottom — edition / date
-{\large\color{dh-navy}第 1 版 · $date$\par}
+{\normalsize\color{dh-navy}第 1 版 · $date$\par}
 \vspace{0.4cm}
 {\color{dh-gold}\rule{0.55\textwidth}{1pt}\par}
-\vspace{2cm}
+\vspace{1.6cm}
 \end{titlepage}
+
+% ---- Copyright page (版权页) ----
+\thispagestyle{empty}
+\begingroup
+\small\color{dh-navy-soft}
+\setlength{\parindent}{0pt}
+\vspace*{9cm}
+
+《四倍做多认知，长期做多人生》\par
+Quadruple Leverage on Cognition, Long Life\par
+作者：花花（@BerryUIKI）\par
+第 1 版 · $date$ \par
+\hspace{0pt}\par
+书稿 © 花花。保留所有权利，转载请标注出处。\par
+代码与脚本示例以 Apache-2.0 许可发布（见仓库 LICENSE）。\par
+本书配套网页工具为开源软件，仓库见 \texttt{github.com/BerryUIKI/4i\_e-acc}。\par
+\hspace{0pt}\par
+{\color{dh-bronze}\textbf{免责声明}}\par
+本书所有投资案例均为教学假设，不构成任何投资建议；历史收益不代表未来表现。投资有风险，入市需谨慎。\par
+\endgroup
+\clearpage
 
 % ---- Frontmatter & Table of Contents ----
 \frontmatter

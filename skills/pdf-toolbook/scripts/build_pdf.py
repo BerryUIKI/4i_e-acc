@@ -1287,6 +1287,13 @@ def main():
                 shutil.copy2(img, chart_dest / img.name)
             rprint(f"Chart images copied from {book_chart_src}", "ok")
 
+        # Copy the LFS cover illustration (00-cover.png) next to the merged
+        # md — xelatex resolves {./} graphicspath against the build dir.
+        cover_src = WORKSPACE_ROOT / "assets" / "illustrations" / "00-cover.png"
+        if cover_src.exists():
+            shutil.copy2(cover_src, merged_path.parent / cover_src.name)
+            rprint(f"Cover illustration copied: {cover_src.name}", "ok")
+
         # Ensure Source Han fonts (download if missing)
         ensure_fonts()
 
@@ -1340,6 +1347,13 @@ def main():
             for img in book_chart_src.glob("*.png"):
                 shutil.copy2(img, chart_dest / img.name)
             rprint(f"Chart images copied from {book_chart_src}", "ok")
+
+        # Copy the LFS cover illustration (00-cover.png) next to the merged
+        # md — xelatex resolves {./} graphicspath against the build dir.
+        cover_src = WORKSPACE_ROOT / "assets" / "illustrations" / "00-cover.png"
+        if cover_src.exists():
+            shutil.copy2(cover_src, merged_path.parent / cover_src.name)
+            rprint(f"Cover illustration copied: {cover_src.name}", "ok")
 
         # Ensure Source Han fonts (download if missing)
         ensure_fonts()
