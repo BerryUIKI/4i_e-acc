@@ -1,49 +1,28 @@
 %===========================================================
 %  pandoc-template.tex — DollarHua PDF Toolbook Template
-%  Version: v1.2 · Updated: 2026-07-29
+%  Version: v2.0 · Updated: 2026-09-07
 %
-%  Used with: pandoc input.md --template=this -o output.tex
-%  Compile with: xelatex (3 passes: TOC + cross-refs + longtable)
+%  Used with: pandoc merged.md --template=this -o output.tex
+%  Compile with: xelatex (2 passes: TOC + cross-refs; optional 3rd if "Rerun")
+%
+%  Optimizations over v1.3:
+%    • Cover rendered as literal titlepage (v1.3 \@maketitle was shadowed by ctex)
+%    • Chapter: display style with 0.6×\textwidth decorative band + 章号居中
+%    • Header: chapter name (left) + book title (right), Bond Navy on blossom rule
+%    • Footer: page number centered
+%    • Part divider macro: \partdivider{...} for "第N部分" inline banners
+%    • Tighter line spacing for body, generous for chapter intros
+%    • First-line indent 2em CJK, parskip 0.4em
 %===========================================================
 
 % ── Document class (ctexbook = Chinese-enabled book) ──
-% NO fontset=none — let ctex use Fandol as guaranteed fallback (installed
-% with texlive-lang-chinese on CI). Then override families with Source Han.
-% This ensures CJK text ALWAYS renders: if Source Han fails, Fandol takes over.
-\documentclass[a4paper,12pt,oneside]{ctexbook}
-
-% ── CJK typography: cross-platform auto-detect ──
-% ctexbook has already loaded xeCJK and configured zhsong/zhhei/zhfs/zhkai
-% to Fandol.  We try the best available font:
-%   PingFang SC (macOS) → Noto Serif CJK SC (Linux, some distros) →
-%   Source Han Serif SC (Linux CI, Adobe Language Specific OTFs) →
-%   Source Han Serif CN (Windows, older CN-subset OTFs) →
-%   Fandol (ctex built-in fallback, always available).
-\IfFontExistsTF{PingFang SC}{%
-  \setCJKmainfont{PingFang SC}[BoldFont={PingFang SC Semibold}]
-  \setCJKsansfont{PingFang SC}[BoldFont={PingFang SC Semibold}]
-  \setCJKmonofont{PingFang SC}
-}{%
-  \IfFontExistsTF{Noto Serif CJK SC}{%
-    \setCJKmainfont{Noto Serif CJK SC}[BoldFont={Noto Serif CJK SC Bold}]
-    \setCJKsansfont{Noto Sans CJK SC}[BoldFont={Noto Sans CJK SC Bold}]
-    \setCJKmonofont{Noto Sans CJK SC}
-  }{%
-    \IfFontExistsTF{Source Han Serif SC}{%
-      \setCJKmainfont{Source Han Serif SC}[BoldFont={Source Han Serif SC Bold}]
-      \setCJKsansfont{Source Han Sans SC}[BoldFont={Source Han Sans SC Bold}]
-      \setCJKmonofont{Source Han Sans SC}
-    }{%
-      \setCJKmainfont{Source Han Serif CN}[BoldFont={Source Han Serif CN Bold}]
-      \setCJKsansfont{Source Han Sans CN}[BoldFont={Source Han Sans CN Bold}]
-      \setCJKmonofont{Source Han Sans CN}
-    }%
-  }%
-}
+% fontset=none → ctex doesn't preload any CJK font; we set our own below.
+\documentclass[a4paper,11pt,oneside,fontset=none,UTF8,zihao=-4]{ctexbook}
 
 % ── Page geometry ──
-\usepackage[top=2.5cm, bottom=2.5cm, left=2.8cm, right=2.3cm,
-            headheight=23pt, headsep=8mm, footskip=12mm,
+% slightly wider text area; headsep increased for header band visibility
+\usepackage[top=2.6cm, bottom=2.6cm, left=2.8cm, right=2.4cm,
+            headheight=14pt, headsep=10mm, footskip=12mm,
             includeheadfoot]{geometry}
 
 % ── DollarHua brand colors ──
@@ -56,6 +35,47 @@
 \definecolor{dh-skin}{HTML}{F9DECE}
 \definecolor{dh-white}{HTML}{FCFDFD}
 \definecolor{dh-red}{HTML}{E85D61}
+
+% ── CJK typography (cross-platform auto-detect) ──
+\usepackage{fontspec}
+\usepackage{xeCJK}
+
+\IfFontExistsTF{PingFang SC}{
+  \setCJKmainfont{PingFang SC}[
+    BoldFont={PingFang SC Semibold},
+    ItalicFont={PingFang SC Light}
+  ]
+  \setCJKsansfont{PingFang SC}
+  \setCJKmonofont{PingFang SC}
+}{
+  \IfFontExistsTF{Noto Serif CJK SC}{
+    \setCJKmainfont{Noto Serif CJK SC}[
+      BoldFont={Noto Serif CJK SC Bold},
+      AutoFakeSlant=0.15
+    ]
+    \setCJKsansfont{Noto Sans CJK SC}
+    \setCJKmonofont{Noto Sans Mono CJK SC}
+  }{
+    \IfFontExistsTF{Source Han Serif SC}{
+      \setCJKmainfont{Source Han Serif SC}[
+        BoldFont={Source Han Serif SC Bold},
+        AutoFakeSlant=0.15
+      ]
+      \setCJKsansfont{Source Han Sans SC}
+      \setCJKmonofont{Source Han Sans SC}
+    }{
+      % Ultimate fallback: SimSun on Windows
+      \setCJKmainfont{SimSun}[AutoFakeBold=2.5]
+      \setCJKsansfont{SimHei}
+      \setCJKmonofont{KaiTi}
+    }
+  }
+}
+
+% CJK line breaking + spacing
+\XeTeXlinebreaklocale "zh"
+\XeTeXlinebreakskip = 0pt plus 1pt
+\xeCJKsetup{CJKecglue=\hskip 0.15em plus 0.05em minus 0.05em}
 
 % ── Unicode character support ──
 \usepackage{newunicodechar}
@@ -75,60 +95,131 @@
 \renewcommand{\headrulewidth}{0.5pt}
 \renewcommand{\headrule}{\hbox to\headwidth{%
   \color{dh-blossom}\leaders\hrule height \headrulewidth\hfill}}
-\fancyhead[L]{\footnotesize\color{dh-navy}\leftmark}
-\fancyhead[R]{\footnotesize\color{dh-navy}\mytitle}
+% \leftmark contains the chapter title (set by \chaptermark below)
+\fancyhead[LE]{\footnotesize\color{dh-navy}\thechapter\quad\leftmark}
+\fancyhead[RO]{\footnotesize\color{dh-navy}\mytitle}
 \fancyfoot[C]{\thepage}
 \fancypagestyle{plain}{
   \fancyhf{}
   \fancyfoot[C]{\thepage}
   \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\headrule}{}
+}
+% Chapter starts: show only page number, no header
+\fancypagestyle{chapterstart}{
+  \fancyhf{}
+  \fancyfoot[C]{\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\headrule}{}
 }
 
-% ── First-line indent: 2 CJK characters ──
+% ── Paragraph: first-line indent 2 CJK chars, generous inter-paragraph ──
 \setlength{\parindent}{2em}
+\setlength{\parskip}{0.4em plus 0.1em minus 0.1em}
+\setlength{\emergencystretch}{1.5em}
 
 % ── Chapter/section title styling ──
 \usepackage{titlesec}
 
-% Chapter: Bond Navy large text + pink decor rules
+% Mixed-color helpers (avoid titlesec choking on `!NN` mixing syntax)
+\definecolor{dh-navy-soft}{HTML}{3A3B72}    % 80% of dh-navy
+\definecolor{dh-navy-faint}{HTML}{8485A0}   % 50% of dh-navy
+
+% Chapter: display style with a band on top, the "第N章" label, the
+% chapter title, and a trailing rule.
+%
+% titlesec's display-style "label" slot is sensitive: it must be a
+% single, balanced group (no bare \par, no unprotected \vspace).
+% We therefore wrap the entire label in a single {…} and use
+% \vskip / \hrulefill instead of \par / \rule.
 \titleformat{\chapter}[display]
   {\centering\Huge\bfseries\sffamily\color{dh-navy}}
-  {\color{dh-blossom}\rule{0.6\textwidth}{2pt}\vspace{0.5cm}\\%
-   \chaptertitlename\ \thechapter}
-  {1em}
+  {{\color{dh-blossom}\hrule height 1.5pt}\vskip 0.7cm
+   {\color{dh-navy-soft}\Large 第\ \thechapter\ 章}}
+  {1.0em}
   {}
-  [\vspace{0.3cm}\color{dh-blossom}\rule{0.3\textwidth}{1pt}]
+  [\vskip 0.6cm{\color{dh-blossom}\hrule height 1pt}]
 
-% Section
+\titlespacing*{\chapter}{0pt}{20pt}{40pt}
+
+% Section: large bold with blossom number prefix
 \titleformat{\section}
   {\Large\bfseries\sffamily\color{dh-navy}}
   {\color{dh-blossom}\thesection}
-  {1em}
+  {0.8em}
   {}
-  [\vspace{-0.3cm}{\color{dh-blossom}\titlerule[1pt]}]
+  [\vspace{-0.2em}{\color{dh-blossom}\titlerule[0.8pt]}]
 
-% Subsection
+\titlespacing*{\section}{0pt}{2.0em}{0.8em}
+
+% Subsection: medium bold
 \titleformat{\subsection}
   {\large\bfseries\sffamily\color{dh-navy}}
   {\color{dh-blossom}\thesubsection}
-  {1em}
+  {0.6em}
   {}
 
-% ── Table of contents styling ──
-\usepackage{hyperref}
+\titlespacing*{\subsection}{0pt}{1.6em}{0.6em}
+
+% Subsubsection: small bold
+\titleformat{\subsubsection}
+  {\normalsize\bfseries\sffamily\color{dh-navy}}
+  {\color{dh-blossom}\thesubsubsection}
+  {0.5em}
+  {}
+
+% Subsection / subsubsection numbering: drop the \thesection component
+% so a chapter with no parent \section does not render as "1.0.1, 1.0.2".
+% We use plain chapter.X (and chapter.X.Y) instead.
+\renewcommand{\thesubsection}{\thechapter.\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\thechapter.\arabic{subsection}.\arabic{subsubsection}}
+
+% Make sure chapter shows in header (with short title)
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+
+% ── TOC styling ──
+\usepackage{tocloft}
+\renewcommand{\cftchapfont}{\bfseries\color{dh-navy}}
+\renewcommand{\cftchappagefont}{\bfseries\color{dh-navy}}
+\renewcommand{\cftsecfont}{\color{dh-navy}}
+\renewcommand{\cftsubsecfont}{\color{dh-navy!85}}
+\renewcommand{\cftdotsep}{1.5}
+\renewcommand{\cftchapleader}{\color{dh-blossom}\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforechapskip}{6pt}
+\setlength{\cftbeforesecskip}{3pt}
+
+% ── Hyperref (must be near end of preamble) ──
+\usepackage[unicode,bookmarks=true,bookmarksnumbered=true]{hyperref}
 \hypersetup{
   colorlinks=true,
   linkcolor=dh-navy,
   urlcolor=dh-gold,
-  pdfborder={0 0 0}
+  citecolor=dh-bronze,
+  pdfborder={0 0 0},
+  pdftitle={$title$},
+  pdfauthor={$author$}
 }
 
 % ── Image support ──
 \usepackage{graphicx}
 \usepackage{float}
-\graphicspath{{./}{./assets/}{./images/}}
-\providecommand{\pandocbounded}[1]{#1}
+% Multiple graphicspath entries so image resolution works regardless of
+% whether xelatex is invoked from the workspace root, the output/ dir,
+% or the output/tex/ split dir.  Each entry is searched in order.
+\graphicspath{%
+  {./}%
+  {../}%
+  {./articles/2026-quadruple-long-life/analysis/output/}%
+  {../articles/2026-quadruple-long-life/analysis/output/}%
+  {./assets/}%
+  {../assets/}%
+  {./images/}%
+  {../images/}%
+}
 \usepackage[export]{adjustbox}
+
+% Pandoc image wrapper (required by Pandoc's LaTeX writer)
+\providecommand{\pandocbounded}[1]{#1}
 
 % ── Code highlighting ──
 \usepackage{listings}
@@ -159,40 +250,87 @@
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{colortbl}
+\usepackage{tabularx}
 \arrayrulecolor{dh-blossom}
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.25}
 
-% ── Block quotes ──
+% ── Block quotes (epigraph) ──
 \usepackage{etoolbox}
-\AtBeginEnvironment{quote}{\small\color{dh-navy}}
+\AtBeginEnvironment{quote}{%
+  \small\color{dh-bronze}%
+  \leftskip=2em \rightskip=1em%
+  \itshape%
+}
+\AtEndEnvironment{quote}{\par\vspace{0.3em}}
 
-% ── Pandoc variables ──
+% ── Part divider macro (for "第N部分" banners inserted before chapters) ──
+\newcommand{\partdivider}[1]{%
+  \par\vspace{0.4em}%
+  \begin{center}%
+    {\color{dh-blossom}\rule{0.2\textwidth}{0.8pt}}%
+    \hspace{1.2em}%
+    {\Large\bfseries\sffamily\color{dh-navy} #1}%
+    \hspace{1.2em}%
+    {\color{dh-blossom}\rule{0.2\textwidth}{0.8pt}}%
+  \end{center}%
+  \vspace{0.2em}%
+}
+
+% ── Pandoc variables (filled in by metadata flags) ──
 \newcommand{\mytitle}{$title$}
 \title{\mytitle}
 \author{$author$}
 \date{$date$}
 
-% ── Cover styling ──
-\makeatletter
-\def\@maketitle{
-  \begin{titlepage}
-    \centering
-    \vspace*{3cm}
-    {\color{dh-blossom}\rule{0.5\textwidth}{2pt}\par}
-    \vspace{1cm}
-    {\Huge\bfseries\color{dh-navy}\mytitle\par}
-    \vspace{0.5cm}
-    {\Large\color{dh-bronze}$author$\par}
-    \vspace{1cm}
-    {\color{dh-blossom}\rule{0.3\textwidth}{1pt}\par}
-    \vfill
-    {\large\color{dh-blossom}$date$\par}
-  \end{titlepage}
-}
-\makeatother
-
+% ────────────────────────────────────────────────────────────
+%  Body
+% ────────────────────────────────────────────────────────────
 \begin{document}
-\maketitle
 
+% ---- Custom Title Page (literal, bypasses ctex's maketitle) ----
+\begin{titlepage}
+\thispagestyle{empty}
+\centering
+\vspace*{2.5cm}
+
+% Top decorative band
+{\color{dh-blossom}\rule{0.55\textwidth}{2pt}\par}
+\vspace{1.2cm}
+
+% Subtitle / brand line
+{\Large\color{dh-bronze}四爱工作室 · 4i\_e-acc\par}
+\vspace{1.6cm}
+
+% Main title
+{\fontsize{36pt}{44pt}\selectfont\bfseries\color{dh-navy}\mytitle\par}
+
+\vspace{0.6cm}
+
+% Decorative divider
+{\color{dh-gold}\rule{0.25\textwidth}{1.2pt}\par}
+\vspace{0.4cm}
+
+% Subtitle (English)
+{\Large\color{dh-navy!85}Long-Term Investing Handbook\par}
+\vspace{1.0cm}
+
+% Author
+{\large\color{dh-bronze}$author$\par}
+\vspace{1.0cm}
+
+% Mid decorative band
+{\color{dh-blossom}\rule{0.35\textwidth}{1pt}\par}
+\vfill
+
+% Bottom — edition / date
+{\large\color{dh-navy}第 1 版 · $date$\par}
+\vspace{0.4cm}
+{\color{dh-gold}\rule{0.55\textwidth}{1pt}\par}
+\vspace{2cm}
+\end{titlepage}
+
+% ---- Table of Contents ----
 $if(toc)$
 \tableofcontents
 $endif$

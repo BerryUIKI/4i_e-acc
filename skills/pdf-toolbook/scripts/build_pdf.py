@@ -345,15 +345,134 @@ def strip_yaml_frontmatter(text):
     file.  Pandoc treats text between --- delimiters as metadata; if CJK
     body text falls inside a YAML block, it is silently discarded.
 
-    Only strips if the very first non-whitespace line is exactly '---'.
+    Only strips when the body between the --- markers looks like YAML
+    (contains at least one ``key: value`` line) AND the closing ---
+    appears within the first 50 lines.  This guardrail is critical:
+    ``---`` is also a valid Markdown thematic break, and many source
+    files use back-to-back ``---`` pairs to bracket an epigraph.
+    Without this check, the entire bracketed epigraph (e.g. B001)
+    would be silently discarded.
     """
     stripped = text.lstrip("\n")
-    if stripped.startswith("---"):
-        # Find the closing --- (must be on its own line)
-        closer = stripped.find("\n---", 3)
-        if closer != -1:
-            return stripped[closer + 4:].lstrip("\n")
+    if not stripped.startswith("---"):
+        return text
+
+    # Closing --- must be a standalone line within the first 50 lines
+    head = stripped.split("\n", 50)[:50]
+    closer_idx = None
+    for i, line in enumerate(head[1:], start=1):
+        if line.strip() == "---":
+            closer_idx = i
+            break
+    if closer_idx is None:
+        return text
+
+    # YAML-content guardrail: body between --- must look like YAML
+    # (at least one `key: value` line).  Without this check, back-to-back
+    # thematic breaks would be mistaken for a YAML block and the entire
+    # bracketed epigraph would be silently discarded.
+    body = "\n".join(head[1:closer_idx])
+    if not re.search(r"^\s*[A-Za-z_][\w-]*\s*:", body, re.MULTILINE):
+        return text
+
+    after_closer = "\n".join(head[closer_idx + 1:])
+    return after_closer.lstrip("\n")
+
+
+# ── Chapter title normalization ────────────────────────
+
+# Match "第N章" or "第N部分" prefix (with optional whitespace) where N is
+# 1-3 ASCII digits or 1-3 CJK numerals.  Anchored to the start of the
+# title to avoid false positives mid-title.
+_CHAPTER_PREFIX_RE = re.compile(
+    r"^第[\d零一二三四五六七八九十百千]{1,3}\s*(?:章|部分)\s*[\s·•・:：\-—]+"
+)
+
+
+def clean_chapter_title(title):
+    """
+    Strip a leading "第N章 · " or "第N部分 · " prefix from a chapter
+    title.  The LaTeX template's \\titleformat{\\chapter} already adds
+    "第 N 章" via \\thechapter, so a duplicate prefix in the title
+    yields "第 5 章 第五章 · 复利..." in the rendered page.  Removing
+    the prefix gives the clean "第 5 章 复利究竟如何工作" form.
+
+    Also collapses multiple whitespace into a single space.
+    """
+    cleaned = _CHAPTER_PREFIX_RE.sub("", title).strip()
+    cleaned = re.sub(r"\s+", " ", cleaned)
+    return cleaned
+
+
+def rewrite_image_paths(text):
+    """
+    Rewrite image references in the merged Markdown so xelatex can
+    find them via the template's \\graphicspath entries.
+
+    Source MDs (e.g. B002-inflation.md) use relative paths such as
+    `../analysis/output/ch06_inflation.png`.  These paths only resolve
+    when xelatex is invoked from the source-MD's directory, not from
+    the build output directory.  build_pdf.py copies the chart images
+    into the build directory, so we strip the directory prefix and
+    keep only the filename.  \\graphicspath then locates the file in
+    the build directory.
+    """
+    return re.sub(
+        r"\.\.?/analysis/output/",
+        "",
+        text,
+    )
+
+
+def strip_chapter_heading(text):
+    """
+    Strip the first heading (h1 or h2) from a document.
+
+    merge_markdown() prepends `# {title}` to every entry so each becomes
+    a chapter.  If the source MD also has its own chapter title (commonly
+    `## 第N章 · ...`), the result is a redundant "section" inside the new
+    chapter with the same name.  This function removes the first such
+    heading so only the prepended chapter title remains.
+
+    The first heading can appear after blank lines, leading `---`
+    thematic breaks, or other decoration — we scan the whole text
+    rather than just the first non-empty line.
+    """
+    lines = text.split("\n")
+    for i, line in enumerate(lines):
+        if line.startswith("# ") or line.startswith("## "):
+            return "\n".join(lines[:i] + lines[i + 1:])
     return text
+
+
+# Match standalone "**第N部分 · 标题**" or "**第N部分 标题**" lines.
+#   第 / 部分 must be present; the part ordinal may be 1-3 digits or CJK numerals.
+PART_DIVIDER_RE = re.compile(
+    r"^\*\*第[\d零一二三四五六七八九十百千]+部分(?:\s*[·•・:：\-—]+\s*.+?)\*\*\s*$",
+    re.MULTILINE,
+)
+
+
+def convert_part_dividers(text):
+    """
+    Convert standalone `**第N部分 · 标题**` lines into pandoc raw-LaTeX
+    blocks invoking `\\partdivider{...}` (defined in pandoc-template.tex).
+
+    A "part divider" line must occupy a line on its own (between blank
+    lines).  Inline `**第N部分**` inside a paragraph is left untouched.
+
+    The pattern uses `第` and `部分` as the strict markers, so headings
+    like `## 第五章` or `**注意**` are unaffected.
+    """
+    def replacer(m):
+        raw = m.group(0)
+        inner = raw.strip().strip("*").strip()
+        return (
+            "```{=latex}\n"
+            f"\\partdivider{{{inner}}}\n"
+            "```"
+        )
+    return PART_DIVIDER_RE.sub(replacer, text)
 
 
 def preprocess_markdown(text):
@@ -514,23 +633,61 @@ def resolve_image_paths(md_content, md_dir):
     return content
 
 
-def merge_markdown(entries, output_file):
+def merge_markdown(entries, output_file, frontmatter_count=5):
     """
     Merge indexed documents into a single Markdown file.
 
     Prepends chapter headers with page breaks.
-    Applies preprocessing: YAML frontmatter stripping, HTML→MD,
-    task lists→plain, emoji removal.
+    Applies preprocessing: YAML frontmatter stripping, source chapter
+    heading removal, HTML→MD, task lists→plain, emoji removal, part
+    divider conversion.
     Then resolves relative image paths to absolute.
-    """
-    merged_lines = []
-    chapter_num = 0
 
+    Sectioning (ctexbook \\frontmatter / \\mainmatter / \\backmatter):
+      • \\frontmatter is opened at the very start
+      • The first entry whose title contains "第" + ordinal + "章"
+        triggers \\mainmatter (logical "first chapter" detection)
+      • The final entry (if it contains "附录" in title or path)
+        triggers \\backmatter
+      • Manual TOC entries (title contains "目录") are skipped because
+        the LaTeX template emits \\tableofcontents for the auto-TOC
+    """
+    import re as _re
+    chapter_re = _re.compile(r"第[一二三四五六七八九十百千零\d]+章")
+
+    # ── Pass 1: filter out manual TOC, keep order intact ──────────────
+    kept = []
     for e in entries:
+        if "目录" in e["title"] and not chapter_re.search(e["title"]):
+            rprint(
+                f"Skipping manual TOC: {e['title']} "
+                "(\\tableofcontents handles this)", "info",
+            )
+            continue
+        kept.append(e)
+
+    # ── Pass 2: write merged MD with section markers ──────────────────
+    merged_lines = ["\\frontmatter\n"]
+    chapter_num = 0
+    switched_to_main = False
+    switched_to_back = False
+
+    for e in kept:
         md_path = Path(WORKSPACE_ROOT) / e["path"]
         if not md_path.exists():
             rprint(f"Skipping missing file: {e['path']}", "warn")
             continue
+
+        # Switch to \mainmatter at the first "第N章" entry
+        if not switched_to_main and chapter_re.search(e["title"]):
+            merged_lines.append("\\mainmatter\n")
+            switched_to_main = True
+
+        # Switch to \backmatter right before an appendix entry
+        is_appendix_entry = "附录" in e["title"] or "附录" in e["path"]
+        if is_appendix_entry and not switched_to_back:
+            merged_lines.append("\\backmatter\n")
+            switched_to_back = True
 
         chapter_num += 1
         content = md_path.read_text(encoding="utf-8")
@@ -540,16 +697,30 @@ def merge_markdown(entries, output_file):
         # body text falls inside a YAML block, Pandoc silently discards it.
         content = strip_yaml_frontmatter(content)
 
+        # Step 0.5: Strip the source's own first heading (h1/h2).
+        # The script prepends "# {title}" below; without this, the source's
+        # own chapter heading (e.g. "## 第五章") becomes a redundant section
+        # inside the newly-created chapter.
+        content = strip_chapter_heading(content)
+
         # Step 1: LaTeX preprocessing (must happen before image path resolution)
         content = preprocess_markdown(content)
 
-        # Step 2: Image path resolution is skipped — Pandoc uses
-        # \graphicspath and relative paths at compile time.
-        # resolve_image_paths() would bake absolute paths into .tex output.
+        # Step 1.5: Convert "**第N部分 · 标题**" banners to raw-LaTeX
+        # \partdivider blocks.  No-op if no part dividers in this entry.
+        content = convert_part_dividers(content)
+
+        # Step 2: Rewrite image paths so xelatex can find them via
+        # the template's \graphicspath entries (the build script copies
+        # the chart images into the build directory).
+        content = rewrite_image_paths(content)
 
         # Add chapter separator (ctexbook auto-numbers chapters, so use title only)
         merged_lines.append("\n\n\\newpage\n\n")
-        merged_lines.append(f"# {e['title']}\n\n")
+        # Strip leading "第N章" / "第N部分" — the LaTeX chapter format
+        # already renders the chapter number via \thechapter.
+        chapter_title = clean_chapter_title(e["title"])
+        merged_lines.append(f"# {chapter_title}\n\n")
         merged_lines.append(content)
 
     merged = "\n".join(merged_lines)
@@ -581,6 +752,11 @@ def generate_tex(template_file, merged_md_path, output_tex_path,
         "--highlight-style=tango",
         "--listings",
         "--standalone",
+        # Force h1 → \chapter even when pandoc does not detect ctexbook
+        # as a book-class template (e.g. when the template uses ctexbook
+        # with a custom preamble).  Without this, all top-level headings
+        # collapse into \section{...} and the chapter styling never fires.
+        "--top-level-division=chapter",
     ]
 
     if toc:
