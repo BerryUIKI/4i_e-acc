@@ -36,7 +36,7 @@
 | 终章 | H001 | 1 | 终章 |
 
 前辅文：`Front-Matter/FM000`–`FM004`（扉页 / 阅读须知 / 作者的话 / 目录 / 序章）
-附录：`Appendices/A-to-L-appendices.md`（12 份模板，A–L）
+附录：`Appendices/A-to-L-appendices.md`（14 份模板，A–N，A–L 为原 12 份，M/N 为税务与传承自查清单）
 
 ## 行文风格 (Voice) — 非常重要
 像一位懂投资的朋友，在咖啡馆里陪你聊天。
