@@ -9,7 +9,7 @@
 - **Languages:** Chinese-primary, English inline
 - **Summary:** A long-form investment guidebook for the 四爱 (4i) community -- a café-style chat that builds wealth consciousness, asset allocation thinking, and long-term investing habits from zero to intermediate.
 
-## Structure -- 9 Parts, 33 Chapters + Epilogue + 12 Appendices
+## Structure -- 9 Parts, 33 Chapters + Epilogue + 14 Appendices
 
 | Part | Prefix | Chapters | Range |
 |------|--------|----------|-------|
@@ -38,7 +38,7 @@
 ## Book Deliverable Files
 - `Front-Matter/` -- opening statement, reading notice, author note, TOC, prologue (5 files)
 - `Main-Text/` -- 33 chapters + epilogue (34 files, A001--A004 through I001--I003, H001)
-- `Appendices/` -- 12 appendix templates & references (1 file)
+- `Appendices/` -- 14 appendix templates & references (1 file)
 - `illustrations/` -- illustration specs & prompts (8 specs + ALL-SPECS.md)
 - `assets/` -- images, charts (generated art goes here)
 

@@ -44,4 +44,4 @@
 38. [第三十三章 · AI 投资辅助与边界：让 AI 当副驾驶，而不是驾驶员](articles/2026-quadruple-long-life/Main-Text/I003-ai-investment-boundary.md)
 39. [终章 · 财富的作用，是增加人生选择权](articles/2026-quadruple-long-life/Main-Text/H001-epilogue.md)
 
-40. [附录 A–L · 模板与参考资料](articles/2026-quadruple-long-life/Appendices/A-to-L-appendices.md)
+40. [附录 A–N · 模板与参考资料](articles/2026-quadruple-long-life/Appendices/A-to-L-appendices.md)
