@@ -8,6 +8,9 @@
 [![Toolbox](https://img.shields.io/badge/Toolbox-10%20Bilingual%20Tools-E3A04B?style=flat-square)](https://berryuiki.github.io/4i_e-acc/tools/)
 [![Desktop](https://img.shields.io/badge/Desktop-Tauri%202%20%7C%20Rust-FEC6CD?logo=tauri&logoColor=1D1E50&style=flat-square)](./desktop/)
 [![Latest PDF](https://img.shields.io/github/v/release/BerryUIKI/4i_e-acc?label=PDF%20Release&color=1D1E50&style=flat-square)](https://github.com/BerryUIKI/4i_e-acc/releases)
+[![Code License: Apache 2.0](https://img.shields.io/badge/Code%20License-Apache%202.0-blue?style=flat-square)](./LICENSE)
+[![Book: All Rights Reserved](https://img.shields.io/badge/Book-All%20Rights%20Reserved-B86C40?style=flat-square)](./LICENSE)
+
 
 **A Long-Term Investing Guide for Ordinary People · FREE · Open Content · 100% Local-First**
 
@@ -330,9 +333,10 @@ Every PR triggers automated GitHub Actions checks:
 
 ### 8.2 Licensing & Intellectual Property
 
-- **Book Manuscript & Educational Content** (`articles/`, `reports/`, etc.): Licensed under [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/). You are free to share and adapt the material with appropriate attribution for non-commercial purposes.
-- **Source Code & Interactive Tools** (`tools/`, `desktop/`, `scripts/`): Licensed under the open-source [MIT License](./LICENSE).
-- **Mascot IP** (DollarHua / 花有财): All character likeness and derivative rights are reserved by author Huahua.
+- **Source Code & Interactive Tools** (`tools/`, `desktop/`, `scripts/`): Licensed under the [Apache License, Version 2.0](./LICENSE). Grants free use, modification, and redistribution with explicit patent protection and trademark terms.
+- **Book Manuscript & Core Content** (`articles/`, `reports/`, `research/`): **Copyright © 2026 Huahua (@BerryUIKI). All rights reserved.** Free for individual non-commercial reading and personal study; unauthorized commercial reproduction, redistribution, adaptation, or publishing is strictly prohibited.
+- **Mascot IP** (DollarHua / 花有财): All character likeness, name, and derivative rights are reserved by author Huahua.
+
 
 ---
 
