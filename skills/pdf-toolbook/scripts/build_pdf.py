@@ -203,7 +203,12 @@ def rprint(msg, level="info"):
     """Prefixed logging."""
     prefixes = {"info": "  📄", "ok": "  ✅", "warn": "  ⚠️", "err": "  ❌", "step": "🔧"}
     p = prefixes.get(level, "  ")
-    print(f"{p} {msg}")
+    try:
+        print(f"{p} {msg}")
+    except UnicodeEncodeError:
+        safe_prefixes = {"info": "  [INFO]", "ok": "  [OK]", "warn": "  [WARN]", "err": "  [ERR]", "step": ">>"}
+        sp = safe_prefixes.get(level, "  ")
+        print(f"{sp} {msg}".encode("ascii", errors="replace").decode("ascii"))
 
 
 # ── LaTeX Preprocessing Pipeline ──────────────────────
@@ -475,6 +480,33 @@ def convert_part_dividers(text):
     return PART_DIVIDER_RE.sub(replacer, text)
 
 
+def ensure_block_images(text):
+    """
+    Ensure all Markdown images ![alt](path) are standalone block elements
+    (surrounded by newlines) so Pandoc creates a proper \begin{figure} environment
+    and centers them rather than rendering them inline after a text sentence.
+    """
+    # If preceded by non-newline, insert two newlines
+    text = re.sub(r'([^\n])\s*(!\[.*?\]\([^)]+\))', r'\1\n\n\2', text)
+    # If followed by non-newline, insert two newlines
+    text = re.sub(r'(!\[.*?\]\([^)]+\))\s*([^\n])', r'\1\n\n\2', text)
+    return text
+
+
+def remove_footer_instructions(text):
+    """
+    Remove editorial footer instructions (e.g. '> **页脚（每页 Footer）：** ...')
+    from document body so they don't render as awkward blockquotes.
+    The footer disclaimer is handled at the template level via fancyfoot.
+    """
+    return re.sub(
+        r'^\s*>\s*\*\*页脚（每页\s*Footer）[：:]\*\*.*$',
+        '',
+        text,
+        flags=re.MULTILINE
+    )
+
+
 def preprocess_markdown(text):
     """
     Pre-Markdown safety preprocessing pipeline.
@@ -488,10 +520,14 @@ def preprocess_markdown(text):
       1. HTML tags → Markdown syntax (Pandoc passes HTML through to LaTeX)
       2. Task lists → plain lists (Pandoc doesn't support task list → LaTeX)
       3. Emoji removal (LaTeX cannot render Unicode emoji)
+      4. Ensure block images (prevent inline image overflow)
+      5. Strip editorial footer instructions (rendered in fancyfoot instead)
     """
     text = convert_html_to_md(text)              # 1. HTML → MD
     text = convert_task_lists(text)               # 2. Task lists → plain
     text = remove_emoji(text)                     # 3. Remove emoji
+    text = ensure_block_images(text)             # 4. Ensure images are standalone paragraphs
+    text = remove_footer_instructions(text)      # 5. Strip editorial footer notes
     return text
 
 
@@ -667,7 +703,9 @@ def merge_markdown(entries, output_file, frontmatter_count=5):
         kept.append(e)
 
     # ── Pass 2: write merged MD with section markers ──────────────────
-    merged_lines = ["\\frontmatter\n"]
+    # Note: \frontmatter is emitted by the LaTeX template right before
+    # \tableofcontents, so TOC pages receive roman numerals (i, ii, ...).
+    merged_lines = []
     chapter_num = 0
     switched_to_main = False
     switched_to_back = False
@@ -779,8 +817,43 @@ def generate_tex(template_file, merged_md_path, output_tex_path,
                 if line.strip():
                     print(f"    {line.strip()}")
         raise
+
+    # Post-process generated LaTeX (brand rules, quotes, table headers)
+    postprocess_tex(output_tex_path)
+
     rprint(f".tex written: {output_tex_path}", "ok")
     return output_tex_path
+
+
+def postprocess_tex(tex_path):
+    """
+    Post-process Pandoc-generated .tex file for brand-consistent typography:
+      1. Horizontal rules: replace Pandoc's default 0.5-linewidth black rule
+         with a 0.2\\textwidth dh-bronze rule (print-safe, elegant).
+      2. Block quotes: replace \\begin{quote}...\\end{quote} with \\begin{dhquote}...\\end{dhquote}.
+      3. Table headers: inject \\rowcolor{dh-pink!25} after \\toprule\\noalign{}.
+    """
+    tex_path = Path(tex_path)
+    content = tex_path.read_text(encoding="utf-8")
+
+    # 1. Horizontal rules
+    content = content.replace(
+        r"\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}",
+        r"\begin{center}{\color{dh-bronze}\rule{0.2\textwidth}{0.5pt}}\end{center}"
+    )
+
+    # 2. Block quotes
+    content = re.sub(r"\\begin\{quote\}", r"\\begin{dhquote}", content)
+    content = re.sub(r"\\end\{quote\}", r"\\end{dhquote}", content)
+
+    # 3. Table header background
+    content = content.replace(
+        r"\toprule\noalign{}",
+        r"\toprule\noalign{}\rowcolor{dh-pink!25}"
+    )
+
+    tex_path.write_text(content, encoding="utf-8")
+    rprint("Post-processed .tex with brand rules, dhquotes, and table styling", "ok")
 
 
 def should_split(merged_md_path, chapter_count):
@@ -829,38 +902,20 @@ def split_tex_into_chapters(tex_path, chapter_count, output_dir):
         postamble = body[end_doc_pos:]
         body = body[:end_doc_pos]
 
-    # Split body by chapter markers
-    # Pandoc may use \chapter{...} or \hypertarget{...}{...\chapter{...}}
-    chapter_pattern = r'(\\hypertarget\{[^}]*\}\{%\s*\n)?\s*(\\chapter\{[^}]*\})'
-    parts = re.split(chapter_pattern, body)
+    # Split body by chapter markers using finditer to avoid empty parts
+    chapter_pattern = re.compile(r'((?:\\hypertarget\{[^}]*\}\{%\s*\n)?\s*\\chapter\{[^}]*\})')
+    matches = list(chapter_pattern.finditer(body))
 
+    if not matches:
+        rprint("Cannot split: no chapter markers found in body", "warn")
+        return tex_path
+
+    pre_chapter_content = body[:matches[0].start()]
     chapters = []
-    i = 0
-    # parts[0] is text before first chapter (TOC, cover content after \begin{document})
-    pre_chapter_content = parts[0] if len(parts) > 0 else ""
-
-    # Subsequent parts are: [hypertarget, chapter_cmd, chapter_body, hypertarget, chapter_cmd, chapter_body, ...]
-    i = 1
-    while i < len(parts):
-        # parts[i] may be the hypertarget (or None if no match)
-        chunk = ""
-        if i < len(parts) and parts[i] and parts[i].strip().startswith("\\hypertarget"):
-            chunk += parts[i]
-            i += 1
-        # parts[i] is the \chapter{...}
-        if i < len(parts) and parts[i]:
-            chunk += parts[i]
-            i += 1
-        # parts[i] is the chapter body
-        if i < len(parts):
-            body_text = ""
-            if parts[i]:
-                body_text = parts[i]
-            chapters.append(chunk + body_text)
-            i += 1
-        else:
-            if chunk:
-                chapters.append(chunk)
+    for idx, m in enumerate(matches):
+        start = m.start()
+        end = matches[idx + 1].start() if idx + 1 < len(matches) else len(body)
+        chapters.append(body[start:end])
 
     if not chapters:
         rprint("Cannot split: no chapter markers found in body", "warn")
@@ -923,7 +978,12 @@ def run_xelatex(tex_path, work_dir, passes=2):
             cwd=str(tex_dir),
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
         )
+
+        stdout_text = result.stdout or ""
+        stderr_text = result.stderr or ""
 
         # Check for fatal errors via returncode and PDF existence
         if result.returncode != 0:
@@ -952,22 +1012,22 @@ def run_xelatex(tex_path, work_dir, passes=2):
                             print(f"    {line.strip()}")
                 else:
                     # Fallback: print last 30 lines of stdout
-                    log_lines = (result.stdout + result.stderr).split("\n")
+                    log_lines = (stdout_text + stderr_text).split("\n")
                     for line in log_lines[-30:]:
                         if line.strip():
                             print(f"    {line.strip()}")
             else:
-                log_lines = (result.stdout + result.stderr).split("\n")
+                log_lines = (stdout_text + stderr_text).split("\n")
                 for line in log_lines[-30:]:
                     if line.strip():
                         print(f"    {line.strip()}")
             return False
 
         # Check for unresolved references (only warn on final pass)
-        if "LaTeX Warning: Reference" in result.stdout:
+        if "LaTeX Warning: Reference" in stdout_text:
             rprint(f"Pass {p}: unresolved references remain (expected if not final pass)", "warn")
 
-        if "LaTeX Warning: Rerun" in result.stdout or "Rerun to get" in result.stdout:
+        if "LaTeX Warning: Rerun" in stdout_text or "Rerun to get" in stdout_text:
             rprint(f"Pass {p}: LaTeX suggests another rerun", "info")
 
     rprint("XeLaTeX compilation complete", "ok")
@@ -1026,9 +1086,9 @@ def compile_pdf(template_file, merged_md_path, output_pdf_path,
         except Exception as e:
             rprint(f"Split failed (continuing with single file): {e}", "warn")
 
-    # Step 3: Compile with XeLaTeX (2-pass minimum)
-    rprint(f"Compiling PDF (2-pass XeLaTeX)...", "step")
-    success = run_xelatex(tex_path, work_dir, passes=2)
+    # Step 3: Compile with XeLaTeX (3 passes for full TOC + labels)
+    rprint(f"Compiling PDF (3-pass XeLaTeX)...", "step")
+    success = run_xelatex(tex_path, work_dir, passes=3)
 
     if not success:
         rprint("Compilation failed. See log for details.", "err")

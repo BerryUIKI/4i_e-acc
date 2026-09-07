@@ -20,9 +20,9 @@
 \documentclass[a4paper,11pt,oneside,fontset=none,UTF8,zihao=-4]{ctexbook}
 
 % ── Page geometry ──
-% slightly wider text area; headsep increased for header band visibility
+% headheight set to 24pt to satisfy fancyhdr and prevent header clipping
 \usepackage[top=2.6cm, bottom=2.6cm, left=2.8cm, right=2.4cm,
-            headheight=14pt, headsep=10mm, footskip=12mm,
+            headheight=24pt, headsep=8mm, footskip=12mm,
             includeheadfoot]{geometry}
 
 % ── DollarHua brand colors ──
@@ -35,6 +35,7 @@
 \definecolor{dh-skin}{HTML}{F9DECE}
 \definecolor{dh-white}{HTML}{FCFDFD}
 \definecolor{dh-red}{HTML}{E85D61}
+\definecolor{dh-navy-muted}{HTML}{8E8FA2}
 
 % ── CJK typography (cross-platform auto-detect) ──
 \usepackage{fontspec}
@@ -48,26 +49,37 @@
   \setCJKsansfont{PingFang SC}
   \setCJKmonofont{PingFang SC}
 }{
-  \IfFontExistsTF{Noto Serif CJK SC}{
-    \setCJKmainfont{Noto Serif CJK SC}[
-      BoldFont={Noto Serif CJK SC Bold},
+  \IfFontExistsTF{Source Han Serif CN}{
+    \setCJKmainfont{Source Han Serif CN}[
+      BoldFont={Source Han Serif CN Bold},
       AutoFakeSlant=0.15
     ]
-    \setCJKsansfont{Noto Sans CJK SC}
-    \setCJKmonofont{Noto Sans Mono CJK SC}
+    \setCJKsansfont{Source Han Sans CN}[
+      BoldFont={Source Han Sans CN Bold}
+    ]
+    \setCJKmonofont{Source Han Sans CN}
   }{
-    \IfFontExistsTF{Source Han Serif SC}{
-      \setCJKmainfont{Source Han Serif SC}[
-        BoldFont={Source Han Serif SC Bold},
+    \IfFontExistsTF{Noto Serif CJK SC}{
+      \setCJKmainfont{Noto Serif CJK SC}[
+        BoldFont={Noto Serif CJK SC Bold},
         AutoFakeSlant=0.15
       ]
-      \setCJKsansfont{Source Han Sans SC}
-      \setCJKmonofont{Source Han Sans SC}
+      \setCJKsansfont{Noto Sans CJK SC}
+      \setCJKmonofont{Noto Sans Mono CJK SC}
     }{
-      % Ultimate fallback: SimSun on Windows
-      \setCJKmainfont{SimSun}[AutoFakeBold=2.5]
-      \setCJKsansfont{SimHei}
-      \setCJKmonofont{KaiTi}
+      \IfFontExistsTF{Source Han Serif SC}{
+        \setCJKmainfont{Source Han Serif SC}[
+          BoldFont={Source Han Serif SC Bold},
+          AutoFakeSlant=0.15
+        ]
+        \setCJKsansfont{Source Han Sans SC}
+        \setCJKmonofont{Source Han Sans SC}
+      }{
+        % Ultimate fallback: SimSun on Windows
+        \setCJKmainfont{SimSun}[AutoFakeBold=2.5]
+        \setCJKsansfont{SimHei}
+        \setCJKmonofont{KaiTi}
+      }
     }
   }
 }
@@ -76,6 +88,9 @@
 \XeTeXlinebreaklocale "zh"
 \XeTeXlinebreakskip = 0pt plus 1pt
 \xeCJKsetup{CJKecglue=\hskip 0.15em plus 0.05em minus 0.05em}
+
+% Line spreading for CJK body text readability
+\linespread{1.45}\selectfont
 
 % ── Unicode character support ──
 \usepackage{newunicodechar}
@@ -87,6 +102,8 @@
 \newunicodechar{–}{\textendash}
 \newunicodechar{…}{\dots}
 \newunicodechar{°}{\ensuremath{^{\circ}}}
+\newunicodechar{⚠}{\textcolor{dh-bronze}{\textbf{[注意]}}}
+\newunicodechar{️}{} % Ignore variation selector-16
 
 % ── Page style (headers / footers) ──
 \usepackage{fancyhdr}
@@ -95,20 +112,21 @@
 \renewcommand{\headrulewidth}{0.5pt}
 \renewcommand{\headrule}{\hbox to\headwidth{%
   \color{dh-blossom}\leaders\hrule height \headrulewidth\hfill}}
-% \leftmark contains the chapter title (set by \chaptermark below)
-\fancyhead[LE]{\footnotesize\color{dh-navy}\thechapter\quad\leftmark}
-\fancyhead[RO]{\footnotesize\color{dh-navy}\mytitle}
-\fancyfoot[C]{\thepage}
+% In oneside mode: left header shows current chapter, right header shows book title
+\fancyhead[L]{\footnotesize\color{dh-navy}\leftmark}
+\fancyhead[R]{\footnotesize\color{dh-navy}\mytitle}
+\newcommand{\footerdisclaimer}{{\tiny\color{dh-navy-muted}投资有风险，入市需谨慎}}
+\fancyfoot[C]{\thepage\\[1pt]\footerdisclaimer}
 \fancypagestyle{plain}{
   \fancyhf{}
-  \fancyfoot[C]{\thepage}
+  \fancyfoot[C]{\thepage\\[1pt]\footerdisclaimer}
   \renewcommand{\headrulewidth}{0pt}
   \renewcommand{\headrule}{}
 }
-% Chapter starts: show only page number, no header
+% Chapter starts: show only page number and disclaimer, no header
 \fancypagestyle{chapterstart}{
   \fancyhf{}
-  \fancyfoot[C]{\thepage}
+  \fancyfoot[C]{\thepage\\[1pt]\footerdisclaimer}
   \renewcommand{\headrulewidth}{0pt}
   \renewcommand{\headrule}{}
 }
@@ -140,7 +158,7 @@
   {}
   [\vskip 0.6cm{\color{dh-blossom}\hrule height 1pt}]
 
-\titlespacing*{\chapter}{0pt}{20pt}{40pt}
+\titlespacing*{\chapter}{0pt}{50pt}{40pt}
 
 % Section: large bold with blossom number prefix
 \titleformat{\section}
@@ -218,8 +236,19 @@
 }
 \usepackage[export]{adjustbox}
 
-% Pandoc image wrapper (required by Pandoc's LaTeX writer)
-\providecommand{\pandocbounded}[1]{#1}
+% Pandoc image wrapper: ensure images fit within page width and height
+\makeatletter
+\newsavebox\pandoc@box
+\providecommand*\pandocbounded[1]{%
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi%
+  \ifdim\@tempa\p@<1\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+\makeatother
 
 % ── Code highlighting ──
 \usepackage{listings}
@@ -240,11 +269,16 @@
 }
 
 % ── Pandoc compatibility ──
-\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\providecommand{\tightlist}{\setlength{\itemsep}{2pt}\setlength{\parskip}{1pt}}
 \usepackage{longtable}
 \usepackage{calc}
 \setlength{\LTleft}{0pt}
 \setlength{\LTright}{0pt}
+
+% ── Footnote styling ──
+\renewcommand{\footnoterule}{%
+  {\color{dh-blossom}\hrule width 0.3\textwidth height 0.4pt}%
+  \vspace{4pt}}
 
 % ── Tables ──
 \usepackage{booktabs}
@@ -252,17 +286,21 @@
 \usepackage{colortbl}
 \usepackage{tabularx}
 \arrayrulecolor{dh-blossom}
-\setlength{\tabcolsep}{4pt}
+\setlength{\tabcolsep}{6pt}
 \renewcommand{\arraystretch}{1.25}
 
-% ── Block quotes (epigraph) ──
-\usepackage{etoolbox}
-\AtBeginEnvironment{quote}{%
-  \small\color{dh-bronze}%
-  \leftskip=2em \rightskip=1em%
-  \itshape%
+% ── Block quotes (brand callout box) ──
+\usepackage[most]{tcolorbox}
+\newtcolorbox{dhquote}{
+  blanker,
+  breakable,
+  borderline west={3pt}{0pt}{dh-blossom},
+  left=12pt, right=8pt,
+  top=4pt, bottom=4pt,
+  before skip=0.6em, after skip=0.6em,
+  fontupper=\small\color{dh-bronze}\itshape
 }
-\AtEndEnvironment{quote}{\par\vspace{0.3em}}
+\renewenvironment{quote}{\begin{dhquote}}{\end{dhquote}}
 
 % ── Part divider macro (for "第N部分" banners inserted before chapters) ──
 \newcommand{\partdivider}[1]{%
@@ -330,7 +368,9 @@
 \vspace{2cm}
 \end{titlepage}
 
-% ---- Table of Contents ----
+% ---- Frontmatter & Table of Contents ----
+\frontmatter
+
 $if(toc)$
 \tableofcontents
 $endif$
