@@ -1,0 +1,28 @@
+{
+  "package": "DollarHua_AI_Character_Pack_Lite_v1.4",
+  "version": "v1.4",
+  "name": {
+    "en": "DollarHua",
+    "zh_CN": "花有财",
+    "nickname": "花花"
+  },
+  "basic_profile": {
+    "role": "A cheerful designer who loves wealth and has a hidden feng shui talent.",
+    "personality": "ENFP; energetic, warm, playful, imaginative, and quick to recover.",
+    "catchphrase": "包能做的，但要加钱"
+  },
+  "appearance": "Chibi character with fluffy short white hair, large white cat ears, warm golden starry eyes, pink flower hair accessories, a soft-pink oversized hoodie, a bronze coin pendant, and a brown bead bracelet.",
+  "creative_freedom": [
+    "pose",
+    "expression",
+    "scene",
+    "props",
+    "outfit details",
+    "lighting",
+    "rendering style"
+  ],
+  "primary_reference": "references/front.png",
+  "reference_folder": "references/",
+  "example_folder": "examples/",
+  "color_standard": "color_standard.json"
+}
