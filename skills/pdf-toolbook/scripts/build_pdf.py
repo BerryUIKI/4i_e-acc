@@ -543,6 +543,66 @@ def preprocess_markdown(text):
     return text
 
 
+def promote_appendix_headings(content, collection_title):
+    """
+    Promote headings inside an appendix-collection file to unnumbered
+    LaTeX chapters/sections via raw-latex blocks.
+
+    Why: the appendix collection is a single Markdown file whose internal
+    headings are `## 附录 X · …` / `### Xn · …`.  The normal merge path
+    wraps the whole file in ONE numbered chapter (`# {title}`), so every
+    appendix collapses into "34.x" sections of that chapter.  The LaTeX
+    `\backmatter` switch does not demote pandoc's numbered \chapter here.
+
+    This converts (for the appendix entry only):
+      `# 附录`            → \chapter*{<collection_title>}  (+ TOC line)
+      `## 附录 X · …`     → \chapter*{附录 X · …}          (+ TOC line)
+      `### Xn · …`        → \section*{Xn · …}              (+ TOC line)
+    Regular body text, quotes and lists pass through untouched.
+    """
+    import re as _re
+
+    def chapter_block(title):
+        safe = escape_latex_special_chars(title)
+        return (
+            "```{=latex}\n"
+            "\\chapter*{" + safe + "}\n"
+            "\\addcontentsline{toc}{chapter}{" + safe + "}\n"
+            "\\markboth{" + safe + "}{}\n"
+            "```"
+        )
+
+    def section_block(title):
+        safe = escape_latex_special_chars(title)
+        return (
+            "```{=latex}\n"
+            "\\section*{" + safe + "}\n"
+            "\\addcontentsline{toc}{section}{" + safe + "}\n"
+            "```"
+        )
+
+    # First h1 → the collection chapter, titled after the manifest entry.
+    content = _re.sub(
+        r"(?m)^# (?!#)\s*(.+?)\s*$",
+        lambda m: chapter_block(collection_title),
+        content,
+        count=1,
+    )
+    # Internal h2 appendix headings → their own unnumbered chapters.
+    content = _re.sub(
+        r"(?m)^## (?!#)\s*(.+?)\s*$",
+        lambda m: chapter_block(m.group(1)),
+        content,
+    )
+    # h3 (e.g. "M1 · …") → unnumbered sections.
+    content = _re.sub(
+        r"(?m)^### (?!#)\s*(.+?)\s*$",
+        lambda m: section_block(m.group(1)),
+        content,
+    )
+    return content
+
+
 def extract_title_from_md(filepath):
     """Extract H1 heading from a Markdown file as document title."""
     try:
@@ -746,6 +806,17 @@ def merge_markdown(entries, output_file, frontmatter_count=5):
         # Crucial: Pandoc treats --- blocks as YAML metadata; if CJK
         # body text falls inside a YAML block, Pandoc silently discards it.
         content = strip_yaml_frontmatter(content)
+
+        # Step 0.4: Appendix collection gets its own heading treatment —
+        # internal `## 附录 X` headings are promoted to unnumbered chapters
+        # (with TOC lines) instead of collapsing into numbered sections.
+        if is_appendix_entry:
+            content = preprocess_markdown(content)      # task lists, emoji, …
+            content = promote_appendix_headings(content, e["title"])
+            content = rewrite_image_paths(content)
+            merged_lines.append("\n\n\\newpage\n\n")
+            merged_lines.append(content)
+            continue
 
         # Step 0.5: Strip the source's own first heading (h1/h2).
         # The script prepends "# {title}" below; without this, the source's
