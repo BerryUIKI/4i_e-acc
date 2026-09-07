@@ -155,11 +155,11 @@
 % \vskip / \hrulefill instead of \par / \rule.
 \titleformat{\chapter}[display]
   {\centering\Huge\bfseries\sffamily\color{dh-navy}}
-  {{\color{dh-blossom}\hrule height 1.5pt}\vskip 0.7cm
-   {\color{dh-navy-soft}\Large 第\ \thechapter\ 章}}
+  {{\color{dh-blossom}\hrule height 3pt}\vskip 0.7cm
+   {\color{dh-blossom}\LARGE\bfseries\sffamily 第\ \thechapter\ 章}}
   {1.0em}
   {}
-  [\vskip 0.6cm{\color{dh-blossom}\hrule height 1pt}]
+  [\vskip 0.6cm{\color{dh-blossom}\hrule height 2pt}]
 
 \titlespacing*{\chapter}{0pt}{50pt}{40pt}
 
@@ -167,10 +167,10 @@
 \newcommand{\sectionbreak}{\clearpage}
 \titleformat{\section}
   {\Large\bfseries\sffamily\color{dh-navy}}
-  {\color{dh-blossom}\thesection}
+  {\color{dh-blossom}\bfseries\thesection}
   {0.8em}
   {}
-  [\vspace{-0.2em}{\color{dh-blossom}\titlerule[0.8pt]}]
+  [\vspace{-0.2em}{\color{dh-blossom}\titlerule[1.4pt]}]
 
 \titlespacing*{\section}{0pt}{2.0em}{0.8em}
 
@@ -201,10 +201,12 @@
 
 % ── TOC styling ──
 \usepackage{tocloft}
-\renewcommand{\cftchapfont}{\bfseries\color{dh-navy}}
-\renewcommand{\cftchappagefont}{\bfseries\color{dh-navy}}
-\renewcommand{\cftsecfont}{\color{dh-navy}}
-\renewcommand{\cftsubsecfont}{\color{dh-navy!85}}
+\renewcommand{\cftchapfont}{\bfseries\sffamily\color{dh-navy}}
+\renewcommand{\cftchappagefont}{\bfseries\color{dh-bronze}}
+\renewcommand{\cftsecfont}{\color{dh-navy-soft}}
+\renewcommand{\cftsecpagefont}{\color{dh-navy-faint}}
+\renewcommand{\cftsubsecfont}{\color{dh-navy-faint}}
+\renewcommand{\cftsubsecpagefont}{\color{dh-navy-faint}}
 \renewcommand{\cftdotsep}{1.5}
 \renewcommand{\cftchapleader}{\color{dh-blossom}\cftdotfill{\cftdotsep}}
 \setlength{\cftbeforechapskip}{6pt}
@@ -298,8 +300,8 @@
 \newtcolorbox{dhquote}{
   blanker,
   breakable,
-  borderline west={3pt}{0pt}{dh-blossom},
-  left=12pt, right=8pt,
+  borderline west={4.5pt}{0pt}{dh-blossom},
+  left=14pt, right=8pt,
   top=4pt, bottom=4pt,
   before skip=0.6em, after skip=0.6em,
   fontupper=\small\color{dh-bronze}\itshape
@@ -310,15 +312,25 @@
 \newcommand{\partdivider}[1]{%
   \clearpage
   \thispagestyle{empty}%
-  \vspace*{5.0cm}%
   \begin{center}%
-    {\color{dh-blossom}\rule{0.35\textwidth}{1.5pt}\par}%
+    \vspace*{2.0cm}%
+    {\color{dh-blossom}\rule{\textwidth}{12pt}\par}%
+    \vspace{0.35cm}%
+    {\color{dh-pink}\rule{\textwidth}{4pt}\par}%
+    \vspace{2.2cm}%
+    {\color{dh-bronze}\large\bfseries\sffamily PART\par}%
+    \vspace{1.0cm}%
+    {\color{dh-navy}\Huge\bfseries\sffamily #1\par}%
+    \vspace{1.4cm}%
+    {\color{dh-blossom}\rule{0.45\textwidth}{3pt}\par}%
+    \vspace{0.9cm}%
+    {\color{dh-navy-faint}\small\sffamily\itshape Quadruple Leverage on Cognition, Long Life\par}%
+    \vfill
+    {\color{dh-pink}\rule{\textwidth}{4pt}\par}%
+    \vspace{0.35cm}%
+    {\color{dh-blossom}\rule{\textwidth}{12pt}\par}%
     \vspace{1.2cm}%
-    {\Huge\bfseries\sffamily\color{dh-navy} #1\par}%
-    \vspace{1.2cm}%
-    {\color{dh-blossom}\rule{0.35\textwidth}{1.5pt}\par}%
   \end{center}%
-  \vfill
   \clearpage
 }
 
