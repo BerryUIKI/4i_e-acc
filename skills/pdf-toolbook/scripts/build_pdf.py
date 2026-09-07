@@ -457,6 +457,18 @@ PART_DIVIDER_RE = re.compile(
     re.MULTILINE,
 )
 
+# Canonical 8 parts mapped to their opening chapters (per book-task.md & TOC)
+CHAPTER_PART_MAP = {
+    "第一章": "第一部分 · 先看清自己的财务生活",
+    "第五章": "第二部分 · 理解收益、复利与风险",
+    "第九章": "第三部分 · 弄清楚钱到底可以放在哪里",
+    "第十三章": "第四部分 · ETF：普通人最值得掌握的投资工具",
+    "第二十章": "第五部分 · 家庭资产配置实战",
+    "第二十六章": "第六部分 · 开始投资",
+    "第二十九章": "第七部分 · 穿越市场周期",
+    "第三十一章": "第八部分 · AI 时代的个人财务",
+}
+
 
 def convert_part_dividers(text):
     """
@@ -744,9 +756,22 @@ def merge_markdown(entries, output_file, frontmatter_count=5):
         # Step 1: LaTeX preprocessing (must happen before image path resolution)
         content = preprocess_markdown(content)
 
-        # Step 1.5: Convert "**第N部分 · 标题**" banners to raw-LaTeX
-        # \partdivider blocks.  No-op if no part dividers in this entry.
-        content = convert_part_dividers(content)
+        # Step 1.5: Handle Part dividers.
+        # If this chapter marks the start of a Part, emit \partdivider BEFORE \chapter
+        part_title = None
+        part_match = PART_DIVIDER_RE.search(content)
+        if part_match:
+            part_title = part_match.group(0).strip().strip("*").strip()
+            content = PART_DIVIDER_RE.sub("", content)
+
+        if not part_title:
+            for k, v in CHAPTER_PART_MAP.items():
+                if k in e["title"]:
+                    part_title = v
+                    break
+
+        if part_title:
+            merged_lines.append(f"\n\n```{{=latex}}\n\\partdivider{{{part_title}}}\n```\n\n")
 
         # Step 2: Rewrite image paths so xelatex can find them via
         # the template's \graphicspath entries (the build script copies
