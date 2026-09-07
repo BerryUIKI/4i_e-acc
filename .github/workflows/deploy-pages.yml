@@ -1,0 +1,38 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - 'index.html'
+      - '.nojekyll'
+      - 'tools/**'
+      - 'assets/**'
+      - '.github/workflows/deploy-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout dev
+        uses: actions/checkout@v4
+
+      - name: Stage web site bundle
+        run: |
+          mkdir -p _site
+          cp -r index.html _site/
+          cp -r .nojekyll _site/
+          cp -r tools _site/
+          cp -r assets _site/
+
+      - name: Deploy to gh-pages branch
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: _site
+          branch: gh-pages
+          commit-message: "deploy: sync web site and tools to gh-pages [CI]"
