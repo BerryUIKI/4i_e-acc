@@ -171,8 +171,15 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          # Dynamically locate compiled PDF (supports split tex/main.pdf and monolithic toolbook.pdf)
+          PDF=$(find output -name "*.pdf" -not -name "quadruple-long-life.pdf" | head -1)
+          if [ -z "$PDF" ]; then
+            echo "ERROR: No compiled PDF found in output/"
+            exit 1
+          fi
+          echo "Found compiled PDF: $PDF"
           # English file name for the book
-          cp output/toolbook.pdf quadruple-long-life.pdf
+          cp "$PDF" quadruple-long-life.pdf
           # Versioning: start at v0.1, bump patch number while the tag exists
           major=0; minor=1
           while gh release view "v${major}.${minor}" >/dev/null 2>&1; do
