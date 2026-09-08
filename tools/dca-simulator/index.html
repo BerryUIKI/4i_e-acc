@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#1D1E50">
+<title>定投模拟器 · DCA Simulator</title>
+<style>
+  :root{--cream:#FBF7F0;--paper:#FFF;--pink:#FEC6CD;--pink-deep:#F3A6AF;--navy:#1D1E50;--bronze:#B86C40;--teal:#0F6E56;--ink:#2C2C2A;--line:#E7E0D4;--muted:#6b675e}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--cream);color:var(--ink);font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;line-height:1.6;padding:24px 16px 40px}
+  .wrap{max-width:1000px;margin:0 auto}
+  header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  header h1{font-size:22px;font-weight:700;color:var(--navy)} header .sub{font-size:13px;color:var(--muted);flex:1}
+  .langbtn{border:1px solid var(--pink-deep);background:#fff;color:var(--navy);font-size:12px;padding:4px 10px;border-radius:999px;cursor:pointer}
+  .disclaimer{font-size:12px;color:var(--muted);margin:6px 0 16px}
+  .layout{display:grid;grid-template-columns:330px 1fr;gap:16px}
+  @media(max-width:760px){.layout{grid-template-columns:1fr}}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+  .card h2{font-size:14px;color:var(--navy);margin-bottom:12px;font-weight:600}
+  .field{margin-bottom:11px} .field label{display:block;font-size:13px;margin-bottom:3px} .field .hint{font-size:11px;color:var(--muted)}
+  .field input{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:15px}
+  .field input:focus{outline:2px solid var(--pink-deep)}
+  .btn{width:100%;padding:11px;border:none;border-radius:10px;background:var(--navy);color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-top:6px}
+  .out{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+  .metric{background:#FDF9F3;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .metric .k{font-size:12px;color:var(--muted)} .metric .v{font-size:19px;font-weight:700;color:var(--navy);margin-top:2px}
+  .metric .v.teal{color:var(--teal)} .metric .v.bronze{color:var(--bronze)}
+  svg{width:100%;height:auto;display:block}
+  .legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin:8px 0}
+  .legend i{display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+  .note{font-size:12.5px;color:var(--muted);margin-top:8px}
+  .verdict{background:#FDF6EE;border:1px solid var(--line);border-left:4px solid var(--bronze);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--ink);margin-top:10px}
+  footer{margin-top:6px;font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><div class="nav-bar" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px;width:100%;font-size:12px">
+    <a class="nav-home" href="../../index.html" style="color:var(--muted);text-decoration:none;background:#FFFDF8;border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-weight:500">🏠 <span data-i18n="navHome">首页</span></a>
+    <a class="nav-tools" href="../index.html" style="color:var(--bronze);text-decoration:none;background:#FFFDF8;border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-weight:600">🧰 <span data-i18n="navTools">工具箱</span></a>
+    <select class="tool-select" onchange="if(this.value)location.href=this.value" aria-label="Switch tool" style="border:1px solid var(--line);border-radius:6px;padding:3px 6px;font-size:11.5px;background:#FFFDF8;color:var(--navy);cursor:pointer;font-family:inherit">
+      <optgroup label="A · 数字工具箱">
+        <option value="../compound-calculator/index.html">A1 复利计算器 · Compound Calculator</option>
+        <option value="../dca-simulator/index.html" selected>A2 定投模拟器 · DCA Simulator</option>
+        <option value="../etf-premium-calculator/index.html">A3 ETF 溢价率速算 · Premium Calculator</option>
+        <option value="../fee-erosion-calculator/index.html">A4 费率侵蚀对比器 · Fee Erosion</option>
+        <option value="../age-allocation-advisor/index.html">A5 年龄配置建议器 · Allocation Advisor</option>
+        <option value="../five-year-rule-checker/index.html">A6 五年规则检查器 · 5-Year Rule</option>
+      </optgroup>
+      <optgroup label="B · AI 财务副驾驶">
+        <option value="../ai-accounting-pack/index.html">B1 AI 记账对话包 · Prompt Pack</option>
+        <option value="../goal-translator/index.html">B2 人生目标翻译器 · Goal Translator</option>
+        <option value="../review-generator/index.html">B3 投资复盘生成器 · Review Generator</option>
+        <option value="../ai-redline-cards/index.html">B4 AI 投资红线卡 · Red-Line Cards</option>
+      </optgroup>
+    </select>
+  </div><h1 data-i18n="title">定投模拟器</h1><span class="sub" data-i18n="subtitle">DCA vs Lump Sum · 源自《四倍做多认知，长期做多人生》第二十七章</span><button class="langbtn" id="langbtn" onclick="toggleLang()">English</button></header>
+  <p class="disclaimer" data-i18n="disclaimer">教学模拟：价格走势为预设 U 型（微笑曲线）模型，非真实行情。结果仅为教学假设，不构成投资建议。</p>
+
+  <div class="layout">
+    <div class="card">
+      <h2 data-i18n="pTitle">场景参数</h2>
+      <div class="field"><label data-i18n="lTotal">可投总金额（元）</label><input id="total" type="number" min="1000" step="1000" value="120000"></div>
+      <div class="row">
+      <div class="field" style="display:inline-block;width:48%;margin-right:4%"><label data-i18n="lMonths">定投月数</label><input id="months" type="number" min="3" max="240" step="1" value="24"></div>
+      <div class="field" style="display:inline-block;width:48%"><label data-i18n="lDd">最大回撤（%）</label><input id="dd" type="number" min="1" max="90" step="5" value="40"></div>
+      </div>
+      <div class="field"><label data-i18n="lEnd">期末回升幅度（%）</label><input id="endgain" type="number" min="-90" max="300" step="10" value="20"><div class="hint" data-i18n="hEnd">相对期初价的期末涨跌幅，可为负</div></div>
+      <button class="btn" onclick="run()" data-i18n="btnRun">模拟</button>
+      <div class="note" data-i18n="pNote">模型：期初价 = 1.00，先线性跌至最大回撤（第 60% 时间点），再线性回升至「期末回升幅度」。</div>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="rTitle">结果对比</h2>
+      <div class="out">
+        <div class="metric"><div class="k" data-i18n="mLS">一次性投入（期初全买）</div><div class="v" id="v-ls">—</div></div>
+        <div class="metric"><div class="k" data-i18n="mDCA">每月定投</div><div class="v teal" id="v-dca">—</div></div>
+      </div>
+      <div class="legend"><span><i style="background:#888780"></i><span data-i18n="lgPrice">价格走势（微笑曲线）</span></span></div>
+      <svg id="chart" viewBox="0 0 620 300"></svg>
+      <div class="verdict" id="verdict"></div>
+    </div>
+  </div>
+
+  <footer>
+    <div id="foot1"></div>
+    <div id="foot2"></div>
+  </footer>
+</div>
+
+<script>
+const I18N={zh:{back:"← 返回工具箱",title:"定投模拟器",subtitle:"DCA vs Lump Sum · 源自《四倍做多认知，长期做多人生》第二十七章",
+disclaimer:"教学模拟：价格走势为预设 U 型（微笑曲线）模型，非真实行情。结果仅为教学假设，不构成投资建议。",
+pTitle:"场景参数",lTotal:"可投总金额（元）",lMonths:"定投月数",lDd:"最大回撤（%）",lEnd:"期末回升幅度（%）",hEnd:"相对期初价的期末涨跌幅，可为负",btnRun:"模拟",
+pNote:"模型：期初价 = 1.00，先线性跌至最大回撤（第 60% 时间点），再线性回升至「期末回升幅度」。",
+rTitle:"结果对比",mLS:"一次性投入（期初全买）",mDCA:"每月定投",lgPrice:"价格走势（微笑曲线）",
+vLS:"期末市值",vDCA:"期末市值",
+lsWins:"一次性投入胜出 {v}。走势一路上行/跌幅浅时，越早买入越占优——资金的时间价值在起作用。",
+dcaWins:"定投胜出 {v}！先跌后涨的「微笑曲线」中，定投在低位买到更多份额，摊低了平均成本。这正是第二十七章讲定投价值的情形。",
+same:"两者几乎相同（该模型下无显著差异）。",
+foot1:"模型口径：期初单价 = 1.00；价格在定投期 60% 处触底（跌幅 = 最大回撤），随后线性回升到期末价位（= 期初 × (1 + 期末回升幅度)）。一次性 = 期初全买；定投 = 每期投入 总额÷月数，期末总份额 × 期末价。未计交易费用与税费。",
+foot2:"来源：《四倍做多认知，长期做多人生》第二十七章（定投）。书 → 工具系列（A2）。教学假设，不构成投资建议。",
+unit:"（本金 ¥{p}）"},
+en:{back:"← Toolbox",title:"DCA Simulator",subtitle:"DCA vs Lump Sum · from Chapter 27 of Quadruple Leverage",
+disclaimer:"Teaching simulation: price path is a preset U-shape (smile-curve) model, not real market data. Hypothetical only.",
+pTitle:"Scenario",lTotal:"Total amount to invest (CNY)",lMonths:"DCA months",lDd:"Max drawdown (%)",lEnd:"Final rebound (%)",hEnd:"End price change vs start; may be negative",btnRun:"Simulate",
+pNote:"Model: start price = 1.00, falls linearly to the max drawdown at 60% of the period, then recovers linearly to the final level.",
+rTitle:"Result",mLS:"Lump sum (all in at start)",mDCA:"Monthly DCA",lgPrice:"Price path (smile curve)",
+vLS:"End value",vDCA:"End value",
+lsWins:"Lump sum wins by {v}. When the path rises steadily (or the dip is shallow), investing earlier pays — time value of money.",
+dcaWins:"DCA wins by {v}! In a dip-then-recover 'smile curve', DCA buys more shares at low prices, lowering average cost. This is the exact case Ch27 describes.",
+same:"Nearly identical (no material difference in this model).",
+foot1:"Model: start price = 1.00; price bottoms (drawdown) at 60% of the period, then recovers linearly to start × (1 + final rebound). Lump sum buys everything at start; DCA buys equal amounts each month; end value = total shares × end price. No fees or taxes.",
+foot2:"Source: Ch27 (DCA) of Quadruple Leverage on Cognition. Book-to-tool series (A2). Hypothetical — not investment advice.",
+unit:" (principal ¥{p})"}};
+let LANG="zh";
+function t(k,v){let s=I18N[LANG][k]||I18N.zh[k];if(v)for(const x in v)s=s.replace("{"+x+"}",v[x]);return s;}
+function fmt(n){return "¥"+Math.round(n).toLocaleString(LANG==="zh"?"zh-CN":"en-US");}
+function toggleLang(){LANG=LANG==="zh"?"en":"zh";applyLang();}
+function applyLang(){document.documentElement.lang=LANG==="zh"?"zh-CN":"en";
+document.getElementById("langbtn").textContent=LANG==="zh"?"English":"中文";
+document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=t(el.dataset.i18n));
+document.getElementById("foot1").innerHTML=t("foot1");document.getElementById("foot2").innerHTML=t("foot2");run();}
+function priceSeries(months,dd,endgain){
+  const arr=[];const bottom=1-dd/100;const fin=1+endgain/100;const trough=Math.round(months*0.6);
+  for(let i=0;i<=months;i++){
+    let px;
+    if(i<=trough) px=1+(bottom-1)*(i/trough);
+    else px=bottom+(fin-bottom)*((i-trough)/(months-trough));
+    arr.push(px);
+  }
+  return arr;
+}
+function run(){
+  const total=Math.max(1000,+document.getElementById("total").value||120000);
+  const months=Math.min(240,Math.max(3,+document.getElementById("months").value||24));
+  const dd=Math.min(90,Math.max(1,+document.getElementById("dd").value||40));
+  const eg=Math.max(-90,Math.min(300,+document.getElementById("endgain").value||20));
+  const px=priceSeries(months,dd,eg);
+  const per=total/months;
+  const lsShares=total/px[0];
+  let dcaShares=0;for(let i=1;i<=months;i++)dcaShares+=per/px[i];
+  const endPx=px[months];
+  const lsVal=lsShares*endPx, dcaVal=dcaShares*endPx;
+  document.getElementById("v-ls").textContent=fmt(lsVal);
+  document.getElementById("v-dca").textContent=fmt(dcaVal);
+  // chart
+  const W=620,H=300,padL=46,padR=14,padT=16,padB=26;
+  const yMax=Math.max(...px)*1.12, xMax=months;
+  const X=i=>padL+(W-padL-padR)*i/xMax, Y=v=>H-padB-(H-padB-padT)*v/yMax;
+  let g="";
+  for(let i=0;i<=4;i++){const v=yMax*i/4,yy=Y(v);g+=`<line x1="${padL}" y1="${yy}" x2="${W-padR}" y2="${yy}" stroke="#EFE9DC"/><text x="${padL-6}" y="${yy+4}" font-size="11" fill="#6b675e" text-anchor="end">${v.toFixed(2)}</text>`;}
+  for(let i=0;i<=Math.min(months,12);i+=Math.max(1,Math.round(months/12))){const xx=X(i);g+=`<text x="${xx}" y="${H-8}" font-size="11" fill="#6b675e" text-anchor="middle">${i}m</text>`;}
+  const line=px.map((v,i)=>(i?"L":"M")+X(i).toFixed(1)+" "+Y(v).toFixed(1)).join(" ");
+  const tx=months*0.6, dot=px[Math.round(tx)];
+  g+=`<path d="${line}" fill="none" stroke="#888780" stroke-width="2.5" stroke-linecap="round"/>`;
+  g+=`<circle cx="${X(Math.round(tx))}" cy="${Y(dot)}" r="4" fill="#B86C40"/><text x="${X(Math.round(tx))+6}" y="${Y(dot)-8}" font-size="11" fill="#B86C40">${t("lDd").replace("（%）","")} ${dd}%</text>`;
+  document.getElementById("chart").innerHTML=g;
+  const gap=dcaVal-lsVal, v=fmt(Math.abs(gap))+" "+t("unit",{p:fmt(total)});
+  let verdict = Math.abs(gap)<total*0.005? t("same") : (gap>0? t("dcaWins",{v:fmt(gap)}) : t("lsWins",{v:fmt(-gap)}));
+  document.getElementById("verdict").innerHTML=verdict;
+}
+applyLang();
+</script>
+<script>
+// Universal Web & Desktop Export + Toast
+(function(){
+  var b=document.createElement("button");
+  b.className="export-fab-btn";
+  b.innerHTML='<span style="margin-right:4px">📥</span>'+(window.LANG==="zh"?"导出结果 / Export":"Export");
+  b.style.cssText="position:fixed;right:16px;bottom:14px;z-index:9999;border:none;border-radius:10px;background:#1D1E50;color:#fff;padding:9px 16px;font-size:13px;cursor:pointer;font-family:inherit;box-shadow:0 3px 12px rgba(29,30,80,0.25);transition:all .15s";
+  b.onmouseenter=function(){b.style.transform="translateY(-1px)";b.style.boxShadow="0 5px 16px rgba(29,30,80,0.35)";};
+  b.onmouseleave=function(){b.style.transform="none";b.style.boxShadow="0 3px 12px rgba(29,30,80,0.25)";};
+  document.body.appendChild(b);
+
+  function showToast(msg){
+    var t=document.getElementById("tool-toast");
+    if(!t){
+      t=document.createElement("div");
+      t.id="tool-toast";
+      t.style.cssText="position:fixed;left:50%;bottom:64px;transform:translateX(-50%);z-index:10000;background:#1D1E50;color:#FFF;padding:8px 18px;border-radius:999px;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,0.25);opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap";
+      document.body.appendChild(t);
+    }
+    t.textContent=msg;
+    t.style.opacity="1";
+    t.style.transform="translateX(-50%) translateY(0)";
+    clearTimeout(t._timer);
+    t._timer=setTimeout(function(){
+      t.style.opacity="0";
+      t.style.transform="translateX(-50%) translateY(6px)";
+    },2400);
+  }
+
+  b.addEventListener("click",function(){
+    var lines=[document.title,""];
+    lines.push("--- INPUTS ---");
+    document.querySelectorAll("input,select,textarea").forEach(function(inp){
+      if(inp.type==="button"||inp.type==="submit") return;
+      var lab=(inp.labels&&inp.labels[0])?inp.labels[0].textContent.trim()+" = ":"";
+      if(!lab&&inp.id){var l=document.querySelector('label[for="'+inp.id+'"]');if(l)lab=l.textContent.trim()+" = ";}
+      lines.push((lab||"")+inp.value);
+    });
+    lines.push("");lines.push("--- RESULT ---");
+    document.querySelectorAll(".metric,.verdict,.diff,.big,.out,.res,#res,#output").forEach(function(el){
+      var txt=el.textContent.trim().replace(/\s+/g," ");
+      if(txt) lines.push(txt);
+    });
+    var content=lines.join("\n");
+    var safeTitle=(document.title.split("·")[0]||document.title).trim().replace(/[^a-zA-Z0-9\u4e00-\u9fa5]+/g,"-").replace(/^-|-$/g,"")||"tool";
+    var name=safeTitle+"-result.txt";
+
+    if(window.__TAURI__){
+      window.__TAURI__.core.invoke("export_result",{content:content,defaultName:name})
+        .then(function(res){
+          if(res!=="cancelled") showToast((window.LANG==="zh"?"已保存至: ":"Saved to: ")+res);
+        })
+        .catch(function(e){window.alert("Export failed: "+e);});
+    }else{
+      var blob=new Blob([content],{type:"text/plain;charset=utf-8"});
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement("a");
+      a.href=url;
+      a.download=name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast(window.LANG==="zh"?"已下载计算结果文本":"Result file downloaded");
+    }
+  });
+})();
+</script>
+<script>
+// LocalStorage Persistence + Reactive Input Calculation + Reset
+(function(){
+  if(typeof localStorage==="undefined") return;
+  var KEY="ql-toolbox:"+location.pathname.replace(/[^a-z0-9]+/gi,"-");
+  function getDefaults(){
+    var o={};
+    document.querySelectorAll("input,select,textarea").forEach(function(el){
+      if(el.id && el.defaultValue!==undefined) o[el.id]=el.defaultValue;
+    });
+    return o;
+  }
+  var defaults=getDefaults();
+
+  window.resetDefaults=function(){
+    localStorage.removeItem(KEY);
+    Object.keys(defaults).forEach(function(id){
+      var el=document.getElementById(id);
+      if(el) el.value=defaults[id];
+    });
+    var fn=window.calc||window.run||window.gen||null;
+    if(fn) fn();
+    var t=document.getElementById("tool-toast");
+    if(t){
+      t.textContent=window.LANG==="zh"?"已恢复默认参数":"Defaults restored";
+      t.style.opacity="1";
+      setTimeout(function(){t.style.opacity="0";},2000);
+    }
+  };
+
+  function loadVals(){
+    var raw=localStorage.getItem(KEY); if(!raw) return;
+    try{ var o=JSON.parse(raw);
+      Object.keys(o).forEach(function(id){ var el=document.getElementById(id); if(el) el.value=o[id]; });
+      var fn=window.calc||window.run||window.gen||null; if(fn) fn();
+    }catch(e){}
+  }
+  function saveVals(){ var o={};
+    document.querySelectorAll("input,select,textarea").forEach(function(el){ if(el.id) o[el.id]=el.value; });
+    try{ localStorage.setItem(KEY, JSON.stringify(o)); }catch(e){}
+    var fn=window.calc||window.run||window.gen||null; if(fn) fn();
+  }
+  document.addEventListener("input",saveVals);
+  document.addEventListener("change",saveVals);
+  loadVals();
+})();
+</script>
+</body>
+</html>

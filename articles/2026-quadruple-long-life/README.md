@@ -5,11 +5,11 @@
 ## Meta
 - **Working title (zh):** 《四倍做多认知，长期做多人生》
 - **Working title (en):** Quadruple Long on Cognition, Long on Life for the Long Run
-- **Status:** Draft (30 chapters + epilogue written; illustrations and data-filling in progress)
+- **Status:** Draft (33 chapters + epilogue written; illustrations and data-filling in progress)
 - **Languages:** Chinese-primary, English inline
 - **Summary:** A long-form investment guidebook for the 四爱 (4i) community -- a café-style chat that builds wealth consciousness, asset allocation thinking, and long-term investing habits from zero to intermediate.
 
-## Structure -- 8 Parts, 30 Chapters + Epilogue + 12 Appendices
+## Structure -- 9 Parts, 33 Chapters + Epilogue + 14 Appendices
 
 | Part | Prefix | Chapters | Range |
 |------|--------|----------|-------|
@@ -20,7 +20,8 @@
 | Part 5 · Asset Allocation | E001--E006 | 6 | 配置原则/资金分账/案例/组合/再平衡 (Ch 20--25) |
 | Part 6 · Getting Started | F001--F003 | 3 | 第一笔/定投/复盘日记 (Ch 26--28) |
 | Part 7 · Cycles & Behavior | G001--G002 | 2 | 牛熊周期/行为金融 (Ch 29--30) |
-| Part 8 · Epilogue | H001 | 1 | 终章 |
+| Part 8 · AI Financial Management | I001--I003 | 3 | AI记账/AI长期规划/AI投资边界 (Ch 31--33) |
+| Epilogue | H001 | 1 | 终章 |
 
 ### Front Matter
 | File | Content |
@@ -36,8 +37,8 @@
 
 ## Book Deliverable Files
 - `Front-Matter/` -- opening statement, reading notice, author note, TOC, prologue (5 files)
-- `Main-Text/` -- 30 chapters + epilogue (31 files, A001--A004 through H001)
-- `Appendices/` -- 12 appendix templates & references (1 file)
+- `Main-Text/` -- 33 chapters + epilogue (34 files, A001--A004 through I001--I003, H001)
+- `Appendices/` -- 14 appendix templates & references (1 file)
 - `illustrations/` -- illustration specs & prompts (8 specs + ALL-SPECS.md)
 - `assets/` -- images, charts (generated art goes here)
 

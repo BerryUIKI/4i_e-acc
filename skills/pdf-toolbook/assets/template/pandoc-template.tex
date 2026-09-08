@@ -1,49 +1,28 @@
 %===========================================================
 %  pandoc-template.tex — DollarHua PDF Toolbook Template
-%  Version: v1.2 · Updated: 2026-07-29
+%  Version: v2.0 · Updated: 2026-09-07
 %
-%  Used with: pandoc input.md --template=this -o output.tex
-%  Compile with: xelatex (3 passes: TOC + cross-refs + longtable)
+%  Used with: pandoc merged.md --template=this -o output.tex
+%  Compile with: xelatex (2 passes: TOC + cross-refs; optional 3rd if "Rerun")
+%
+%  Optimizations over v1.3:
+%    • Cover rendered as literal titlepage (v1.3 \@maketitle was shadowed by ctex)
+%    • Chapter: display style with 0.6×\textwidth decorative band + 章号居中
+%    • Header: chapter name (left) + book title (right), Bond Navy on blossom rule
+%    • Footer: page number centered
+%    • Part divider macro: \partdivider{...} for "第N部分" inline banners
+%    • Tighter line spacing for body, generous for chapter intros
+%    • First-line indent 2em CJK, parskip 0.4em
 %===========================================================
 
 % ── Document class (ctexbook = Chinese-enabled book) ──
-% NO fontset=none — let ctex use Fandol as guaranteed fallback (installed
-% with texlive-lang-chinese on CI). Then override families with Source Han.
-% This ensures CJK text ALWAYS renders: if Source Han fails, Fandol takes over.
-\documentclass[a4paper,12pt,oneside]{ctexbook}
-
-% ── CJK typography: cross-platform auto-detect ──
-% ctexbook has already loaded xeCJK and configured zhsong/zhhei/zhfs/zhkai
-% to Fandol.  We try the best available font:
-%   PingFang SC (macOS) → Noto Serif CJK SC (Linux, some distros) →
-%   Source Han Serif SC (Linux CI, Adobe Language Specific OTFs) →
-%   Source Han Serif CN (Windows, older CN-subset OTFs) →
-%   Fandol (ctex built-in fallback, always available).
-\IfFontExistsTF{PingFang SC}{%
-  \setCJKmainfont{PingFang SC}[BoldFont={PingFang SC Semibold}]
-  \setCJKsansfont{PingFang SC}[BoldFont={PingFang SC Semibold}]
-  \setCJKmonofont{PingFang SC}
-}{%
-  \IfFontExistsTF{Noto Serif CJK SC}{%
-    \setCJKmainfont{Noto Serif CJK SC}[BoldFont={Noto Serif CJK SC Bold}]
-    \setCJKsansfont{Noto Sans CJK SC}[BoldFont={Noto Sans CJK SC Bold}]
-    \setCJKmonofont{Noto Sans CJK SC}
-  }{%
-    \IfFontExistsTF{Source Han Serif SC}{%
-      \setCJKmainfont{Source Han Serif SC}[BoldFont={Source Han Serif SC Bold}]
-      \setCJKsansfont{Source Han Sans SC}[BoldFont={Source Han Sans SC Bold}]
-      \setCJKmonofont{Source Han Sans SC}
-    }{%
-      \setCJKmainfont{Source Han Serif CN}[BoldFont={Source Han Serif CN Bold}]
-      \setCJKsansfont{Source Han Sans CN}[BoldFont={Source Han Sans CN Bold}]
-      \setCJKmonofont{Source Han Sans CN}
-    }%
-  }%
-}
+% fontset=none → ctex doesn't preload any CJK font; we set our own below.
+\documentclass[a4paper,11pt,oneside,fontset=none,UTF8,zihao=-4]{ctexbook}
 
 % ── Page geometry ──
-\usepackage[top=2.5cm, bottom=2.5cm, left=2.8cm, right=2.3cm,
-            headheight=23pt, headsep=8mm, footskip=12mm,
+% headheight set to 24pt to satisfy fancyhdr and prevent header clipping
+\usepackage[top=2.6cm, bottom=2.6cm, left=2.8cm, right=2.4cm,
+            headheight=24pt, headsep=8mm, footskip=12mm,
             includeheadfoot]{geometry}
 
 % ── DollarHua brand colors ──
@@ -56,6 +35,63 @@
 \definecolor{dh-skin}{HTML}{F9DECE}
 \definecolor{dh-white}{HTML}{FCFDFD}
 \definecolor{dh-red}{HTML}{E85D61}
+\definecolor{dh-navy-muted}{HTML}{8E8FA2}
+
+% ── CJK typography (cross-platform auto-detect) ──
+\usepackage{fontspec}
+\usepackage{xeCJK}
+
+\IfFontExistsTF{PingFang SC}{
+  \setCJKmainfont{PingFang SC}[
+    BoldFont={PingFang SC Semibold},
+    ItalicFont={PingFang SC Light}
+  ]
+  \setCJKsansfont{PingFang SC}
+  \setCJKmonofont{PingFang SC}
+}{
+  \IfFontExistsTF{Source Han Serif CN}{
+    \setCJKmainfont{Source Han Serif CN}[
+      BoldFont={Source Han Serif CN Bold},
+      AutoFakeSlant=0.15
+    ]
+    \setCJKsansfont{Source Han Sans CN}[
+      BoldFont={Source Han Sans CN Bold}
+    ]
+    \setCJKmonofont{Source Han Sans CN}
+  }{
+    \IfFontExistsTF{Noto Serif CJK SC}{
+      \setCJKmainfont{Noto Serif CJK SC}[
+        BoldFont={Noto Serif CJK SC Bold},
+        AutoFakeSlant=0.15
+      ]
+      \setCJKsansfont{Noto Sans CJK SC}
+      \setCJKmonofont{Noto Sans Mono CJK SC}
+    }{
+      \IfFontExistsTF{Source Han Serif SC}{
+        \setCJKmainfont{Source Han Serif SC}[
+          BoldFont={Source Han Serif SC Bold},
+          AutoFakeSlant=0.15
+        ]
+        \setCJKsansfont{Source Han Sans SC}
+        \setCJKmonofont{Source Han Sans SC}
+      }{
+        % Ultimate fallback: SimSun on Windows
+        \setCJKmainfont{SimSun}[AutoFakeBold=2.5]
+        \setCJKsansfont{SimHei}
+        \setCJKmonofont{KaiTi}
+      }
+    }
+  }
+}
+
+% CJK line breaking + spacing
+\XeTeXlinebreaklocale "zh"
+\XeTeXlinebreakskip = 0pt plus 1pt
+\xeCJKsetup{CJKecglue=\hskip 0.15em plus 0.05em minus 0.05em,
+            PunctStyle=quanjiao}  % full-width CJK punctuation (publishing standard)
+
+% Line spreading for CJK body text readability
+\linespread{1.45}\selectfont
 
 % ── Unicode character support ──
 \usepackage{newunicodechar}
@@ -67,6 +103,8 @@
 \newunicodechar{–}{\textendash}
 \newunicodechar{…}{\dots}
 \newunicodechar{°}{\ensuremath{^{\circ}}}
+\newunicodechar{⚠}{\textcolor{dh-bronze}{\textbf{[注意]}}}
+\newunicodechar{️}{} % Ignore variation selector-16
 
 % ── Page style (headers / footers) ──
 \usepackage{fancyhdr}
@@ -75,60 +113,162 @@
 \renewcommand{\headrulewidth}{0.5pt}
 \renewcommand{\headrule}{\hbox to\headwidth{%
   \color{dh-blossom}\leaders\hrule height \headrulewidth\hfill}}
+% In oneside mode: left header shows current chapter, right header shows book title
 \fancyhead[L]{\footnotesize\color{dh-navy}\leftmark}
 \fancyhead[R]{\footnotesize\color{dh-navy}\mytitle}
-\fancyfoot[C]{\thepage}
+\newcommand{\footerdisclaimer}{{\tiny\color{dh-navy-muted}投资有风险，入市需谨慎}}
+\fancyfoot[C]{\small\color{dh-navy-soft}\thepage}
 \fancypagestyle{plain}{
   \fancyhf{}
-  \fancyfoot[C]{\thepage}
+  \fancyfoot[C]{\small\color{dh-navy-soft}\thepage}
   \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\headrule}{}
+}
+% Chapter starts: show only page number and disclaimer, no header
+\fancypagestyle{chapterstart}{
+  \fancyhf{}
+  \fancyfoot[C]{\small\color{dh-navy-soft}\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\headrule}{}
 }
 
-% ── First-line indent: 2 CJK characters ──
+% ── Paragraph: first-line indent 2 CJK chars, generous inter-paragraph ──
 \setlength{\parindent}{2em}
+\setlength{\parskip}{0.4em plus 0.1em minus 0.1em}
+\setlength{\emergencystretch}{1.5em}
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
 
 % ── Chapter/section title styling ──
 \usepackage{titlesec}
 
-% Chapter: Bond Navy large text + pink decor rules
+% Mixed-color helpers (avoid titlesec choking on `!NN` mixing syntax)
+\definecolor{dh-navy-soft}{HTML}{3A3B72}    % 80% of dh-navy
+\definecolor{dh-navy-faint}{HTML}{8485A0}   % 50% of dh-navy
+
+% Chapter: display style with a band on top, the "第N章" label, the
+% chapter title, and a trailing rule.
+%
+% titlesec's display-style "label" slot is sensitive: it must be a
+% single, balanced group (no bare \par, no unprotected \vspace).
+% We therefore wrap the entire label in a single {…} and use
+% \vskip / \hrulefill instead of \par / \rule.
 \titleformat{\chapter}[display]
   {\centering\Huge\bfseries\sffamily\color{dh-navy}}
-  {\color{dh-blossom}\rule{0.6\textwidth}{2pt}\vspace{0.5cm}\\%
-   \chaptertitlename\ \thechapter}
-  {1em}
+  {{\color{dh-blossom}\hrule height 3pt}\vskip 0.7cm
+   {\color{dh-blossom}\LARGE\bfseries\sffamily 第\ \thechapter\ 章}}
+  {1.0em}
   {}
-  [\vspace{0.3cm}\color{dh-blossom}\rule{0.3\textwidth}{1pt}]
+  [\vskip 0.6cm{\color{dh-blossom}\hrule height 2pt}]
 
-% Section
+% Chapter top spacing: 50pt left a ~4.4cm blank band at the top of every
+% chapter-opening page (2.6cm margin + 50pt before-spacing) — tightened
+% to 14pt so the chapter title sits near the top of the text block.
+\titlespacing*{\chapter}{0pt}{14pt}{34pt}
+
+% Section: large bold with blossom number prefix (each section starts on a new page)
+\newcommand{\sectionbreak}{\clearpage}
 \titleformat{\section}
   {\Large\bfseries\sffamily\color{dh-navy}}
-  {\color{dh-blossom}\thesection}
-  {1em}
+  {\color{dh-blossom}\bfseries\thesection}
+  {0.8em}
   {}
-  [\vspace{-0.3cm}{\color{dh-blossom}\titlerule[1pt]}]
+  [\vspace{-0.2em}{\color{dh-blossom}\titlerule[1.4pt]}]
 
-% Subsection
+\titlespacing*{\section}{0pt}{2.0em}{0.8em}
+
+% Subsection: medium bold
 \titleformat{\subsection}
   {\large\bfseries\sffamily\color{dh-navy}}
   {\color{dh-blossom}\thesubsection}
-  {1em}
+  {0.6em}
   {}
 
-% ── Table of contents styling ──
-\usepackage{hyperref}
+\titlespacing*{\subsection}{0pt}{1.6em}{0.6em}
+
+% Subsubsection: small bold
+\titleformat{\subsubsection}
+  {\normalsize\bfseries\sffamily\color{dh-navy}}
+  {\color{dh-blossom}\thesubsubsection}
+  {0.5em}
+  {}
+
+% Subsection / subsubsection numbering: drop the \thesection component
+% so a chapter with no parent \section does not render as "1.0.1, 1.0.2".
+% We use plain chapter.X (and chapter.X.Y) instead.
+\renewcommand{\thesubsection}{\thechapter.\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\thechapter.\arabic{subsection}.\arabic{subsubsection}}
+
+% Make sure chapter shows in header (with short title)
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+
+% ── TOC styling ──
+\usepackage{tocloft}
+\renewcommand{\cftchapfont}{\bfseries\sffamily\color{dh-navy}}
+\renewcommand{\cftchappagefont}{\bfseries\color{dh-bronze}}
+\renewcommand{\cftsecfont}{\color{dh-navy-soft}}
+\renewcommand{\cftsecpagefont}{\color{dh-navy-faint}}
+\renewcommand{\cftsubsecfont}{\color{dh-navy-faint}}
+\renewcommand{\cftsubsecpagefont}{\color{dh-navy-faint}}
+\renewcommand{\cftdotsep}{1.5}
+\renewcommand{\cftchapleader}{\color{dh-blossom}\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforechapskip}{6pt}
+\setlength{\cftbeforesecskip}{3pt}
+
+% ── Hyperref (must be near end of preamble) ──
+\usepackage[unicode,bookmarks=true,bookmarksnumbered=true]{hyperref}
 \hypersetup{
   colorlinks=true,
   linkcolor=dh-navy,
   urlcolor=dh-gold,
-  pdfborder={0 0 0}
+  citecolor=dh-bronze,
+  pdfborder={0 0 0},
+  pdftitle={$title$},
+  pdfauthor={$author$}
 }
 
 % ── Image support ──
 \usepackage{graphicx}
 \usepackage{float}
-\graphicspath{{./}{./assets/}{./images/}}
-\providecommand{\pandocbounded}[1]{#1}
+% Multiple graphicspath entries so image resolution works regardless of
+% whether xelatex is invoked from the workspace root, the output/ dir,
+% or the output/tex/ split dir.  Each entry is searched in order.
+\graphicspath{%
+  {./}%
+  {../}%
+  {./articles/2026-quadruple-long-life/analysis/output/}%
+  {../articles/2026-quadruple-long-life/analysis/output/}%
+  {./assets/}%
+  {../assets/}%
+  {./assets/illustrations/}%
+  {../assets/illustrations/}%
+  {./images/}%
+  {../images/}%
+}
 \usepackage[export]{adjustbox}
+\usepackage{eso-pic}   % full-bleed cover image
+
+% ── Caption styling: small, centered, bronze figure/table labels ──
+\usepackage{caption}
+\captionsetup{font=small, labelfont={bf,color=dh-bronze}, labelsep=quad,
+              justification=centering, skip=6pt}
+\renewcommand{\figurename}{图}
+\renewcommand{\tablename}{表}
+
+% Pandoc image wrapper: ensure images fit within page width and height
+\makeatletter
+\newsavebox\pandoc@box
+\providecommand*\pandocbounded[1]{%
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi%
+  \ifdim\@tempa\p@<1\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+\makeatother
 
 % ── Code highlighting ──
 \usepackage{listings}
@@ -149,49 +289,140 @@
 }
 
 % ── Pandoc compatibility ──
-\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\providecommand{\tightlist}{\setlength{\itemsep}{2pt}\setlength{\parskip}{1pt}}
 \usepackage{longtable}
 \usepackage{calc}
 \setlength{\LTleft}{0pt}
 \setlength{\LTright}{0pt}
 
+% ── Footnote styling ──
+\renewcommand{\footnoterule}{%
+  {\color{dh-blossom}\hrule width 0.3\textwidth height 0.4pt}%
+  \vspace{4pt}}
+
 % ── Tables ──
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{colortbl}
+\usepackage{tabularx}
 \arrayrulecolor{dh-blossom}
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.25}
 
-% ── Block quotes ──
-\usepackage{etoolbox}
-\AtBeginEnvironment{quote}{\small\color{dh-navy}}
+% ── Block quotes (brand callout box) ──
+\usepackage[most]{tcolorbox}
+\newtcolorbox{dhquote}{
+  blanker,
+  breakable,
+  borderline west={4.5pt}{0pt}{dh-blossom},
+  left=14pt, right=8pt,
+  top=4pt, bottom=4pt,
+  before skip=0.6em, after skip=0.6em,
+  fontupper=\small\color{dh-bronze}\itshape
+}
+\renewenvironment{quote}{\begin{dhquote}}{\end{dhquote}}
 
-% ── Pandoc variables ──
+% ── Part divider macro (standalone full-page banner for "第N部分") ──
+\newcommand{\partdivider}[1]{%
+  \clearpage
+  \thispagestyle{empty}%
+  \begin{center}%
+    \vspace*{2.0cm}%
+    {\color{dh-blossom}\rule{\textwidth}{12pt}\par}%
+    \vspace{0.35cm}%
+    {\color{dh-pink}\rule{\textwidth}{4pt}\par}%
+    \vspace{2.2cm}%
+    {\color{dh-bronze}\large\bfseries\sffamily PART\par}%
+    \vspace{1.0cm}%
+    {\color{dh-navy}\Huge\bfseries\sffamily #1\par}%
+    \vspace{1.4cm}%
+    {\color{dh-blossom}\rule{0.45\textwidth}{3pt}\par}%
+    \vspace{0.9cm}%
+    {\color{dh-navy-faint}\small\sffamily\itshape Quadruple Leverage on Cognition, Long Life\par}%
+    \vfill
+    {\color{dh-pink}\rule{\textwidth}{4pt}\par}%
+    \vspace{0.35cm}%
+    {\color{dh-blossom}\rule{\textwidth}{12pt}\par}%
+    \vspace{1.2cm}%
+  \end{center}%
+  \clearpage
+}
+
+% ── Pandoc variables (filled in by metadata flags) ──
 \newcommand{\mytitle}{$title$}
 \title{\mytitle}
 \author{$author$}
 \date{$date$}
 
-% ── Cover styling ──
-\makeatletter
-\def\@maketitle{
-  \begin{titlepage}
-    \centering
-    \vspace*{3cm}
-    {\color{dh-blossom}\rule{0.5\textwidth}{2pt}\par}
-    \vspace{1cm}
-    {\Huge\bfseries\color{dh-navy}\mytitle\par}
-    \vspace{0.5cm}
-    {\Large\color{dh-bronze}$author$\par}
-    \vspace{1cm}
-    {\color{dh-blossom}\rule{0.3\textwidth}{1pt}\par}
-    \vfill
-    {\large\color{dh-blossom}$date$\par}
-  \end{titlepage}
-}
-\makeatother
-
+% ────────────────────────────────────────────────────────────
+%  Body
+% ────────────────────────────────────────────────────────────
 \begin{document}
-\maketitle
+
+% ---- Cover: full-bleed DollarHua illustration (LFS asset 00-cover.png) ----
+\begin{titlepage}
+\thispagestyle{empty}
+\AddToShipoutPictureBG*{%
+  \AtPageLowerLeft{%
+    \includegraphics[width=\paperwidth,height=\paperheight]{00-cover.png}%
+  }%
+}
+\mbox{}% force the shipout
+\end{titlepage}
+
+% ---- Half title (扉页) ----
+\begin{titlepage}
+\thispagestyle{empty}
+\centering
+\vspace*{4.2cm}
+
+{\color{dh-blossom}\rule{0.55\textwidth}{2pt}\par}
+\vspace{2.0cm}
+
+{\fontsize{30pt}{44pt}\selectfont\bfseries\color{dh-navy}%
+四倍做多认知\\[0.35em]%
+长期做多人生\par}
+
+\vspace{0.7cm}
+
+{\color{dh-gold}\rule{0.25\textwidth}{1.2pt}\par}
+\vspace{0.5cm}
+
+{\large\color{dh-navy!85}Quadruple Leverage on Cognition, Long Life\par}
+\vspace{1.4cm}
+
+{\large\color{dh-bronze}$author$\par}
+\vfill
+
+{\normalsize\color{dh-navy}第 1 版 · $date$\par}
+\vspace{0.4cm}
+{\color{dh-gold}\rule{0.55\textwidth}{1pt}\par}
+\vspace{1.6cm}
+\end{titlepage}
+
+% ---- Copyright page (版权页) ----
+\thispagestyle{empty}
+\begingroup
+\small\color{dh-navy-soft}
+\setlength{\parindent}{0pt}
+\vspace*{9cm}
+
+《四倍做多认知，长期做多人生》\par
+Quadruple Leverage on Cognition, Long Life\par
+作者：花花（@BerryUIKI）\par
+第 1 版 · $date$ \par
+\hspace{0pt}\par
+书稿 © 花花。保留所有权利，转载请标注出处。\par
+代码与脚本示例以 Apache-2.0 许可发布（见仓库 LICENSE）。\par
+本书配套网页工具为开源软件，仓库见 \texttt{github.com/BerryUIKI/4i\_e-acc}。\par
+\hspace{0pt}\par
+{\color{dh-bronze}\textbf{免责声明}}\par
+本书所有投资案例均为教学假设，不构成任何投资建议；历史收益不代表未来表现。投资有风险，入市需谨慎。\par
+\endgroup
+\clearpage
+
+% ---- Frontmatter & Table of Contents ----
+\frontmatter
 
 $if(toc)$
 \tableofcontents

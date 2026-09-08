@@ -1,7 +1,7 @@
 # 《四倍做多认知，长期做多人生》 — PDF 编译索引
 
 > CI 自动生成 · Auto-generated build manifest
-> 仅含书稿交付物：前辅文 → 30章正文 + 终章 → 附录
+> 仅含书稿交付物：前辅文 → 33章正文 + 终章 → 附录
 
 1. [扉页 · Opening Statement](articles/2026-quadruple-long-life/Front-Matter/FM000-opening-statement.md)
 2. [阅读须知 · Reading Notice](articles/2026-quadruple-long-life/Front-Matter/FM001-reading-notice.md)
@@ -9,7 +9,7 @@
 4. [目录 · Table of Contents](articles/2026-quadruple-long-life/Front-Matter/FM003-table-of-contents.md)
 5. [序章 · 为什么普通人必须理解资产](articles/2026-quadruple-long-life/Front-Matter/FM004-prologue.md)
 
-6. [第一章 · 收入、资产与财富不是一回事](articles/2026-quadruple-long-life/Main-Text/A001-where-wealth-comes-from.md)
+6. [第一章 · 财富从哪里来？](articles/2026-quadruple-long-life/Main-Text/A001-where-wealth-comes-from.md)
 7. [第二章 · 先计算自己的净资产](articles/2026-quadruple-long-life/Main-Text/A002-calculate-net-worth.md)
 8. [第三章 · 储蓄率比收入数字更重要](articles/2026-quadruple-long-life/Main-Text/A003-savings-rate.md)
 9. [第四章 · 投资之前，先处理负债和应急资金](articles/2026-quadruple-long-life/Main-Text/A004-debt-and-emergency-fund.md)
@@ -39,6 +39,9 @@
 33. [第二十八章 · 如何记录和复盘投资](articles/2026-quadruple-long-life/Main-Text/F003-investment-journal.md)
 34. [第二十九章 · 牛市、熊市与市场周期](articles/2026-quadruple-long-life/Main-Text/G001-market-cycles.md)
 35. [第三十章 · 投资中最难管理的是自己](articles/2026-quadruple-long-life/Main-Text/G002-behavioral-finance.md)
-36. [终章 · 财富的作用，是增加人生选择权](articles/2026-quadruple-long-life/Main-Text/H001-epilogue.md)
+36. [第三十一章 · AI 记账：让每一笔钱都有处可去](articles/2026-quadruple-long-life/Main-Text/I001-ai-bookkeeping.md)
+37. [第三十二章 · AI 长期规划：把人生目标翻译成财务数字](articles/2026-quadruple-long-life/Main-Text/I002-ai-long-term-planning.md)
+38. [第三十三章 · AI 投资辅助与边界：让 AI 当副驾驶，而不是驾驶员](articles/2026-quadruple-long-life/Main-Text/I003-ai-investment-boundary.md)
+39. [终章 · 财富的作用，是增加人生选择权](articles/2026-quadruple-long-life/Main-Text/H001-epilogue.md)
 
-37. [附录 A–L · 模板与参考资料](articles/2026-quadruple-long-life/Appendices/A-to-L-appendices.md)
+40. [附录 A–N · 模板与参考资料](articles/2026-quadruple-long-life/Appendices/A-to-L-appendices.md)

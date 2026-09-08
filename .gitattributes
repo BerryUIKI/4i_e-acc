@@ -7,3 +7,7 @@
 # Chart PNGs are small (60-140 KB) — keep as regular blobs so CI
 # (which does not fetch LFS objects) can load them in XeLaTeX.
 articles/2026-quadruple-long-life/analysis/output/*.png -filter -diff -merge
+desktop/src-tauri/icons/*.png -filter -diff -merge
+desktop/src-tauri/icons/*.ico -filter -diff -merge
+
+

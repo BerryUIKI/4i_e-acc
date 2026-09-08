@@ -1,0 +1,38 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Quadruple Toolbox",
+  "version": "0.1.0",
+  "identifier": "com.berryuiki.quadruple-toolbox",
+  "build": {
+    "frontendDist": "../../tools"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "四倍做多工具箱 · Quadruple Leverage Toolbox",
+        "width": 1180,
+        "height": 820,
+        "minWidth": 900,
+        "minHeight": 620,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app"],
+    "category": "Finance",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.ico",
+      "icons/icon.icns"
+    ]
+
+  }
+}

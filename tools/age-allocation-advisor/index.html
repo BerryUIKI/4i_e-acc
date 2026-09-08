@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#1D1E50">
+<title>年龄配置建议器 · Allocation Advisor</title>
+<style>
+  :root{--cream:#FBF7F0;--paper:#FFF;--pink:#FEC6CD;--pink-deep:#F3A6AF;--navy:#1D1E50;--bronze:#B86C40;--teal:#0F6E56;--red:#A32D2D;--ink:#2C2C2A;--line:#E7E0D4;--muted:#6b675e}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--cream);color:var(--ink);font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;line-height:1.6;padding:24px 16px 40px}
+  .wrap{max-width:960px;margin:0 auto}
+  header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  header h1{font-size:22px;font-weight:700;color:var(--navy)} header .sub{font-size:13px;color:var(--muted);flex:1}
+  .langbtn{border:1px solid var(--pink-deep);background:#fff;color:var(--navy);font-size:12px;padding:4px 10px;border-radius:999px;cursor:pointer}
+  .disclaimer{font-size:12px;color:var(--muted);margin:6px 0 16px}
+  .grid{display:grid;grid-template-columns:330px 1fr;gap:16px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+  .card h2{font-size:14px;color:var(--navy);margin-bottom:12px;font-weight:600}
+  .q{margin-bottom:12px}
+  .q .ql{font-size:13px;margin-bottom:5px}
+  .q select,.q input{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:14px;background:#fff}
+  .btn{width:100%;padding:11px;border:none;border-radius:10px;background:var(--navy);color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:center}
+  th{color:var(--muted);font-weight:500} td.hl{background:#FDF0DC}
+  tr.cur td{background:#E1F5EE;font-weight:600}
+  .note{font-size:12px;color:var(--muted);margin-top:8px}
+  .warnbox{background:#FCEBEB;border-left:4px solid var(--red);border-radius:8px;padding:10px 12px;font-size:13px;margin-top:12px}
+  .warnbox b{color:var(--red)}
+  .okbox{background:#EAF3DE;border-left:4px solid #639922;border-radius:8px;padding:10px 12px;font-size:13px;margin-top:12px}
+  footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="nav-bar" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px;width:100%;font-size:12px">
+    <a class="nav-home" href="../../index.html" style="color:var(--muted);text-decoration:none;background:#FFFDF8;border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-weight:500">🏠 <span data-i18n="navHome">首页</span></a>
+    <a class="nav-tools" href="../index.html" style="color:var(--bronze);text-decoration:none;background:#FFFDF8;border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-weight:600">🧰 <span data-i18n="navTools">工具箱</span></a>
+    <select class="tool-select" onchange="if(this.value)location.href=this.value" aria-label="Switch tool" style="border:1px solid var(--line);border-radius:6px;padding:3px 6px;font-size:11.5px;background:#FFFDF8;color:var(--navy);cursor:pointer;font-family:inherit">
+      <optgroup label="A · 数字工具箱">
+        <option value="../compound-calculator/index.html">A1 复利计算器 · Compound Calculator</option>
+        <option value="../dca-simulator/index.html">A2 定投模拟器 · DCA Simulator</option>
+        <option value="../etf-premium-calculator/index.html">A3 ETF 溢价率速算 · Premium Calculator</option>
+        <option value="../fee-erosion-calculator/index.html">A4 费率侵蚀对比器 · Fee Erosion</option>
+        <option value="../age-allocation-advisor/index.html" selected>A5 年龄配置建议器 · Allocation Advisor</option>
+        <option value="../five-year-rule-checker/index.html">A6 五年规则检查器 · 5-Year Rule</option>
+      </optgroup>
+      <optgroup label="B · AI 财务副驾驶">
+        <option value="../ai-accounting-pack/index.html">B1 AI 记账对话包 · Prompt Pack</option>
+        <option value="../goal-translator/index.html">B2 人生目标翻译器 · Goal Translator</option>
+        <option value="../review-generator/index.html">B3 投资复盘生成器 · Review Generator</option>
+        <option value="../ai-redline-cards/index.html">B4 AI 投资红线卡 · Red-Line Cards</option>
+      </optgroup>
+    </select>
+  </div><h1 data-i18n="title">年龄配置建议器</h1><span class="sub" data-i18n="subtitle">源自《四倍做多认知，长期做多人生》第二十二章 + 附录 J</span><button class="langbtn" id="langbtn" onclick="toggleLang()">English</button></header>
+<p class="disclaimer" data-i18n="disclaimer">教学参考工具：区间为一般参考，非个性化投资建议；有疑问请咨询专业人士。</p>
+<div class="grid">
+  <div class="card">
+    <h2 data-i18n="qTitle">几个问题</h2>
+    <div class="q"><div class="ql" data-i18n="qAge">你的年龄段</div>
+      <select id="age"><option value="1" data-i18n="a1">20–30 岁</option><option value="2" data-i18n="a2">30–40 岁</option><option value="3" data-i18n="a3">40–50 岁</option><option value="4" data-i18n="a4">50–60 岁</option><option value="5" data-i18n="a5">60 岁以上</option></select></div>
+    <div class="q"><div class="ql" data-i18n="qEF">应急资金（3–6 个月支出）是否已备齐？</div>
+      <select id="ef"><option value="ok" data-i18n="efOk">已备齐</option><option value="no" data-i18n="efNo">还没备齐</option></select></div>
+    <div class="q"><div class="ql" data-i18n="qBig">近期（≤5 年）是否有明确要动用的大额资金（购房首付/换房等）？</div>
+      <select id="big"><option value="no" data-i18n="bigNo">没有</option><option value="2y" data-i18n="big2y">两年内要用</option><option value="5y" data-i18n="big5y">三到五年内要用</option></select></div>
+    <div class="q"><div class="ql" data-i18n="qInc">收入稳定吗？（创业/提成制波动大？）</div>
+      <select id="inc"><option value="ok" data-i18n="incOk">比较稳定</option><option value="vol" data-i18n="incVol">波动较大</option></select></div>
+    <div class="q"><div class="ql" data-i18n="qPen">退休后保障强吗？（如体制内养老金可覆盖生活）</div>
+      <select id="pen"><option value="no" data-i18n="penNo">一般/靠自己</option><option value="yes" data-i18n="penYes">保障很强</option></select></div>
+    <button class="btn" onclick="run()" data-i18n="btnRun">生成参考</button>
+  </div>
+  <div class="card">
+    <h2 data-i18n="rTitle">参考区间（%）</h2>
+    <table id="tbl">
+      <tr><th data-i18n="hStage">阶段</th><th data-i18n="hEquity">权益类</th><th data-i18n="hBond">债券类</th><th data-i18n="hGold">黄金/另类</th><th data-i18n="hCash">现金</th></tr>
+    </table>
+    <div id="advice"></div>
+    <div class="note" data-i18n="note">区间来自附录 J；「不适用情形」与调整方向来自第二十二章各阶段。权益类指宽基股票 ETF；债券类含利率债/货基替代；比例合计约 100%。</div>
+  </div>
+</div>
+<footer><div id="foot"></div></footer>
+</div>
+<script>
+const BANDS=[
+ {rows:["20–30","60–80%","15–30%","0–5%","5%"]},
+ {rows:["30–40","50–70%","25–40%","5–10%","5%"]},
+ {rows:["40–50","40–60%","30–50%","5–10%","5–10%"]},
+ {rows:["50–60","30–50%","40–55%","5–10%","5–10%"]},
+ {rows:["60+","20–40%","40–60%","5–10%","10–15%"]}];
+const I18N={zh:{back:"← 返回工具箱",title:"年龄配置建议器",subtitle:"源自《四倍做多认知，长期做多人生》第二十二章 + 附录 J",disclaimer:"教学参考工具：区间为一般参考，非个性化投资建议；有疑问请咨询专业人士。",
+qTitle:"几个问题",qAge:"你的年龄段",a1:"20–30 岁",a2:"30–40 岁",a3:"40–50 岁",a4:"50–60 岁",a5:"60 岁以上",
+qEF:"应急资金（3–6 个月支出）是否已备齐？",efOk:"已备齐",efNo:"还没备齐",
+qBig:"近期（≤5 年）是否有明确要动用的大额资金（购房首付/换房等）？",bigNo:"没有",big2y:"两年内要用",big5y:"三到五年内要用",
+qInc:"收入稳定吗？（创业/提成制波动大？）",incOk:"比较稳定",incVol:"波动较大",
+qPen:"退休后保障强吗？（如体制内养老金可覆盖生活）",penNo:"一般/靠自己",penYes:"保障很强",btnRun:"生成参考",
+rTitle:"参考区间（%）",hStage:"阶段",hEquity:"权益类",hBond:"债券类",hGold:"黄金/另类",hCash:"现金",
+cur:"← 你的阶段",
+warnEF:"<b>⚠ 先补应急资金</b>：3–6 个月支出的应急金未备齐前，先别把大量资金投入高波动权益（第四章）。参考区间应整体下移，优先现金/货币类。",
+warnBig2:"<b>⚠ 大额近用钱</b>：两年内要动用的钱不适合放进高波动权益（第四章「五年规则」），请把这部分单独放存款/货币基金，不要计入上述配置。",
+warnBig5:"<b>⚠ 中期大额计划</b>：三到五年内换房/首付的资金，应在用钱前逐步从权益转出（第二十二章）。",
+warnVol:"<b>⚠ 收入波动大</b>：创业/提成制等收入波动大，权益比例宜靠向区间下限，并加大现金缓冲。",
+boostPen:"<b>✔ 退休保障强</b>：若退休金可覆盖生活，可适当容忍更高权益（或相反主动转保守——看你想要增长还是现金流，第二十二章）。",
+okBox:"<b>✔ 基础项已齐</b>：应急资金与近期大额资金都已安排，可参考区间执行。",
+note:"区间来自附录 J；「不适用情形」与调整方向来自第二十二章各阶段。权益类指宽基股票 ETF；债券类含利率债/货基替代；比例合计约 100%。",
+foot:"来源：《四倍做多认知，长期做多人生》第二十二章（年龄配置）+ 附录 J（配置参考表）。书 → 工具系列（A5）。教学参考，不构成投资建议。"},
+en:{back:"← Toolbox",title:"Age Allocation Advisor",subtitle:"from Ch22 + Appendix J of Quadruple Leverage",disclaimer:"Teaching reference: ranges are generic, not personalised advice; consult a professional when in doubt.",
+qTitle:"A few questions",qAge:"Your age band",a1:"20–30",a2:"30–40",a3:"40–50",a4:"50–60",a5:"60+",
+qEF:"Emergency fund (3–6 months of expenses) ready?",efOk:"Yes",efNo:"Not yet",
+qBig:"Large near-term spending (≤5 yrs: home down payment etc.)?",bigNo:"None",big2y:"Within 2 years",big5y:"Within 3–5 years",
+qInc:"Is your income stable? (startup/commission = volatile)",incOk:"Fairly stable",incVol:"Volatile",
+qPen:"Strong pension coverage after retirement?",penNo:"Average / self-funded",penYes:"Strong",btnRun:"Generate reference",
+rTitle:"Reference ranges (%)",hStage:"Stage",hEquity:"Equity",hBond:"Bonds",hGold:"Gold/Alt",hCash:"Cash",
+cur:"← your stage",
+warnEF:"<b>⚠ Build emergency fund first</b>: before 3–6 months of expenses are set aside, don't put large sums into volatile equity (Ch4). Shift the range toward cash/money-market.",
+warnBig2:"<b>⚠ Money needed within 2 years</b> does not belong in volatile equity (Ch4 five-year rule). Keep it in deposits/money-market — don't count it in this allocation.",
+warnBig5:"<b>⚠ Mid-term large spending</b>: funds for a home purchase in 3–5 years should be rotated out of equity progressively (Ch22).",
+warnVol:"<b>⚠ Volatile income</b>: lean to the lower bound of the equity range and keep a larger cash buffer.",
+boostPen:"<b>✔ Strong pension</b>: if pension covers living costs you may tolerate more equity (or deliberately go conservative — growth vs cash flow, Ch22).",
+okBox:"<b>✔ Basics in place</b>: emergency fund and near-term spending are handled; you may follow the reference range.",
+note:"Ranges from Appendix J; caveats and direction from Ch22. Equity = broad stock ETFs; bonds incl. rates/money-market substitutes; weights sum to ≈100%.",
+foot:"Source: Ch22 (age-based allocation) + Appendix J of Quadruple Leverage. Book-to-tool series (A5). Teaching reference, not investment advice."}};
+let LANG="zh";function t(k,v){let s=I18N[LANG][k]||I18N.zh[k];if(v)for(const x in v)s=s.replace("{"+x+"}",v[x]);return s;}
+function toggleLang(){LANG=LANG==="zh"?"en":"zh";applyLang();}
+function applyLang(){document.documentElement.lang=LANG==="zh"?"zh-CN":"en";document.getElementById("langbtn").textContent=LANG==="zh"?"English":"中文";
+document.querySelectorAll("[data-i18n]").forEach(el=>{if(el.tagName!=="OPTION")el.textContent=t(el.dataset.i18n);});
+run();document.getElementById("foot").innerHTML=t("foot");}
+function bandRows(idx){const r=BANDS[idx].rows;return `<tr class="cur"><td>${r[0]} ${t("cur")}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`;}
+function run(){
+  const age=+document.getElementById("age").value;
+  const ef=document.getElementById("ef").value, big=document.getElementById("big").value,
+        inc=document.getElementById("inc").value, pen=document.getElementById("pen").value;
+  let html=`<tr><th>${t("hStage")}</th><th>${t("hEquity")}</th><th>${t("hBond")}</th><th>${t("hGold")}</th><th>${t("hCash")}</th></tr>`;
+  BANDS.forEach((b,i)=>{const r=b.rows;html+=`<tr class="${i===age-1?'cur':''}"><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`;});
+  document.getElementById("tbl").innerHTML=html;
+  const adv=[];
+  if(ef==="no")adv.push(t("warnEF"));
+  if(big==="2y")adv.push(t("warnBig2"));
+  if(big==="5y")adv.push(t("warnBig5"));
+  if(inc==="vol")adv.push(t("warnVol"));
+  if(pen==="yes")adv.push(t("boostPen"));
+  if(adv.length===0)adv.push(t("okBox"));
+  document.getElementById("advice").innerHTML=adv.map(a=>`<div class="${a.indexOf("⚠")>=0?'warnbox':'okbox'}">${a}</div>`).join("");
+}
+applyLang();
+</script>
+<script>
+// Universal Web & Desktop Export + Toast
+(function(){
+  var b=document.createElement("button");
+  b.className="export-fab-btn";
+  b.innerHTML='<span style="margin-right:4px">📥</span>'+(window.LANG==="zh"?"导出结果 / Export":"Export");
+  b.style.cssText="position:fixed;right:16px;bottom:14px;z-index:9999;border:none;border-radius:10px;background:#1D1E50;color:#fff;padding:9px 16px;font-size:13px;cursor:pointer;font-family:inherit;box-shadow:0 3px 12px rgba(29,30,80,0.25);transition:all .15s";
+  b.onmouseenter=function(){b.style.transform="translateY(-1px)";b.style.boxShadow="0 5px 16px rgba(29,30,80,0.35)";};
+  b.onmouseleave=function(){b.style.transform="none";b.style.boxShadow="0 3px 12px rgba(29,30,80,0.25)";};
+  document.body.appendChild(b);
+
+  function showToast(msg){
+    var t=document.getElementById("tool-toast");
+    if(!t){
+      t=document.createElement("div");
+      t.id="tool-toast";
+      t.style.cssText="position:fixed;left:50%;bottom:64px;transform:translateX(-50%);z-index:10000;background:#1D1E50;color:#FFF;padding:8px 18px;border-radius:999px;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,0.25);opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap";
+      document.body.appendChild(t);
+    }
+    t.textContent=msg;
+    t.style.opacity="1";
+    t.style.transform="translateX(-50%) translateY(0)";
+    clearTimeout(t._timer);
+    t._timer=setTimeout(function(){
+      t.style.opacity="0";
+      t.style.transform="translateX(-50%) translateY(6px)";
+    },2400);
+  }
+
+  b.addEventListener("click",function(){
+    var lines=[document.title,""];
+    lines.push("--- INPUTS ---");
+    document.querySelectorAll("input,select,textarea").forEach(function(inp){
+      if(inp.type==="button"||inp.type==="submit") return;
+      var lab=(inp.labels&&inp.labels[0])?inp.labels[0].textContent.trim()+" = ":"";
+      if(!lab&&inp.id){var l=document.querySelector('label[for="'+inp.id+'"]');if(l)lab=l.textContent.trim()+" = ";}
+      lines.push((lab||"")+inp.value);
+    });
+    lines.push("");lines.push("--- RESULT ---");
+    document.querySelectorAll(".metric,.verdict,.diff,.big,.out,.res,#res,#output").forEach(function(el){
+      var txt=el.textContent.trim().replace(/\s+/g," ");
+      if(txt) lines.push(txt);
+    });
+    var content=lines.join("\n");
+    var safeTitle=(document.title.split("·")[0]||document.title).trim().replace(/[^a-zA-Z0-9\u4e00-\u9fa5]+/g,"-").replace(/^-|-$/g,"")||"tool";
+    var name=safeTitle+"-result.txt";
+
+    if(window.__TAURI__){
+      window.__TAURI__.core.invoke("export_result",{content:content,defaultName:name})
+        .then(function(res){
+          if(res!=="cancelled") showToast((window.LANG==="zh"?"已保存至: ":"Saved to: ")+res);
+        })
+        .catch(function(e){window.alert("Export failed: "+e);});
+    }else{
+      var blob=new Blob([content],{type:"text/plain;charset=utf-8"});
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement("a");
+      a.href=url;
+      a.download=name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast(window.LANG==="zh"?"已下载计算结果文本":"Result file downloaded");
+    }
+  });
+})();
+</script>
+<script>
+// LocalStorage Persistence + Reactive Input Calculation + Reset
+(function(){
+  if(typeof localStorage==="undefined") return;
+  var KEY="ql-toolbox:"+location.pathname.replace(/[^a-z0-9]+/gi,"-");
+  function getDefaults(){
+    var o={};
+    document.querySelectorAll("input,select,textarea").forEach(function(el){
+      if(el.id && el.defaultValue!==undefined) o[el.id]=el.defaultValue;
+    });
+    return o;
+  }
+  var defaults=getDefaults();
+
+  window.resetDefaults=function(){
+    localStorage.removeItem(KEY);
+    Object.keys(defaults).forEach(function(id){
+      var el=document.getElementById(id);
+      if(el) el.value=defaults[id];
+    });
+    var fn=window.calc||window.run||window.gen||null;
+    if(fn) fn();
+    var t=document.getElementById("tool-toast");
+    if(t){
+      t.textContent=window.LANG==="zh"?"已恢复默认参数":"Defaults restored";
+      t.style.opacity="1";
+      setTimeout(function(){t.style.opacity="0";},2000);
+    }
+  };
+
+  function loadVals(){
+    var raw=localStorage.getItem(KEY); if(!raw) return;
+    try{ var o=JSON.parse(raw);
+      Object.keys(o).forEach(function(id){ var el=document.getElementById(id); if(el) el.value=o[id]; });
+      var fn=window.calc||window.run||window.gen||null; if(fn) fn();
+    }catch(e){}
+  }
+  function saveVals(){ var o={};
+    document.querySelectorAll("input,select,textarea").forEach(function(el){ if(el.id) o[el.id]=el.value; });
+    try{ localStorage.setItem(KEY, JSON.stringify(o)); }catch(e){}
+    var fn=window.calc||window.run||window.gen||null; if(fn) fn();
+  }
+  document.addEventListener("input",saveVals);
+  document.addEventListener("change",saveVals);
+  loadVals();
+})();
+</script>
+</body>
+</html>

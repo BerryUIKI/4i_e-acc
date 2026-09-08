@@ -203,7 +203,12 @@ def rprint(msg, level="info"):
     """Prefixed logging."""
     prefixes = {"info": "  📄", "ok": "  ✅", "warn": "  ⚠️", "err": "  ❌", "step": "🔧"}
     p = prefixes.get(level, "  ")
-    print(f"{p} {msg}")
+    try:
+        print(f"{p} {msg}")
+    except UnicodeEncodeError:
+        safe_prefixes = {"info": "  [INFO]", "ok": "  [OK]", "warn": "  [WARN]", "err": "  [ERR]", "step": ">>"}
+        sp = safe_prefixes.get(level, "  ")
+        print(f"{sp} {msg}".encode("ascii", errors="replace").decode("ascii"))
 
 
 # ── LaTeX Preprocessing Pipeline ──────────────────────
@@ -345,15 +350,173 @@ def strip_yaml_frontmatter(text):
     file.  Pandoc treats text between --- delimiters as metadata; if CJK
     body text falls inside a YAML block, it is silently discarded.
 
-    Only strips if the very first non-whitespace line is exactly '---'.
+    Only strips when the body between the --- markers looks like YAML
+    (contains at least one ``key: value`` line) AND the closing ---
+    appears within the first 50 lines.  This guardrail is critical:
+    ``---`` is also a valid Markdown thematic break, and many source
+    files use back-to-back ``---`` pairs to bracket an epigraph.
+    Without this check, the entire bracketed epigraph (e.g. B001)
+    would be silently discarded.
     """
     stripped = text.lstrip("\n")
-    if stripped.startswith("---"):
-        # Find the closing --- (must be on its own line)
-        closer = stripped.find("\n---", 3)
-        if closer != -1:
-            return stripped[closer + 4:].lstrip("\n")
+    if not stripped.startswith("---"):
+        return text
+
+    # Closing --- must be a standalone line within the first 50 lines
+    head = stripped.split("\n", 50)[:50]
+    closer_idx = None
+    for i, line in enumerate(head[1:], start=1):
+        if line.strip() == "---":
+            closer_idx = i
+            break
+    if closer_idx is None:
+        return text
+
+    # YAML-content guardrail: body between --- must look like YAML
+    # (at least one `key: value` line).  Without this check, back-to-back
+    # thematic breaks would be mistaken for a YAML block and the entire
+    # bracketed epigraph would be silently discarded.
+    body = "\n".join(head[1:closer_idx])
+    if not re.search(r"^\s*[A-Za-z_][\w-]*\s*:", body, re.MULTILINE):
+        return text
+
+    after_closer = "\n".join(head[closer_idx + 1:])
+    return after_closer.lstrip("\n")
+
+
+# ── Chapter title normalization ────────────────────────
+
+# Match "第N章" or "第N部分" prefix (with optional whitespace) where N is
+# 1-3 ASCII digits or 1-3 CJK numerals.  Anchored to the start of the
+# title to avoid false positives mid-title.
+_CHAPTER_PREFIX_RE = re.compile(
+    r"^第[\d零一二三四五六七八九十百千]{1,3}\s*(?:章|部分)\s*[\s·•・:：\-—]+"
+)
+
+
+def clean_chapter_title(title):
+    """
+    Strip a leading "第N章 · " or "第N部分 · " prefix from a chapter
+    title.  The LaTeX template's \\titleformat{\\chapter} already adds
+    "第 N 章" via \\thechapter, so a duplicate prefix in the title
+    yields "第 5 章 第五章 · 复利..." in the rendered page.  Removing
+    the prefix gives the clean "第 5 章 复利究竟如何工作" form.
+
+    Also collapses multiple whitespace into a single space.
+    """
+    cleaned = _CHAPTER_PREFIX_RE.sub("", title).strip()
+    cleaned = re.sub(r"\s+", " ", cleaned)
+    return cleaned
+
+
+def rewrite_image_paths(text):
+    """
+    Rewrite image references in the merged Markdown so xelatex can
+    find them via the template's \\graphicspath entries.
+
+    Source MDs (e.g. B002-inflation.md) use relative paths such as
+    `../analysis/output/ch06_inflation.png`.  These paths only resolve
+    when xelatex is invoked from the source-MD's directory, not from
+    the build output directory.  build_pdf.py copies the chart images
+    into the build directory, so we strip the directory prefix and
+    keep only the filename.  \\graphicspath then locates the file in
+    the build directory.
+    """
+    return re.sub(
+        r"\.\.?/analysis/output/",
+        "",
+        text,
+    )
+
+
+def strip_chapter_heading(text):
+    """
+    Strip the first heading (h1 or h2) from a document.
+
+    merge_markdown() prepends `# {title}` to every entry so each becomes
+    a chapter.  If the source MD also has its own chapter title (commonly
+    `## 第N章 · ...`), the result is a redundant "section" inside the new
+    chapter with the same name.  This function removes the first such
+    heading so only the prepended chapter title remains.
+
+    The first heading can appear after blank lines, leading `---`
+    thematic breaks, or other decoration — we scan the whole text
+    rather than just the first non-empty line.
+    """
+    lines = text.split("\n")
+    for i, line in enumerate(lines):
+        if line.startswith("# ") or line.startswith("## "):
+            return "\n".join(lines[:i] + lines[i + 1:])
     return text
+
+
+# Match standalone "**第N部分 · 标题**" or "**第N部分 标题**" lines.
+#   第 / 部分 must be present; the part ordinal may be 1-3 digits or CJK numerals.
+PART_DIVIDER_RE = re.compile(
+    r"^\*\*第[\d零一二三四五六七八九十百千]+部分(?:\s*[·•・:：\-—]+\s*.+?)\*\*\s*$",
+    re.MULTILINE,
+)
+
+# Canonical 8 parts mapped to their opening chapters (per book-task.md & TOC)
+CHAPTER_PART_MAP = {
+    "第一章": "第一部分 · 先看清自己的财务生活",
+    "第五章": "第二部分 · 理解收益、复利与风险",
+    "第九章": "第三部分 · 弄清楚钱到底可以放在哪里",
+    "第十三章": "第四部分 · ETF：普通人最值得掌握的投资工具",
+    "第二十章": "第五部分 · 家庭资产配置实战",
+    "第二十六章": "第六部分 · 开始投资",
+    "第二十九章": "第七部分 · 穿越市场周期",
+    "第三十一章": "第八部分 · AI 时代的个人财务",
+}
+
+
+def convert_part_dividers(text):
+    """
+    Convert standalone `**第N部分 · 标题**` lines into pandoc raw-LaTeX
+    blocks invoking `\\partdivider{...}` (defined in pandoc-template.tex).
+
+    A "part divider" line must occupy a line on its own (between blank
+    lines).  Inline `**第N部分**` inside a paragraph is left untouched.
+
+    The pattern uses `第` and `部分` as the strict markers, so headings
+    like `## 第五章` or `**注意**` are unaffected.
+    """
+    def replacer(m):
+        raw = m.group(0)
+        inner = raw.strip().strip("*").strip()
+        return (
+            "```{=latex}\n"
+            f"\\partdivider{{{inner}}}\n"
+            "```"
+        )
+    return PART_DIVIDER_RE.sub(replacer, text)
+
+
+def ensure_block_images(text):
+    """
+    Ensure all Markdown images ![alt](path) are standalone block elements
+    (surrounded by newlines) so Pandoc creates a proper \begin{figure} environment
+    and centers them rather than rendering them inline after a text sentence.
+    """
+    # If preceded by non-newline, insert two newlines
+    text = re.sub(r'([^\n])\s*(!\[.*?\]\([^)]+\))', r'\1\n\n\2', text)
+    # If followed by non-newline, insert two newlines
+    text = re.sub(r'(!\[.*?\]\([^)]+\))\s*([^\n])', r'\1\n\n\2', text)
+    return text
+
+
+def remove_footer_instructions(text):
+    """
+    Remove editorial footer instructions (e.g. '> **页脚（每页 Footer）：** ...')
+    from document body so they don't render as awkward blockquotes.
+    The footer disclaimer is handled at the template level via fancyfoot.
+    """
+    return re.sub(
+        r'^\s*>\s*\*\*页脚（每页\s*Footer）[：:]\*\*.*$',
+        '',
+        text,
+        flags=re.MULTILINE
+    )
 
 
 def preprocess_markdown(text):
@@ -369,11 +532,75 @@ def preprocess_markdown(text):
       1. HTML tags → Markdown syntax (Pandoc passes HTML through to LaTeX)
       2. Task lists → plain lists (Pandoc doesn't support task list → LaTeX)
       3. Emoji removal (LaTeX cannot render Unicode emoji)
+      4. Ensure block images (prevent inline image overflow)
+      5. Strip editorial footer instructions (rendered in fancyfoot instead)
     """
     text = convert_html_to_md(text)              # 1. HTML → MD
     text = convert_task_lists(text)               # 2. Task lists → plain
     text = remove_emoji(text)                     # 3. Remove emoji
+    text = ensure_block_images(text)             # 4. Ensure images are standalone paragraphs
+    text = remove_footer_instructions(text)      # 5. Strip editorial footer notes
     return text
+
+
+def promote_appendix_headings(content, collection_title):
+    """
+    Promote headings inside an appendix-collection file to unnumbered
+    LaTeX chapters/sections via raw-latex blocks.
+
+    Why: the appendix collection is a single Markdown file whose internal
+    headings are `## 附录 X · …` / `### Xn · …`.  The normal merge path
+    wraps the whole file in ONE numbered chapter (`# {title}`), so every
+    appendix collapses into "34.x" sections of that chapter.  The LaTeX
+    `\backmatter` switch does not demote pandoc's numbered \chapter here.
+
+    This converts (for the appendix entry only):
+      `# 附录`            → \chapter*{<collection_title>}  (+ TOC line)
+      `## 附录 X · …`     → \chapter*{附录 X · …}          (+ TOC line)
+      `### Xn · …`        → \section*{Xn · …}              (+ TOC line)
+    Regular body text, quotes and lists pass through untouched.
+    """
+    import re as _re
+
+    def chapter_block(title):
+        safe = escape_latex_special_chars(title)
+        return (
+            "```{=latex}\n"
+            "\\chapter*{" + safe + "}\n"
+            "\\addcontentsline{toc}{chapter}{" + safe + "}\n"
+            "\\markboth{" + safe + "}{}\n"
+            "```"
+        )
+
+    def section_block(title):
+        safe = escape_latex_special_chars(title)
+        return (
+            "```{=latex}\n"
+            "\\section*{" + safe + "}\n"
+            "\\addcontentsline{toc}{section}{" + safe + "}\n"
+            "```"
+        )
+
+    # First h1 → the collection chapter, titled after the manifest entry.
+    content = _re.sub(
+        r"(?m)^# (?!#)\s*(.+?)\s*$",
+        lambda m: chapter_block(collection_title),
+        content,
+        count=1,
+    )
+    # Internal h2 appendix headings → their own unnumbered chapters.
+    content = _re.sub(
+        r"(?m)^## (?!#)\s*(.+?)\s*$",
+        lambda m: chapter_block(m.group(1)),
+        content,
+    )
+    # h3 (e.g. "M1 · …") → unnumbered sections.
+    content = _re.sub(
+        r"(?m)^### (?!#)\s*(.+?)\s*$",
+        lambda m: section_block(m.group(1)),
+        content,
+    )
+    return content
 
 
 def extract_title_from_md(filepath):
@@ -514,23 +741,63 @@ def resolve_image_paths(md_content, md_dir):
     return content
 
 
-def merge_markdown(entries, output_file):
+def merge_markdown(entries, output_file, frontmatter_count=5):
     """
     Merge indexed documents into a single Markdown file.
 
     Prepends chapter headers with page breaks.
-    Applies preprocessing: YAML frontmatter stripping, HTML→MD,
-    task lists→plain, emoji removal.
+    Applies preprocessing: YAML frontmatter stripping, source chapter
+    heading removal, HTML→MD, task lists→plain, emoji removal, part
+    divider conversion.
     Then resolves relative image paths to absolute.
+
+    Sectioning (ctexbook \\frontmatter / \\mainmatter / \\backmatter):
+      • \\frontmatter is opened at the very start
+      • The first entry whose title contains "第" + ordinal + "章"
+        triggers \\mainmatter (logical "first chapter" detection)
+      • The final entry (if it contains "附录" in title or path)
+        triggers \\backmatter
+      • Manual TOC entries (title contains "目录") are skipped because
+        the LaTeX template emits \\tableofcontents for the auto-TOC
     """
+    import re as _re
+    chapter_re = _re.compile(r"第[一二三四五六七八九十百千零\d]+章")
+
+    # ── Pass 1: filter out manual TOC, keep order intact ──────────────
+    kept = []
+    for e in entries:
+        if "目录" in e["title"] and not chapter_re.search(e["title"]):
+            rprint(
+                f"Skipping manual TOC: {e['title']} "
+                "(\\tableofcontents handles this)", "info",
+            )
+            continue
+        kept.append(e)
+
+    # ── Pass 2: write merged MD with section markers ──────────────────
+    # Note: \frontmatter is emitted by the LaTeX template right before
+    # \tableofcontents, so TOC pages receive roman numerals (i, ii, ...).
     merged_lines = []
     chapter_num = 0
+    switched_to_main = False
+    switched_to_back = False
 
-    for e in entries:
+    for e in kept:
         md_path = Path(WORKSPACE_ROOT) / e["path"]
         if not md_path.exists():
             rprint(f"Skipping missing file: {e['path']}", "warn")
             continue
+
+        # Switch to \mainmatter at the first "第N章" entry
+        if not switched_to_main and chapter_re.search(e["title"]):
+            merged_lines.append("\\mainmatter\n")
+            switched_to_main = True
+
+        # Switch to \backmatter right before an appendix entry
+        is_appendix_entry = "附录" in e["title"] or "附录" in e["path"]
+        if is_appendix_entry and not switched_to_back:
+            merged_lines.append("\\backmatter\n")
+            switched_to_back = True
 
         chapter_num += 1
         content = md_path.read_text(encoding="utf-8")
@@ -540,16 +807,54 @@ def merge_markdown(entries, output_file):
         # body text falls inside a YAML block, Pandoc silently discards it.
         content = strip_yaml_frontmatter(content)
 
+        # Step 0.4: Appendix collection gets its own heading treatment —
+        # internal `## 附录 X` headings are promoted to unnumbered chapters
+        # (with TOC lines) instead of collapsing into numbered sections.
+        if is_appendix_entry:
+            content = preprocess_markdown(content)      # task lists, emoji, …
+            content = promote_appendix_headings(content, e["title"])
+            content = rewrite_image_paths(content)
+            merged_lines.append("\n\n\\newpage\n\n")
+            merged_lines.append(content)
+            continue
+
+        # Step 0.5: Strip the source's own first heading (h1/h2).
+        # The script prepends "# {title}" below; without this, the source's
+        # own chapter heading (e.g. "## 第五章") becomes a redundant section
+        # inside the newly-created chapter.
+        content = strip_chapter_heading(content)
+
         # Step 1: LaTeX preprocessing (must happen before image path resolution)
         content = preprocess_markdown(content)
 
-        # Step 2: Image path resolution is skipped — Pandoc uses
-        # \graphicspath and relative paths at compile time.
-        # resolve_image_paths() would bake absolute paths into .tex output.
+        # Step 1.5: Handle Part dividers.
+        # If this chapter marks the start of a Part, emit \partdivider BEFORE \chapter
+        part_title = None
+        part_match = PART_DIVIDER_RE.search(content)
+        if part_match:
+            part_title = part_match.group(0).strip().strip("*").strip()
+            content = PART_DIVIDER_RE.sub("", content)
+
+        if not part_title:
+            for k, v in CHAPTER_PART_MAP.items():
+                if k in e["title"]:
+                    part_title = v
+                    break
+
+        if part_title:
+            merged_lines.append(f"\n\n```{{=latex}}\n\\partdivider{{{part_title}}}\n```\n\n")
+
+        # Step 2: Rewrite image paths so xelatex can find them via
+        # the template's \graphicspath entries (the build script copies
+        # the chart images into the build directory).
+        content = rewrite_image_paths(content)
 
         # Add chapter separator (ctexbook auto-numbers chapters, so use title only)
         merged_lines.append("\n\n\\newpage\n\n")
-        merged_lines.append(f"# {e['title']}\n\n")
+        # Strip leading "第N章" / "第N部分" — the LaTeX chapter format
+        # already renders the chapter number via \thechapter.
+        chapter_title = clean_chapter_title(e["title"])
+        merged_lines.append(f"# {chapter_title}\n\n")
         merged_lines.append(content)
 
     merged = "\n".join(merged_lines)
@@ -581,6 +886,11 @@ def generate_tex(template_file, merged_md_path, output_tex_path,
         "--highlight-style=tango",
         "--listings",
         "--standalone",
+        # Force h1 → \chapter even when pandoc does not detect ctexbook
+        # as a book-class template (e.g. when the template uses ctexbook
+        # with a custom preamble).  Without this, all top-level headings
+        # collapse into \section{...} and the chapter styling never fires.
+        "--top-level-division=chapter",
     ]
 
     if toc:
@@ -603,8 +913,43 @@ def generate_tex(template_file, merged_md_path, output_tex_path,
                 if line.strip():
                     print(f"    {line.strip()}")
         raise
+
+    # Post-process generated LaTeX (brand rules, quotes, table headers)
+    postprocess_tex(output_tex_path)
+
     rprint(f".tex written: {output_tex_path}", "ok")
     return output_tex_path
+
+
+def postprocess_tex(tex_path):
+    """
+    Post-process Pandoc-generated .tex file for brand-consistent typography:
+      1. Horizontal rules: replace Pandoc's default 0.5-linewidth black rule
+         with a 0.2\\textwidth dh-bronze rule (print-safe, elegant).
+      2. Block quotes: replace \\begin{quote}...\\end{quote} with \\begin{dhquote}...\\end{dhquote}.
+      3. Table headers: inject \\rowcolor{dh-pink!25} after \\toprule\\noalign{}.
+    """
+    tex_path = Path(tex_path)
+    content = tex_path.read_text(encoding="utf-8")
+
+    # 1. Horizontal rules
+    content = content.replace(
+        r"\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}",
+        r"\begin{center}{\color{dh-bronze}\rule{0.2\textwidth}{0.5pt}}\end{center}"
+    )
+
+    # 2. Block quotes
+    content = re.sub(r"\\begin\{quote\}", r"\\begin{dhquote}", content)
+    content = re.sub(r"\\end\{quote\}", r"\\end{dhquote}", content)
+
+    # 3. Table header background
+    content = content.replace(
+        r"\toprule\noalign{}",
+        r"\toprule\noalign{}\rowcolor{dh-pink!25}"
+    )
+
+    tex_path.write_text(content, encoding="utf-8")
+    rprint("Post-processed .tex with brand rules, dhquotes, and table styling", "ok")
 
 
 def should_split(merged_md_path, chapter_count):
@@ -653,38 +998,20 @@ def split_tex_into_chapters(tex_path, chapter_count, output_dir):
         postamble = body[end_doc_pos:]
         body = body[:end_doc_pos]
 
-    # Split body by chapter markers
-    # Pandoc may use \chapter{...} or \hypertarget{...}{...\chapter{...}}
-    chapter_pattern = r'(\\hypertarget\{[^}]*\}\{%\s*\n)?\s*(\\chapter\{[^}]*\})'
-    parts = re.split(chapter_pattern, body)
+    # Split body by chapter markers using finditer to avoid empty parts
+    chapter_pattern = re.compile(r'((?:\\hypertarget\{[^}]*\}\{%\s*\n)?\s*\\chapter\{[^}]*\})')
+    matches = list(chapter_pattern.finditer(body))
 
+    if not matches:
+        rprint("Cannot split: no chapter markers found in body", "warn")
+        return tex_path
+
+    pre_chapter_content = body[:matches[0].start()]
     chapters = []
-    i = 0
-    # parts[0] is text before first chapter (TOC, cover content after \begin{document})
-    pre_chapter_content = parts[0] if len(parts) > 0 else ""
-
-    # Subsequent parts are: [hypertarget, chapter_cmd, chapter_body, hypertarget, chapter_cmd, chapter_body, ...]
-    i = 1
-    while i < len(parts):
-        # parts[i] may be the hypertarget (or None if no match)
-        chunk = ""
-        if i < len(parts) and parts[i] and parts[i].strip().startswith("\\hypertarget"):
-            chunk += parts[i]
-            i += 1
-        # parts[i] is the \chapter{...}
-        if i < len(parts) and parts[i]:
-            chunk += parts[i]
-            i += 1
-        # parts[i] is the chapter body
-        if i < len(parts):
-            body_text = ""
-            if parts[i]:
-                body_text = parts[i]
-            chapters.append(chunk + body_text)
-            i += 1
-        else:
-            if chunk:
-                chapters.append(chunk)
+    for idx, m in enumerate(matches):
+        start = m.start()
+        end = matches[idx + 1].start() if idx + 1 < len(matches) else len(body)
+        chapters.append(body[start:end])
 
     if not chapters:
         rprint("Cannot split: no chapter markers found in body", "warn")
@@ -747,7 +1074,12 @@ def run_xelatex(tex_path, work_dir, passes=2):
             cwd=str(tex_dir),
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
         )
+
+        stdout_text = result.stdout or ""
+        stderr_text = result.stderr or ""
 
         # Check for fatal errors via returncode and PDF existence
         if result.returncode != 0:
@@ -776,22 +1108,22 @@ def run_xelatex(tex_path, work_dir, passes=2):
                             print(f"    {line.strip()}")
                 else:
                     # Fallback: print last 30 lines of stdout
-                    log_lines = (result.stdout + result.stderr).split("\n")
+                    log_lines = (stdout_text + stderr_text).split("\n")
                     for line in log_lines[-30:]:
                         if line.strip():
                             print(f"    {line.strip()}")
             else:
-                log_lines = (result.stdout + result.stderr).split("\n")
+                log_lines = (stdout_text + stderr_text).split("\n")
                 for line in log_lines[-30:]:
                     if line.strip():
                         print(f"    {line.strip()}")
             return False
 
         # Check for unresolved references (only warn on final pass)
-        if "LaTeX Warning: Reference" in result.stdout:
+        if "LaTeX Warning: Reference" in stdout_text:
             rprint(f"Pass {p}: unresolved references remain (expected if not final pass)", "warn")
 
-        if "LaTeX Warning: Rerun" in result.stdout or "Rerun to get" in result.stdout:
+        if "LaTeX Warning: Rerun" in stdout_text or "Rerun to get" in stdout_text:
             rprint(f"Pass {p}: LaTeX suggests another rerun", "info")
 
     rprint("XeLaTeX compilation complete", "ok")
@@ -850,9 +1182,9 @@ def compile_pdf(template_file, merged_md_path, output_pdf_path,
         except Exception as e:
             rprint(f"Split failed (continuing with single file): {e}", "warn")
 
-    # Step 3: Compile with XeLaTeX (2-pass minimum)
-    rprint(f"Compiling PDF (2-pass XeLaTeX)...", "step")
-    success = run_xelatex(tex_path, work_dir, passes=2)
+    # Step 3: Compile with XeLaTeX (3 passes for full TOC + labels)
+    rprint(f"Compiling PDF (3-pass XeLaTeX)...", "step")
+    success = run_xelatex(tex_path, work_dir, passes=3)
 
     if not success:
         rprint("Compilation failed. See log for details.", "err")
@@ -955,6 +1287,13 @@ def main():
                 shutil.copy2(img, chart_dest / img.name)
             rprint(f"Chart images copied from {book_chart_src}", "ok")
 
+        # Copy the LFS cover illustration (00-cover.png) next to the merged
+        # md — xelatex resolves {./} graphicspath against the build dir.
+        cover_src = WORKSPACE_ROOT / "assets" / "illustrations" / "00-cover.png"
+        if cover_src.exists():
+            shutil.copy2(cover_src, merged_path.parent / cover_src.name)
+            rprint(f"Cover illustration copied: {cover_src.name}", "ok")
+
         # Ensure Source Han fonts (download if missing)
         ensure_fonts()
 
@@ -1008,6 +1347,13 @@ def main():
             for img in book_chart_src.glob("*.png"):
                 shutil.copy2(img, chart_dest / img.name)
             rprint(f"Chart images copied from {book_chart_src}", "ok")
+
+        # Copy the LFS cover illustration (00-cover.png) next to the merged
+        # md — xelatex resolves {./} graphicspath against the build dir.
+        cover_src = WORKSPACE_ROOT / "assets" / "illustrations" / "00-cover.png"
+        if cover_src.exists():
+            shutil.copy2(cover_src, merged_path.parent / cover_src.name)
+            rprint(f"Cover illustration copied: {cover_src.name}", "ok")
 
         # Ensure Source Han fonts (download if missing)
         ensure_fonts()

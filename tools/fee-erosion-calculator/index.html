@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#1D1E50">
+<title>费率侵蚀对比器 · Fee Erosion</title>
+<style>
+  :root{--cream:#FBF7F0;--paper:#FFF;--pink:#FEC6CD;--pink-deep:#F3A6AF;--navy:#1D1E50;--bronze:#B86C40;--teal:#0F6E56;--ink:#2C2C2A;--line:#E7E0D4;--muted:#6b675e}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--cream);color:var(--ink);font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;line-height:1.6;padding:24px 16px 40px}
+  .wrap{max-width:980px;margin:0 auto}
+  header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  header h1{font-size:22px;font-weight:700;color:var(--navy)} header .sub{font-size:13px;color:var(--muted);flex:1}
+  .langbtn{border:1px solid var(--pink-deep);background:#fff;color:var(--navy);font-size:12px;padding:4px 10px;border-radius:999px;cursor:pointer}
+  .disclaimer{font-size:12px;color:var(--muted);margin:6px 0 16px}
+  .grid{display:grid;grid-template-columns:330px 1fr;gap:16px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+  .card h2{font-size:14px;color:var(--navy);margin-bottom:12px;font-weight:600}
+  .field{margin-bottom:11px}.field label{display:block;font-size:13px;margin-bottom:3px}.field .hint{font-size:11px;color:var(--muted)}
+  .field input{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:15px}
+  .btn{width:100%;padding:11px;border:none;border-radius:10px;background:var(--navy);color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-top:6px}
+  .out{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .metric{background:#FDF9F3;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .metric .k{font-size:12px;color:var(--muted)}.metric .v{font-size:19px;font-weight:700;color:var(--navy);margin-top:2px}
+  .metric .v.a{color:var(--teal)}.metric .v.b{color:var(--bronze)}
+  .diff{background:#FDF6EE;border-left:4px solid var(--bronze);border-radius:8px;padding:11px 13px;font-size:13.5px;margin-top:12px}
+  .bar{margin-top:14px}.bar .row{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:13px}
+  .bar .lbl{width:150px;color:var(--muted);flex-shrink:0}
+  .bar .track{flex:1;background:#F1EDE4;border-radius:6px;height:22px;position:relative}
+  .bar .fill{height:22px;border-radius:6px}
+  .note{font-size:12px;color:var(--muted);margin-top:10px}
+  footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="nav-bar" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px;width:100%;font-size:12px">
+    <a class="nav-home" href="../../index.html" style="color:var(--muted);text-decoration:none;background:#FFFDF8;border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-weight:500">🏠 <span data-i18n="navHome">首页</span></a>
+    <a class="nav-tools" href="../index.html" style="color:var(--bronze);text-decoration:none;background:#FFFDF8;border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-weight:600">🧰 <span data-i18n="navTools">工具箱</span></a>
+    <select class="tool-select" onchange="if(this.value)location.href=this.value" aria-label="Switch tool" style="border:1px solid var(--line);border-radius:6px;padding:3px 6px;font-size:11.5px;background:#FFFDF8;color:var(--navy);cursor:pointer;font-family:inherit">
+      <optgroup label="A · 数字工具箱">
+        <option value="../compound-calculator/index.html">A1 复利计算器 · Compound Calculator</option>
+        <option value="../dca-simulator/index.html">A2 定投模拟器 · DCA Simulator</option>
+        <option value="../etf-premium-calculator/index.html">A3 ETF 溢价率速算 · Premium Calculator</option>
+        <option value="../fee-erosion-calculator/index.html" selected>A4 费率侵蚀对比器 · Fee Erosion</option>
+        <option value="../age-allocation-advisor/index.html">A5 年龄配置建议器 · Allocation Advisor</option>
+        <option value="../five-year-rule-checker/index.html">A6 五年规则检查器 · 5-Year Rule</option>
+      </optgroup>
+      <optgroup label="B · AI 财务副驾驶">
+        <option value="../ai-accounting-pack/index.html">B1 AI 记账对话包 · Prompt Pack</option>
+        <option value="../goal-translator/index.html">B2 人生目标翻译器 · Goal Translator</option>
+        <option value="../review-generator/index.html">B3 投资复盘生成器 · Review Generator</option>
+        <option value="../ai-redline-cards/index.html">B4 AI 投资红线卡 · Red-Line Cards</option>
+      </optgroup>
+    </select>
+  </div><h1 data-i18n="title">费率侵蚀对比器</h1><span class="sub" data-i18n="subtitle">源自《四倍做多认知，长期做多人生》第十六章</span><button class="langbtn" id="langbtn" onclick="toggleLang()">English</button></header>
+<p class="disclaimer" data-i18n="disclaimer">对比两只基金的总费率对长期回报的侵蚀。教学模型，不构成投资建议。</p>
+<div class="grid">
+  <div class="card">
+    <h2 data-i18n="inTitle">输入</h2>
+    <div class="field"><label data-i18n="lP">初始本金（元）</label><input id="p" type="number" min="0" step="1000" value="100000"></div>
+    <div class="row" style="display:flex;gap:8px">
+      <div class="field" style="flex:1"><label data-i18n="lR">市场年化（%）</label><input id="r" type="number" min="0" max="100" step="0.5" value="7"></div>
+      <div class="field" style="flex:1"><label data-i18n="lY">年限（年）</label><input id="y" type="number" min="1" max="50" step="1" value="30"></div>
+    </div>
+    <div class="field"><label data-i18n="lFA">基金 A 总费率（%/年）</label><input id="fa" type="number" min="0" max="10" step="0.05" value="0.15"><div class="hint" data-i18n="hFA">例：低费率指数基金 ≈ 0.15–0.5%</div></div>
+    <div class="field"><label data-i18n="lFB">基金 B 总费率（%/年）</label><input id="fb" type="number" min="0" max="10" step="0.05" value="1.00"><div class="hint" data-i18n="hFB">例：部分主动/销售费基金 ≈ 1–1.5%</div></div>
+    <button class="btn" onclick="run()" data-i18n="btnRun">对比</button>
+  </div>
+  <div class="card">
+    <h2 data-i18n="outTitle">30 年后的差距</h2>
+    <div class="out">
+      <div class="metric"><div class="k" data-i18n="mA">基金 A（低费率）终值</div><div class="v a" id="v-a">—</div></div>
+      <div class="metric"><div class="k" data-i18n="mB">基金 B（高费率）终值</div><div class="v b" id="v-b">—</div></div>
+    </div>
+    <div class="diff" id="diff"></div>
+    <div class="bar" id="bars"></div>
+    <div class="note" data-i18n="note">模型：净年化 = 市场年化 − 总费率，按年复利；未计申购赎回费与税费（那些只加大差距）。费率看「总费率 = 管理费 + 托管费 + 销售服务费」，别只看管理费。</div>
+  </div>
+</div>
+<footer><div id="foot"></div></footer>
+</div>
+<script>
+const I18N={zh:{back:"← 返回工具箱",title:"费率侵蚀对比器",subtitle:"源自《四倍做多认知，长期做多人生》第十六章",disclaimer:"对比两只基金的总费率对长期回报的侵蚀。教学模型，不构成投资建议。",
+inTitle:"输入",lP:"初始本金（元）",lR:"市场年化（%）",lY:"年限（年）",lFA:"基金 A 总费率（%/年）",hFA:"例：低费率指数基金 ≈ 0.15–0.5%",lFB:"基金 B 总费率（%/年）",hFB:"例：部分主动/销售费基金 ≈ 1–1.5%",btnRun:"对比",
+outTitle:"终值对比",mA:"基金 A（低费率）终值",mB:"基金 B（高费率）终值",
+diffFmt:"{y} 年后，低费率基金多出约 <b>{gap}</b>（是初始本金的 {pct} 倍）。看似每年只差 {df}%，复利之下差距被放大成倍数级——这正是第十六章说的「费率是唯一确定的成本」。",
+note:"模型：净年化 = 市场年化 − 总费率，按年复利；未计申购赎回费与税费（那些只会加大差距）。费率看「总费率 = 管理费 + 托管费 + 销售服务费」，别只看管理费。",
+foot:"来源：《四倍做多认知，长期做多人生》第十六章（费率、跟踪误差与隐性成本）。书 → 工具系列（A4）。教学假设，不构成投资建议。",
+lblA:"基金 A",lblB:"基金 B",scale:"相对本金倍数"},
+en:{back:"← Toolbox",title:"Fee Erosion Comparator",subtitle:"from Chapter 16 of Quadruple Leverage",disclaimer:"Compare how total fees erode long-term returns. Teaching model, not investment advice.",
+inTitle:"Inputs",lP:"Initial capital (CNY)",lR:"Market return (%/yr)",lY:"Years",lFA:"Fund A total fee (%/yr)",hFA:"e.g. low-cost index ≈ 0.15–0.5%",lFB:"Fund B total fee (%/yr)",hFB:"e.g. some active/front-load ≈ 1–1.5%",btnRun:"Compare",
+outTitle:"Final values",mA:"Fund A (low fee)",mB:"Fund B (high fee)",
+diffFmt:"After {y} years the low-fee fund ends with about <b>{gap}</b> more ({pct}× the initial capital). A {df}% yearly gap becomes multiples over time — Ch16's point that fees are the one certain cost.",
+note:"Model: net return = market return − total fee, annual compounding; entry/exit fees & taxes excluded (they only widen the gap). Look at total fee = management + custody + distribution, not just management fee.",
+foot:"Source: Ch16 (fees, tracking error, hidden costs) of Quadruple Leverage. Book-to-tool series (A4). Hypothetical.",
+lblA:"Fund A",lblB:"Fund B",scale:"Multiple of capital"}};
+let LANG="zh";function t(k,v){let s=I18N[LANG][k]||I18N.zh[k];if(v)for(const x in v)s=s.replace("{"+x+"}",v[x]);return s;}
+function fmt(n){return "¥"+Math.round(n).toLocaleString(LANG==="zh"?"zh-CN":"en-US");}
+function toggleLang(){LANG=LANG==="zh"?"en":"zh";applyLang();}
+function applyLang(){document.documentElement.lang=LANG==="zh"?"zh-CN":"en";document.getElementById("langbtn").textContent=LANG==="zh"?"English":"中文";
+document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=t(el.dataset.i18n));document.getElementById("foot").innerHTML=t("foot");run();}
+function run(){
+  const p=Math.max(0,+document.getElementById("p").value||0);
+  const r=(+document.getElementById("r").value||0)/100;
+  const y=Math.min(50,Math.max(1,+document.getElementById("y").value||30));
+  const fa=(+document.getElementById("fa").value||0)/100;
+  const fb=(+document.getElementById("fb").value||0)/100;
+  const va=p*Math.pow(1+r-fa,y), vb=p*Math.pow(1+r-fb,y);
+  document.getElementById("v-a").textContent=fmt(va);
+  document.getElementById("v-b").textContent=fmt(vb);
+  document.getElementById("diff").innerHTML=t("diffFmt",{y,gap:fmt(va-vb),pct:((va-vb)/p).toFixed(1),df:((fa-fb)*100).toFixed(2)});
+  const max=Math.max(va,vb)/p;
+  const wA=((va/p)/max*100).toFixed(1), wB=((vb/p)/max*100).toFixed(1);
+  document.getElementById("bars").innerHTML=
+    `<div class="row"><span class="lbl">${t("lblA")}</span><div class="track"><div class="fill" style="width:${wA}%;background:var(--teal)"></div></div><span>${(va/p).toFixed(1)}×</span></div>`+
+    `<div class="row"><span class="lbl">${t("lblB")}</span><div class="track"><div class="fill" style="width:${wB}%;background:var(--bronze)"></div></div><span>${(vb/p).toFixed(1)}×</span></div>`;
+}
+applyLang();
+</script>
+<script>
+// Universal Web & Desktop Export + Toast
+(function(){
+  var b=document.createElement("button");
+  b.className="export-fab-btn";
+  b.innerHTML='<span style="margin-right:4px">📥</span>'+(window.LANG==="zh"?"导出结果 / Export":"Export");
+  b.style.cssText="position:fixed;right:16px;bottom:14px;z-index:9999;border:none;border-radius:10px;background:#1D1E50;color:#fff;padding:9px 16px;font-size:13px;cursor:pointer;font-family:inherit;box-shadow:0 3px 12px rgba(29,30,80,0.25);transition:all .15s";
+  b.onmouseenter=function(){b.style.transform="translateY(-1px)";b.style.boxShadow="0 5px 16px rgba(29,30,80,0.35)";};
+  b.onmouseleave=function(){b.style.transform="none";b.style.boxShadow="0 3px 12px rgba(29,30,80,0.25)";};
+  document.body.appendChild(b);
+
+  function showToast(msg){
+    var t=document.getElementById("tool-toast");
+    if(!t){
+      t=document.createElement("div");
+      t.id="tool-toast";
+      t.style.cssText="position:fixed;left:50%;bottom:64px;transform:translateX(-50%);z-index:10000;background:#1D1E50;color:#FFF;padding:8px 18px;border-radius:999px;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,0.25);opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap";
+      document.body.appendChild(t);
+    }
+    t.textContent=msg;
+    t.style.opacity="1";
+    t.style.transform="translateX(-50%) translateY(0)";
+    clearTimeout(t._timer);
+    t._timer=setTimeout(function(){
+      t.style.opacity="0";
+      t.style.transform="translateX(-50%) translateY(6px)";
+    },2400);
+  }
+
+  b.addEventListener("click",function(){
+    var lines=[document.title,""];
+    lines.push("--- INPUTS ---");
+    document.querySelectorAll("input,select,textarea").forEach(function(inp){
+      if(inp.type==="button"||inp.type==="submit") return;
+      var lab=(inp.labels&&inp.labels[0])?inp.labels[0].textContent.trim()+" = ":"";
+      if(!lab&&inp.id){var l=document.querySelector('label[for="'+inp.id+'"]');if(l)lab=l.textContent.trim()+" = ";}
+      lines.push((lab||"")+inp.value);
+    });
+    lines.push("");lines.push("--- RESULT ---");
+    document.querySelectorAll(".metric,.verdict,.diff,.big,.out,.res,#res,#output").forEach(function(el){
+      var txt=el.textContent.trim().replace(/\s+/g," ");
+      if(txt) lines.push(txt);
+    });
+    var content=lines.join("\n");
+    var safeTitle=(document.title.split("·")[0]||document.title).trim().replace(/[^a-zA-Z0-9\u4e00-\u9fa5]+/g,"-").replace(/^-|-$/g,"")||"tool";
+    var name=safeTitle+"-result.txt";
+
+    if(window.__TAURI__){
+      window.__TAURI__.core.invoke("export_result",{content:content,defaultName:name})
+        .then(function(res){
+          if(res!=="cancelled") showToast((window.LANG==="zh"?"已保存至: ":"Saved to: ")+res);
+        })
+        .catch(function(e){window.alert("Export failed: "+e);});
+    }else{
+      var blob=new Blob([content],{type:"text/plain;charset=utf-8"});
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement("a");
+      a.href=url;
+      a.download=name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast(window.LANG==="zh"?"已下载计算结果文本":"Result file downloaded");
+    }
+  });
+})();
+</script>
+<script>
+// LocalStorage Persistence + Reactive Input Calculation + Reset
+(function(){
+  if(typeof localStorage==="undefined") return;
+  var KEY="ql-toolbox:"+location.pathname.replace(/[^a-z0-9]+/gi,"-");
+  function getDefaults(){
+    var o={};
+    document.querySelectorAll("input,select,textarea").forEach(function(el){
+      if(el.id && el.defaultValue!==undefined) o[el.id]=el.defaultValue;
+    });
+    return o;
+  }
+  var defaults=getDefaults();
+
+  window.resetDefaults=function(){
+    localStorage.removeItem(KEY);
+    Object.keys(defaults).forEach(function(id){
+      var el=document.getElementById(id);
+      if(el) el.value=defaults[id];
+    });
+    var fn=window.calc||window.run||window.gen||null;
+    if(fn) fn();
+    var t=document.getElementById("tool-toast");
+    if(t){
+      t.textContent=window.LANG==="zh"?"已恢复默认参数":"Defaults restored";
+      t.style.opacity="1";
+      setTimeout(function(){t.style.opacity="0";},2000);
+    }
+  };
+
+  function loadVals(){
+    var raw=localStorage.getItem(KEY); if(!raw) return;
+    try{ var o=JSON.parse(raw);
+      Object.keys(o).forEach(function(id){ var el=document.getElementById(id); if(el) el.value=o[id]; });
+      var fn=window.calc||window.run||window.gen||null; if(fn) fn();
+    }catch(e){}
+  }
+  function saveVals(){ var o={};
+    document.querySelectorAll("input,select,textarea").forEach(function(el){ if(el.id) o[el.id]=el.value; });
+    try{ localStorage.setItem(KEY, JSON.stringify(o)); }catch(e){}
+    var fn=window.calc||window.run||window.gen||null; if(fn) fn();
+  }
+  document.addEventListener("input",saveVals);
+  document.addEventListener("change",saveVals);
+  loadVals();
+})();
+</script>
+</body>
+</html>
