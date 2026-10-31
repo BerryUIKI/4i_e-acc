@@ -5,7 +5,7 @@
 > 工作原则：**先记录、后执行**——你给素材我就先写进对应 MD，不擅自 push、不频繁开 PR。
 
 ## 工作流约定（已确认，2026-09-07 更新）
-- **分支流**：任何内容变更走 short-lived 分支 → **PR 到 `dev`**（squash merge，见 `BRANCHING.md`）；内容达到可发布状态才开 `dev` → `main` 的 release PR。`main` 受保护（1 人审批 + enforce_admins），`dev` 受保护（禁直推）。
+- **分支流**：任何内容变更走 short-lived 分支 → **PR 到 `dev`**（squash merge，见 `BRANCHING.md`）；内容达到可发布状态才开 `dev` → `main` 的 release PR。`main` 与 `dev` 均受保护（禁直推）；`main` 对协作者要求 1 人审批，但 `enforce_admins` 为 **off**，仓库所有者可自审自合并（见 `CONTRIBUTING.md`）。
 - **先记录，后执行**：你给文字/想法 → 我先整理进 `Front-Matter/` 或 `Main-Text/` 对应文件，同时更新 `outline.md` / `notes.md`；不在中途向远端开 PR。
 - **代办表驱动**：本 `todo.md` 是主线。你引用它并说「执行」我才动手。
 - **行文/合规**：中文为主、术语英文；不荐股、不短期投机；咖啡馆朋友聊天式语气。
@@ -32,13 +32,13 @@
   - P1-1 附录 J 补充「不适用情形」→ 已完成（浓缩自 Ch22，5 阶段速览，PR #19）
   - P1-2 附录新增「溢价率-实际亏损对照速查表」→ 已完成（附录 D 补充表，10 档对照，PR #19）
 - **分支维护**（2026-09-07）：本地与远端对齐（仅 `main` + `dev`）；历史实验分支归档 tag `experiment/pdf-toolbook-v1` 后删除
-- **新增附录 M/N**（2026-09-07，草稿）：附录 M 个人投资者税务自查清单（M1 股息差别化 20/10/0 · M2 差价免税 · M3 基金分红细节 · M4 跨境提醒 · M5 年度自查行动表）；附录 N 遗产与传承规划清单（N1 资产清点表 · N2 民法典继承速查 · N3 传承工具对比 · N4 行动清单）。已并入 `Appendices/A-to-L-appendices.md`，同步更新 agents.md / README 双语 / book-task.md 条目 40。**未 commit、未 push**，待花花审阅。
+- **新增附录 M/N**（2026-09-07）：附录 M 个人投资者税务自查清单（M1 股息差别化 20/10/0 · M2 差价免税 · M3 基金分红细节 · M4 跨境提醒 · M5 年度自查行动表）；附录 N 遗产与传承规划清单（N1 资产清点表 · N2 民法典继承速查 · N3 传承工具对比 · N4 行动清单）。已并入 `Appendices/A-to-L-appendices.md`，同步更新 agents.md / README 双语 / book-task.md 条目 40。**已合并 main（PR #56，commit `d3d94b2`）**。
 
 ### ⚠️ 待办
 - [ ] **P0-6 补齐插图 09–17（9 张）**：09 资金金字塔、10 三档配置、11 牛熊温度计、12 通胀幽灵、13 主动vs被动、14 25vs35、15 费率侵蚀、16 全球地图、17 选择权之路
   - 说明：18 份 spec（00–17）完整存在于 `illustrations/ALL-SPECS.md`；已生成 9 张（00–08）存于 `assets/illustrations/`；剩余 9 张按 ALL-SPECS 的 Prompt + DollarHua 参考图（`assets/dollarhua/references/front.png`）生成
   - 状态：2026-09-07 决定**暂缓**（ImageGen 消耗 credits，用户选择延后）
-- [x] 补充附录（税务、遗产规划）— 草稿已写入附录 M/N（2026-09-07），**待花花审阅**后走分支 PR（见下方已完成区）
+- [x] 补充附录（税务、遗产规划）— 附录 M/N 已写入并合并 main（PR #56）
 - [ ] 关键章节英文翻译 — 可选
 
 ### 已决策（不再待办）
