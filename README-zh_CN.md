@@ -195,7 +195,7 @@
 
 ### 4.2 快速运行与构建
 
-运行前请确保本地已安装 [Rust 编译环境](https://www.rust-lang.org/) 以及 [Node.js & pnpm](https://pnpm.io/)。
+运行前请确保本地已安装 [Rust 编译环境](https://www.rust-lang.org/)（1.77+）以及 [Node.js & pnpm](https://pnpm.io/)。需要 Node.js **24 LTS 或更新版本**——Node 20 已停止维护（EOL）。
 
 ```bash
 # 1. 进入桌面项目目录

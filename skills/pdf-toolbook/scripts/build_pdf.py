@@ -544,7 +544,7 @@ def preprocess_markdown(text):
 
 
 def promote_appendix_headings(content, collection_title):
-    """
+    r"""
     Promote headings inside an appendix-collection file to unnumbered
     LaTeX chapters/sections via raw-latex blocks.
 

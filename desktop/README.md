@@ -11,6 +11,11 @@ HTML pages inside a native window — **no data ever leaves the machine**.
 - **Bridge**: tools pages call `window.__TAURI__.core.invoke("export_result", …)` (global Tauri enabled);
   the Export button only appears inside the desktop app, never in plain browsers/gh-pages.
 
+## Prerequisites
+- **Node.js 24 LTS or newer** (pinned in `.nvmrc` / `.node-version`; enforced by `engines` in `package.json`).
+  Node 20 reached end-of-life on 2026-04-30.
+- **Rust 1.77+** for the Tauri core.
+
 ## Run (dev)
 ```bash
 pnpm install     # in desktop/ — installs @tauri-apps/cli (Rust toolchain still required underneath)
