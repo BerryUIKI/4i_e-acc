@@ -186,7 +186,7 @@ Located in [`desktop/`](./desktop/), providing a native desktop package for the 
 
 ### 4.2 Quick Start & Build
 
-Make sure [Rust](https://www.rust-lang.org/) and [Node.js with pnpm](https://pnpm.io/) are installed locally.
+Make sure [Rust](https://www.rust-lang.org/) (1.77+) and [Node.js with pnpm](https://pnpm.io/) are installed locally. Node.js **24 LTS or newer** is required — Node 20 is end-of-life.
 
 ```bash
 # 1. Navigate to desktop directory

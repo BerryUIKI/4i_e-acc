@@ -4,6 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "description": "Quadruple Leverage Toolbox — desktop (Tauri 2 + Rust core, pnpm-managed commands). Reuses ../tools as frontend.",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "tauri": "tauri",
     "dev": "tauri dev",

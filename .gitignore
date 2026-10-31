@@ -33,6 +33,9 @@ out/
 output/
 *.log
 
+# ---- PDF toolchain caches (downloaded at build time, ~495 MB) ----
+skills/pdf-toolbook/assets/fonts/
+
 # ---- Agent handoff drafts (finalized handoffs are committed via agents/handoffs/) ----
 agents/handoffs/draft-*
 agents/handoffs/tmp-*
