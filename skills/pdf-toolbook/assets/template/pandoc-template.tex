@@ -256,18 +256,39 @@
 \renewcommand{\figurename}{图}
 \renewcommand{\tablename}{表}
 
-% Pandoc image wrapper: ensure images fit within page width and height
+% ── Image sizing ────────────────────────────────────────────────────
+% Every chart in this book was bleeding off the page: TeX laid each one out at
+% its natural pixel size (~54 cm wide for a 2083 px PNG), far past the ~16 cm
+% text block, and the right edge was clipped at the paper boundary.
+%
+% Pandoc 3.1.3 emits a bare \includegraphics{file.png} with no width argument
+% and no wrapper, so the sizing has to be imposed at the \includegraphics level
+% itself. Redefining it to wrap the real command in \adjustbox gives every image
+% a max width/max height bound that:
+%   - scales an over-wide chart down to \linewidth,
+%   - caps a tall image at \textheight,
+%   - keeps the aspect ratio and never crops,
+%   - leaves an image smaller than the block at its natural size (max width is a
+%     ceiling, not a target — unlike width=\linewidth, which would upscale).
+%
+% Two approaches that look equivalent but do not work here, both tested:
+%   - \setkeys{Gin}{max width=...} compiles but silently does nothing; the max
+%     keys are not honoured as graphicx defaults inside a figure.
+%   - \setkeys{Gin}{width=\linewidth} does size the image but forces every small
+%     image up to full measure.
+% The \pandocbounded macro is kept only for older pandoc versions that did emit
+% \pandocbounded{\includegraphics{...}} wrappers.
 \makeatletter
-\newsavebox\pandoc@box
-\providecommand*\pandocbounded[1]{%
-  \sbox\pandoc@box{#1}%
-  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
-  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
-  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi%
-  \ifdim\@tempa\p@<1\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
-  \else\usebox{\pandoc@box}%
-  \fi%
-}
+\let\pandoc@origincludegraphics\includegraphics
+\renewcommand{\includegraphics}[2][]{%
+  \adjustbox{max width=\linewidth, max height=\textheight, keepaspectratio}{%
+    \pandoc@origincludegraphics[#1]{#2}}}
+\makeatother
+
+\makeatletter
+\@ifundefined{pandocbounded}
+  {\newcommand*\pandocbounded[1]{\adjustbox{max width=\linewidth, max height=\textheight, keepaspectratio}{#1}}}
+  {\renewcommand*\pandocbounded[1]{\adjustbox{max width=\linewidth, max height=\textheight, keepaspectratio}{#1}}}
 \makeatother
 
 % ── Code highlighting ──
