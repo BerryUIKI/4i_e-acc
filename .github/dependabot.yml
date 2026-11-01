@@ -1,0 +1,48 @@
+version: 2
+
+updates:
+  # GitHub Actions used by .github/workflows/*.yml
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:17"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "[f78f1d3e]"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "ci"
+    groups:
+      # Batch routine action bumps into one PR to keep review cheap.
+      github-actions:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # pnpm-managed Tauri CLI in desktop/
+  - package-ecosystem: "npm"
+    directory: "/desktop"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:17"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "[f78f1d3e]"
+      include: "scope"
+    labels:
+      - "dependencies"
+    groups:
+      desktop-npm:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
