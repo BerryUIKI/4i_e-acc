@@ -11,7 +11,7 @@ fig,ax=figure(ratio=.70)
 style_axes(ax)
 ax.bar(labels,values,color=C_BLUE,width=.52)
 span=max(values)-min(min(values),0) or 1
-for i,v in enumerate(values):ax.text(i,v+span*.035,f'{v:.2f}',ha='center',fontsize=9,color=C_BRONZE)
+for i,v in enumerate(values):ax.text(i,v+(span*.035 if v>=0 else -span*.07),f'{v:.2f}',ha='center',fontsize=9,color=C_BRONZE)
 ax.set_ylim(min(min(values),0)-span*.10,max(values)+span*.22)
 ax.set_title('同样盈利与股息，不同期末估值',loc='left')
 ax.set_ylabel('单期总收益（%）')
