@@ -1,15 +1,17 @@
 ## 阅读须知 · Reading Notice
 
-> 欢迎翻开这本书。在开始阅读之前，希望你先了解几点。
+本书写给四爱社群，也欢迎希望整理个人财务生活的中文读者。书名中的“四倍”承接社群名称与学习态度，不表示使用四倍金融杠杆。
 
-**第一，** 本书旨在分享长期投资理念、资产配置方法（asset allocation）及个人研究观点，仅用于知识交流与学习参考，不构成任何形式的投资建议（investment advice），也不应被视为买卖任何金融产品的依据。
+书中既有通用原则，也以人民币和中国大陆常见账户、产品说明具体问题。境外读者应区分自己所在地、税务居民地与产品注册地的规则；大陆产品的交易时间、账户和税务安排不能直接套用到其他市场。机构和产品是否准入，应查当地规则及有效披露。
 
-**第二，** 投资有风险，市场存在波动，任何投资都可能产生亏损。书中提及的案例、市场、产品或历史数据，仅用于帮助读者理解相关概念，不代表未来表现，也不构成收益承诺。
+本文用于教育交流，不构成针对个人情况的投资、法律或税务建议。虚构案例、数学模型与历史观察会分别标注。模型的收益、费用与现金流属于假设；历史数据不代表未来结果，任何投资都可能亏损。
 
-**第三，** 本书主要面向中国大陆境外投资者编写。不同国家和地区对金融产品、证券投资及税务等相关规定存在差异，请读者在阅读和实践过程中，自觉遵守所在地法律法规，并根据自身情况独立作出投资决策。
+### 怎样阅读这本手册
 
-**最后，** 希望你带着思考阅读这本书。我更希望你理解长期投资（long-term investing）背后的逻辑，而不是记住某一只股票、某一只基金，或某一种策略。真正能够陪伴你很多年的，不是某一次正确的判断，而是一套持续受益的财富认知。愿这本书，能成为你长期投资旅程的一个起点。
+- **先看清现状：** 第 1—8 章配合附录 A、B、C；需要记账帮助时可先读第 31 章。
+- **建立自己的方案：** 第 20—28 章配合附录 F—J，遇到不懂的产品再回查前面的工具章。
+- **理解 ETF：** 第 13—19 章连续阅读，先看机制，再用筛选清单查资料。
 
-> *Reading Notice (English):* Welcome to this book. Before you begin, I hope you will keep a few things in mind. First, this book shares long-term investing philosophy, asset allocation methods, and personal research views for knowledge exchange and learning only. It does not constitute investment advice of any kind, nor should it be taken as a basis for buying or selling any financial product. Second, investing carries risk; markets fluctuate, and any investment may incur losses. Cases, markets, products, or historical data mentioned here serve only to illustrate concepts — they do not represent future performance and are not a promise of returns. Third, this book is written primarily for investors outside mainland China. Rules on financial products, securities, and taxation differ by jurisdiction; please comply with the laws where you live and make independent decisions based on your own situation. Finally, I hope you read with a critical mind. Understand the logic behind long-term investing rather than memorizing any single stock, fund, or strategy. What stays with you for years is not one correct call, but an enduring wealth mindset. May this book be a starting point on your long-term investing journey.
+不必把一次买入当成阅读成绩。填好一张资产表、发现预算缺口，或决定先保留现金，都是有效进展。遇到不确定的数字，先回查来源和口径，再作判断。
 
-> **页脚（每页 Footer）：** 投资有风险，入市需谨慎；长期主义不能保证收益，但有助于帮助投资者建立更加理性、稳健的投资框架。
+*English note: This is an educational handbook for the 4i community and interested Chinese-language readers. Mainland-China examples are jurisdiction-specific. Distinguish hypothetical models from historical observations, verify local eligibility and tax rules, and make decisions based on your own circumstances. Investment returns are not guaranteed.*
