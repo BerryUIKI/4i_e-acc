@@ -7,45 +7,66 @@ Ch18 — SPIVA 主动基金 vs 被动指数基金（2024 年终）
         → 下载最新 PDF 报告 → 提取各分类「跑输基准的主动基金占比」
   更新方法：修改 categories / underperform 数组为最新报告数据
 """
-import matplotlib.pyplot as plt
-import numpy as np
-from _style import C_NAVY, C_RED, C_BLUE, C_GREEN, C_CREAM, C_GRAY, save_chart
+from matplotlib.patches import Patch
+from _style import (
+    C_NAVY, C_NAVY_SOFT, C_RED, C_BLUE, C_GRAY, C_RULE, C_CREAM,
+    figure, save_chart, style_axes,
+)
 
 categories = [
-    "美股大盘\n1年", "美股大盘\n5年", "美股大盘\n10年",
-    "美股中盘\n5年", "美股小盘\n5年",
-    "新兴市场\n5年", "国际股票\n5年",
-    "A股主动\n1年", "A股主动\n3年", "A股主动\n5年"
+    "美股大盘 1 年", "美股大盘 5 年", "美股大盘 10 年",
+    "美股中盘 5 年", "美股小盘 5 年",
+    "新兴市场 5 年", "国际股票 5 年",
+    "A股主动 1 年", "A股主动 3 年", "A股主动 5 年",
 ]
 underperform = [51, 75, 87, 58, 62, 84, 65, 42, 55, 68]  # % underperform
 
+# Three tiers rather than a continuous ramp: the argument is qualitative —
+# the longer the horizon, the worse active management does.
 colors = [C_RED if v >= 70 else C_BLUE if v >= 60 else C_GRAY for v in underperform]
 
-fig, ax = plt.subplots(figsize=(11, 7))
-fig.patch.set_facecolor(C_CREAM)
+fig, ax = figure(ratio=1.00)
+style_axes(ax, grid_axis="x")
 
-bars = ax.barh(categories, underperform, color=colors, edgecolor="white", height=0.7)
-ax.axvline(x=50, color=C_GRAY, linewidth=1, linestyle="--", alpha=0.5)
-ax.text(52, -0.7, "50% 分界线", fontsize=8, color=C_GRAY, alpha=0.7)
+bars = ax.barh(categories, underperform, color=colors, height=0.62, zorder=3)
+
+# 50% is the point where active merely matches the coin flip; it is the only
+# reference line the chart needs.
+ax.axvline(x=50, color=C_RULE, linewidth=1, linestyle=(0, (4, 3)), zorder=2)
+ax.annotate(
+    "50% 分界", xy=(50, 1), xycoords=("data", "axes fraction"),
+    xytext=(1.5, -0.075), textcoords="offset points",
+    fontsize=8, color=C_NAVY_SOFT, ha="left", va="top",
+)
 
 for bar, val in zip(bars, underperform):
-    ax.text(bar.get_width() + 1, bar.get_y() + bar.get_height()/2, f"{val}%",
-            va="center", fontsize=11, fontweight="bold", color=C_NAVY)
+    ax.annotate(
+        f"{val}%", (bar.get_width(), bar.get_y() + bar.get_height() / 2),
+        textcoords="offset points", xytext=(4, 0),
+        va="center", fontsize=9, color=C_NAVY,
+    )
 
-ax.set_title("主动基金跑输指数的比例（SPIVA 数据）", fontsize=14, fontweight="bold", color=C_NAVY)
+ax.set_title("主动基金跑输指数的比例（SPIVA 数据）", loc="left")
 ax.set_xlabel("跑输基准的主动基金占比 (%)")
-ax.set_xlim(0, 105)
+# Headroom past 100 so the longest bar's "87%" label lands outside the plot
+# instead of being clipped by the axis edge.
+ax.set_xlim(0, 112)
 ax.invert_yaxis()
-ax.grid(axis="x", alpha=0.2)
+ax.tick_params(axis="y", length=0, pad=6)
 
-# Legend explanation
-from matplotlib.patches import Patch
 legend_elements = [
-    Patch(facecolor=C_RED, label="≥70% 跑输（时间越长越难战胜市场）"),
-    Patch(facecolor=C_BLUE, label="60-69% 跑输"),
-    Patch(facecolor=C_GRAY, label="<60% 跑输"),
+    Patch(facecolor=C_RED, label="70% 以上"),
+    Patch(facecolor=C_BLUE, label="60–69%"),
+    Patch(facecolor=C_GRAY, label="60% 以下"),
 ]
-ax.legend(handles=legend_elements, loc="lower right", fontsize=8)
+# Legend goes in the lower right, which is empty because only the bottom three
+# rows reach that far right and none of them do. framealpha is explicit: at the
+# default the legend is drawn on the cream field but the bars behind it show
+# through the last row's value label.
+ax.legend(handles=legend_elements, loc="lower right", frameon=True,
+          facecolor=C_CREAM, edgecolor="none", framealpha=1.0,
+          fontsize=8.5, handlelength=1.1, title=None,
+          bbox_to_anchor=(1.0, 0.02))
 
-plt.tight_layout()
+fig.tight_layout()
 save_chart(fig, "ch18_spiva.png")

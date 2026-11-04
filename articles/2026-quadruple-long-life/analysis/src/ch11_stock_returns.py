@@ -9,40 +9,48 @@ Ch11 — 股票长期收益拆解：标普500 vs 沪深300（2005-2025）
     沪深300：https://www.csindex.com.cn → 指数月报 → 估值与基本面
   更新方法：修改 sp500 / csi300 数组中的年化数值
 """
-import matplotlib.pyplot as plt
 import numpy as np
-from _style import C_NAVY, C_RED, C_BLUE, C_ORANGE, C_GRAY, C_CREAM, save_chart
+from _style import C_NAVY, C_RED, C_BLUE, C_RULE, figure, save_chart, style_axes
 
 categories = ["盈利增长", "股息收益", "估值变化", "总年化回报"]
 sp500 = [6.8, 2.0, 1.0, 9.8]
 csi300 = [8.5, 2.2, -2.8, 7.9]
 
 x = np.arange(len(categories))
-width = 0.35
+width = 0.34
 
-fig, ax = plt.subplots(figsize=(10, 6))
-fig.patch.set_facecolor(C_CREAM)
-ax.set_facecolor(C_CREAM)
+fig, ax = figure(ratio=0.66)
+style_axes(ax, grid_axis="y")
 
-bars1 = ax.bar(x - width/2, sp500, width, color=C_BLUE, edgecolor="white", label="标普500")
-bars2 = ax.bar(x + width/2, csi300, width, color=C_RED, edgecolor="white", label="沪深300")
+bars1 = ax.bar(x - width / 2, sp500, width, color=C_BLUE, label="标普500", zorder=3)
+bars2 = ax.bar(x + width / 2, csi300, width, color=C_RED, label="沪深300", zorder=3)
 
-for bar in bars1:
-    v = bar.get_height()
-    ax.text(bar.get_x() + bar.get_width()/2, v + 0.2 if v > 0 else v - 0.8,
-            f"{v:+.1f}%", ha="center", fontsize=10, color=C_BLUE, fontweight="bold")
-for bar in bars2:
-    v = bar.get_height()
-    ax.text(bar.get_x() + bar.get_width()/2, v + 0.2 if v > 0 else v - 0.8,
-            f"{v:+.1f}%", ha="center", fontsize=10, color=C_RED, fontweight="bold")
+# Value labels sit outside the bar on whichever side the bar points, so the
+# negative 估值变化 bar is labelled below rather than inside the axis. The two
+# bars in a pair are narrow, so labels are nudged apart horizontally to stop
+# adjacent pairs colliding (observed on the 2.0/2.2 group).
+for bars, color, dx in ((bars1, C_BLUE, -4), (bars2, C_RED, 4)):
+    for bar in bars:
+        v = bar.get_height()
+        offset = 4 if v >= 0 else -12
+        ax.annotate(
+            f"{v:+.1f}%", (bar.get_x() + bar.get_width() / 2, v),
+            textcoords="offset points", xytext=(dx, offset),
+            ha="center", fontsize=8.5, color=color,
+        )
 
-ax.axhline(y=0, color=C_GRAY, linewidth=0.5)
-ax.set_title("股票长期回报拆解：标普500 vs 沪深300（2005-2025 年化）",
-             fontsize=13, fontweight="bold", color=C_NAVY)
+ax.axhline(y=0, color=C_RULE, linewidth=0.9, zorder=2)
+ax.set_title("股票长期回报拆解（2005–2025 年化）", loc="left")
+
+# Legend in the upper-left: with ylim headroom raised, the area above the
+# 盈利增长 bars is the only region no bar or value label occupies.
+ax.legend(loc="upper left", frameon=False, ncol=2,
+          columnspacing=1.4, handlelength=1.2, borderaxespad=0.4)
+
 ax.set_xticks(x)
 ax.set_xticklabels(categories)
-ax.legend()
-ax.grid(axis="y", alpha=0.2)
+ax.tick_params(axis="x", length=0)
+ax.set_ylim(-3.8, 13.6)
 
-plt.tight_layout()
+fig.tight_layout()
 save_chart(fig, "ch11_stock_returns.png")
