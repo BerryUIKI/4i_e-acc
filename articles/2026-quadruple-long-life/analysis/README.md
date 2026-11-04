@@ -1,51 +1,22 @@
-# 分析图表 — 数据来源与复现说明
+# 图表复现与数据边界
 
-> 所有图表由 `src/` 下的 Python 脚本生成，输出到 `output/`。  
-> 运行：`cd src && pip install matplotlib pandas numpy && python ch*.py`
+对应 2026-11-05 修订稿；具体来源、取得日期、公式和参数见 [参考登记册](../references.md) 与各脚本头部。现稿保留三组可回查历史观察：2023–2025 全年 CPI、2022 黄金四币种回报、SPIVA 美国大盘主动基金两年一年期比例。其余图表均为明确参数的纯数学模型，不能称作历史实证。
 
-## 数据来源一览
+## 运行
 
-| 图表 | 脚本 | 数据来源 | 获取方式 |
-|------|------|----------|----------|
-| Ch6 通胀 | `ch06_inflation.py` | 中国国家统计局 CPI 月度数据 | [stats.gov.cn](https://data.stats.gov.cn) → 居民消费价格指数(CPI) → 年度同比 |
-| Ch7 亏损回本 | `ch07_drawdowns.py` | 纯数学计算 | `回本涨幅 = 1/(1-跌幅) - 1`，无需外部数据 |
-| Ch9 货币基金 | `ch09_money_market.py` | 天弘余额宝 7日年化 + 人民银行活期利率 | [天天基金网](https://fund.eastmoney.com) → 余额宝历史收益；[pbc.gov.cn](http://www.pbc.gov.cn) → 存款基准利率 |
-| Ch10 国债收益率 | `ch10_bond_yields.py` | 中国债券信息网中债收益率曲线 | [chinabond.com.cn](https://www.chinabond.com.cn) → 中债收益率 → 国债到期收益率 |
-| Ch11 股票收益拆解 | `ch11_stock_returns.py` | Bloomberg / Wind 终端共识数据 | 专业终端导出（盈利增长、股息率、PE 变化）；或 [S&P DJI](https://www.spglobal.com/spdji/) + [中证指数](https://www.csindex.com.cn) 公开年报 |
-| Ch12 黄金 | `ch12_gold.py` | 伦敦金定盘价 USD/oz（年化涨跌） | [LBMA](https://www.lbma.org.uk) 或 [World Gold Council](https://www.gold.org) |
-| Ch15 QDII 溢价 | `ch15_qdii_premium.py` | 各 QDII-ETF 历史溢价率峰值 | [东方财富](https://quote.eastmoney.com) → ETF 详情页 → IOPV 折溢价历史 |
-| Ch16 费率侵蚀 | `ch16_etf_fees.py` | 纯数学模拟 | `终值 = 本金 × (1 + 年化收益 - 费率)^年数`，参数见脚本注释 |
-| Ch18 SPIVA | `ch18_spiva.py` | S&P SPIVA Scorecard（2024 年终） | [spglobal.com/spiva](https://www.spglobal.com/spdji/en/research-insights/spiva/) → 免费下载 PDF 报告 |
-| Ch20 相关性 | `ch20_correlation.py` | 大类资产年化收益相关系数 | Bloomberg/Wind/Portfolio Visualizer 导出日收益 → 计算 Pearson 相关系数 |
-| Ch27 微笑曲线 | `ch27_smile_curve.py` | 纯数学模拟 | V 形价格路径（100→50→100），参数见脚本注释 |
-| Ch29 市场周期 | `ch29_market_cycles.py` | Bloomberg 终端沪深300 + 标普500 历史数据 | 终端导出年化回报；或 [Yahoo Finance](https://finance.yahoo.com) / [AKShare](https://github.com/akfamily/akshare) Python 库拉取 |
-
-## 复现步骤
+在仓库根目录运行，需 Python、matplotlib、numpy，以及 `_style.py` 支持的一种简体中文字体：
 
 ```bash
-# 1. 创建虚拟环境
-python3 -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# 2. 安装依赖
-pip install matplotlib pandas numpy
-
-# 3. 运行所有脚本
-cd src
-python ch06_inflation.py
-python ch07_drawdowns.py
-# ... (依次运行)
-# 或一次运行全部：
-for f in ch*.py; do python "$f"; done
+python -m pip install matplotlib numpy
+python articles/2026-quadruple-long-life/analysis/src/teaching_models.py
+python articles/2026-quadruple-long-life/analysis/src/ch27_smile_curve.py
+node tools/shared/finance-math.test.cjs
 ```
 
-图表输出到 `../output/` 目录。
+其他图表逐个运行相应 `chNN_*.py`，输出到本目录 `output/`，会覆盖同名生成图片。运行前确认当前分支和改动，生成后对照正文及真实放置尺寸检查图例、单位、图注与裁切。
 
-## 数据更新
+`ch01_data_verification.py` 现仅复算书中年金数值，不再宣称验证未提供原始记录的历史数据。`teaching_models.py` 与网页 `tools/shared/finance-math.js` 使用有效年收益率与月末投入；零收益场景单独处理。
 
-本书图表基于 2024-2025 年度数据构建。如需要更新到最新年份：
-1. 编辑对应脚本中的数据数组（均标注在脚本头部注释中）
-2. 重新运行脚本
-3. 输出 PNG 会自动覆盖
+## 更新
 
-所有数值均已标注年份范围，方便定位更新点。
+先确定历史观察还是数学模型，再修改输入。历史图必须指向具体材料和统计口径；模型图必须完整列出假设。正文与图不同步时不要发布。已撤下的多年终端共识统计与手填相关性矩阵不应仅因旧图片仍可打开而重新引用；旧版可在 Git 历史中查阅。
