@@ -45,3 +45,5 @@
 39. [终章 · 财富的作用，是增加人生选择权](articles/2026-quadruple-long-life/Main-Text/H001-epilogue.md)
 
 40. [附录 A–N · 模板与参考资料](articles/2026-quadruple-long-life/Appendices/A-to-L-appendices.md)
+
+41. [作者资源与利益关系说明](articles/2026-quadruple-long-life/Back-Matter/author-resources.md)
