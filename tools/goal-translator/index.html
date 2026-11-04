@@ -89,7 +89,7 @@ verdictNeed:"距离目标还差 {gap}（已备 {have} 按 {r}% 滚 {y} 年后为
 verdictFit:"按每月存 {save}、年化 {r}%：{y} 年后你能积累约 {acc}，达成率约 {pct}。",
 verdictShort:"按每月存 {save}，{y} 年后约积累 {acc}，距离 {target} 还差 {short} —— 需要提高月存或延长期限/调高预期（谨慎）。",
 note:"算法：先让已备金额按年化滚到目标日，缺口再按「每月末投入 → 月度等效年金」反解月供。公式见页脚。",
-foot:"公式：F = P×(1+r)^n + A×[(1+r)^n−1]÷r，反解 A（每月 ×12）。来源：第三十二章（AI 长期规划）。书 → 工具系列（B2）。教学假设，不构成投资建议。"},
+foot:"纯数学模型：F=P(1+r)^n+M[(1+q)^(12n)−1]/q，q=(1+r)^(1/12)−1；月末投入，零收益时追加部分=M×12n。与第三十二章统一，2026-11-05 校核；未计费用和通胀。"},
 en:{back:"← Toolbox",title:"Life Goal Translator",subtitle:"Turn goals into monthly numbers · from Ch32",disclaimer:"Reverse tool: given a target amount & horizon, find the monthly saving needed. Hypothetical (fixed annual return), not advice.",
 inTitle:"Your goal",lType:"Goal type (reference)",tp0:"Custom",tp1:"Home down payment",tp2:"Children's education",tp3:"Early retirement / freedom",
 lAmt:"Target amount (CNY)",lYr:"Years away",lHave:"Already saved (CNY)",lRate:"Expected annual return (%)",hRate:"Hypothetical effective annual return, not a product forecast. Consider inflation separately.",btnRun:"Translate to monthly",
@@ -100,7 +100,7 @@ verdictNeed:"You're {gap} short (already-saved {have} grows to {fvHave} at {r}% 
 verdictFit:"Saving {save}/month at {r}%: after {y} years you'd accumulate ≈{acc} — about {pct} of your target.",
 verdictShort:"Saving {save}/month gives ≈{acc} in {y} years, still {short} short of {target} — raise the monthly amount or extend the horizon.",
 note:"Method: the saved amount compounds to the target date; the remaining gap is solved as an ordinary annuity to find the monthly amount.",
-foot:"Formula: F = P×(1+r)^n + A×[(1+r)^n−1]÷r, solve for A (per year, ÷12). Source: Ch32 (AI long-term planning). Book-to-tool series (B2). Hypothetical."}};
+foot:"Pure mathematics: F=P(1+r)^n+M[(1+q)^(12n)-1]/q; q=(1+r)^(1/12)-1, month-end contributions. At zero return use M*12n. Aligned with Ch32, 2026-11-05; no fees or inflation."}};
 let LANG="zh";function t(k,v){let s=I18N[LANG][k]||I18N.zh[k];if(v)for(const x in v)s=s.replace("{"+x+"}",v[x]);return s;}
 function fmt(n){return "¥"+Math.round(n).toLocaleString(LANG==="zh"?"zh-CN":"en-US");}
 function money(n){return Math.round(n).toLocaleString(LANG==="zh"?"zh-CN":"en-US");}
