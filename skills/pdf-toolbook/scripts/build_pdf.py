@@ -182,6 +182,9 @@ def ensure_fonts():
     """
     Ensure Source Han fonts are available. Downloads them if missing.
     """
+    if (FONTS_DIR / 'SourceHanSerifSC-Regular.otf').exists() and (FONTS_DIR / 'SourceHanSansSC-Regular.otf').exists():
+        rprint('Using cached local Source Han fonts', 'ok')
+        return True
     if check_source_han_fonts():
         return True
     rprint("Source Han fonts not found. Downloading from GitHub...", "warn")
@@ -498,11 +501,9 @@ def ensure_block_images(text):
     (surrounded by newlines) so Pandoc creates a proper \begin{figure} environment
     and centers them rather than rendering them inline after a text sentence.
     """
-    # If preceded by non-newline, insert two newlines
-    text = re.sub(r'([^\n])\s*(!\[.*?\]\([^)]+\))', r'\1\n\n\2', text)
-    # If followed by non-newline, insert two newlines
-    text = re.sub(r'(!\[.*?\]\([^)]+\))\s*([^\n])', r'\1\n\n\2', text)
-    return text
+    # Keep Pandoc image attributes attached to the image, including width.
+    return re.sub(r'(!\[[^\n]*?\]\([^\n)]+\)(?:\{[^\n{}]*\})?)',
+                  r'\n\n\1\n\n', text)
 
 
 def remove_footer_instructions(text):
@@ -896,6 +897,8 @@ def generate_tex(template_file, merged_md_path, output_tex_path,
         f"--metadata=title:{title}",
         f"--metadata=author:{author}",
         f"--metadata=date:{date}",
+        f"--variable=localfontdir:{FONTS_DIR.as_posix()}/",
+        "--from=markdown-smart",
         "--highlight-style=tango",
         "--listings",
         "--standalone",
@@ -1292,14 +1295,7 @@ def main():
         merged_path.parent.mkdir(parents=True, exist_ok=True)
         merged_path, chapter_count = merge_markdown(entries, merged_path)
 
-        # Copy Chart images from book assets to output directory
-        book_chart_src = WORKSPACE_ROOT / "articles" / "2026-quadruple-long-life" / "analysis" / "output"
-        if book_chart_src.exists():
-            chart_dest = merged_path.parent
-            for img in book_chart_src.glob("*.png"):
-                shutil.copy2(img, chart_dest / img.name)
-            rprint(f"Chart images copied from {book_chart_src}", "ok")
-
+        # Source images resolve absolutely; do not overwrite legacy output copies.
         # Copy the LFS cover illustration (00-cover.png) next to the merged
         # md — xelatex resolves {./} graphicspath against the build dir.
         cover_src = WORKSPACE_ROOT / "assets" / "illustrations" / "00-cover.png"
@@ -1353,14 +1349,7 @@ def main():
         merged_path.parent.mkdir(parents=True, exist_ok=True)
         merged_path, chapter_count = merge_markdown(entries, merged_path)
 
-        # Copy Chart images from book assets to output directory
-        book_chart_src = WORKSPACE_ROOT / "articles" / "2026-quadruple-long-life" / "analysis" / "output"
-        if book_chart_src.exists():
-            chart_dest = merged_path.parent
-            for img in book_chart_src.glob("*.png"):
-                shutil.copy2(img, chart_dest / img.name)
-            rprint(f"Chart images copied from {book_chart_src}", "ok")
-
+        # Source images resolve absolutely; do not overwrite legacy output copies.
         # Copy the LFS cover illustration (00-cover.png) next to the merged
         # md — xelatex resolves {./} graphicspath against the build dir.
         cover_src = WORKSPACE_ROOT / "assets" / "illustrations" / "00-cover.png"

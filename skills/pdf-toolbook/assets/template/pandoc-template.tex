@@ -53,6 +53,13 @@
 \usepackage{fontspec}
 \usepackage{xeCJK}
 
+\IfFileExists{$localfontdir$SourceHanSerifSC-Regular.otf}{
+  \setCJKmainfont{SourceHanSerifSC-Regular.otf}[
+    Path={$localfontdir$}, BoldFont={SourceHanSerifSC-Bold.otf}]
+  \setCJKsansfont{SourceHanSansSC-Regular.otf}[
+    Path={$localfontdir$}, BoldFont={SourceHanSansSC-Bold.otf}]
+  \setCJKmonofont{SourceHanSansSC-Regular.otf}[Path={$localfontdir$}]
+}{
 \IfFontExistsTF{PingFang SC}{
   \setCJKmainfont{PingFang SC}[
     BoldFont={PingFang SC Semibold},
@@ -94,6 +101,7 @@
       }
     }
   }
+}
 }
 
 % CJK line breaking + spacing
@@ -342,6 +350,7 @@
 % ── Pandoc compatibility ──
 \providecommand{\tightlist}{\setlength{\itemsep}{2pt}\setlength{\parskip}{1pt}}
 \providecommand{\passthrough}[1]{#1}
+\newcounter{none} % Pandoc 3.13 uncaptioned longtables
 \usepackage{longtable}
 \usepackage{calc}
 \setlength{\LTleft}{0pt}
