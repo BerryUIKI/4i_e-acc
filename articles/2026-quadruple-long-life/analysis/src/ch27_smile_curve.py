@@ -32,7 +32,7 @@ ax2.set_title('同为 10 万元预算，未投现金按零息保留', loc='left'
 ax2.set_xlabel('期数')
 ax2.set_ylabel('资产（万元）')
 ax2.set_xticks([1, 3, 6, 9, 12])
-ax2.legend(fontsize=7.5, loc='upper left')
+ax2.legend(fontsize=7.5, loc='lower right', frameon=True, facecolor='white', framealpha=.95)
 ax2.annotate(f'分批末值 {dca_total[-1]/10000:.2f} 万',
              (12, dca_total[-1]/10000), xytext=(-8, 8), textcoords='offset points',
              ha='right', fontsize=8, color=C_BRONZE)
