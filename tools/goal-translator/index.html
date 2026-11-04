@@ -52,7 +52,7 @@
     </select>
   </div><h1 data-i18n="title">人生目标翻译器</h1><span class="sub" data-i18n="subtitle">把目标翻译成每月数字 · 源自第三十二章</span>
 <button class="langbtn" id="langbtn" onclick="toggleLang()">English</button></header>
-<p class="disclaimer" data-i18n="disclaimer">反向翻译工具：给定目标金额与年限，算出每月该存多少。教学假设（固定年化、年复利），不构成投资建议。</p>
+<p class="disclaimer" data-i18n="disclaimer">反向翻译工具：给定目标金额与年限，算出每月该存多少。教学假设（固定有效年收益率、月末投入），不构成投资建议。</p>
 <div class="grid">
   <div class="card">
     <h2 data-i18n="inTitle">你的目标</h2>
@@ -63,7 +63,7 @@
       <div class="field" style="flex:1"><label data-i18n="lYr">距离年限（年）</label><input id="yr" type="number" min="1" max="50" value="10"></div>
       <div class="field" style="flex:1"><label data-i18n="lHave">已备金额（元）</label><input id="have" type="number" min="0" step="10000" value="0"></div>
     </div>
-    <div class="field"><label data-i18n="lRate">预期年化（%）</label><input id="rate" type="number" min="0" max="100" step="0.5" value="5"><div class="hint" data-i18n="hRate">稳健：2–3% · 偏债：3–5% · 含权益：5–8% · 请勿用短期高收益假设</div></div>
+    <div class="field"><label data-i18n="lRate">预期年化（%）</label><input id="rate" type="number" min="0" max="100" step="0.5" value="5"><div class="hint" data-i18n="hRate">教学假设的有效年收益率，不是产品收益承诺；另需考虑通胀</div></div>
     <button class="btn" onclick="run()" data-i18n="btnRun">翻译成每月数字</button>
   </div>
   <div class="card">
@@ -72,26 +72,27 @@
     <div class="big" id="need">—</div>
     <div class="verdict" id="verdict"></div>
     <div class="alt" id="alt"></div>
-    <div class="note" data-i18n="note">算法：先让已备金额按年化滚到目标日，缺口再按「每月定额 → 期末年金」反解月供。公式见页脚。</div>
+    <div class="note" data-i18n="note">算法：先让已备金额按年化滚到目标日，缺口再按「每月末投入 → 月度等效年金」反解月供。公式见页脚。</div>
   </div>
 </div>
 <footer><div id="foot"></div></footer>
 </div>
+<script src="../shared/finance-math.js"></script>
 <script>
-const I18N={zh:{back:"← 返回工具箱",title:"人生目标翻译器",subtitle:"把目标翻译成每月数字 · 源自第三十二章",disclaimer:"反向翻译工具：给定目标金额与年限，算出每月该存多少。教学假设（固定年化、年复利），不构成投资建议。",
+const I18N={zh:{back:"← 返回工具箱",title:"人生目标翻译器",subtitle:"把目标翻译成每月数字 · 源自第三十二章",disclaimer:"反向翻译工具：给定目标金额与年限，算出每月该存多少。教学假设（固定有效年收益率、月末投入），不构成投资建议。",
 inTitle:"你的目标",lType:"目标类型（参考）",tp0:"自定义",tp1:"买房首付",tp2:"子女教育",tp3:"提前退休/自由",
-lAmt:"目标金额（元）",lYr:"距离年限（年）",lHave:"已备金额（元）",lRate:"预期年化（%）",hRate:"稳健：2–3% · 偏债：3–5% · 含权益：5–8% · 请勿用短期高收益假设",btnRun:"翻译成每月数字",
+lAmt:"目标金额（元）",lYr:"距离年限（年）",lHave:"已备金额（元）",lRate:"预期年化（%）",hRate:"教学假设的有效年收益率，不是产品收益承诺；另需考虑通胀",btnRun:"翻译成每月数字",
 outTitle:"翻译结果",lSave:"你每月能存（元）？",
 needBig:"每月需存 {need}",
 need0:"已备金额已足够：让它继续复利即可，无需再额外储蓄。",
 verdictNeed:"距离目标还差 {gap}（已备 {have} 按 {r}% 滚 {y} 年后为 {fvHave}）。把缺口 {gap} 平摊到 {y} 年，每月需要存 {need}。",
 verdictFit:"按每月存 {save}、年化 {r}%：{y} 年后你能积累约 {acc}，达成率约 {pct}。",
 verdictShort:"按每月存 {save}，{y} 年后约积累 {acc}，距离 {target} 还差 {short} —— 需要提高月存或延长期限/调高预期（谨慎）。",
-note:"算法：先让已备金额按年化滚到目标日，缺口再按「每月定额 → 期末年金」反解月供。公式见页脚。",
+note:"算法：先让已备金额按年化滚到目标日，缺口再按「每月末投入 → 月度等效年金」反解月供。公式见页脚。",
 foot:"公式：F = P×(1+r)^n + A×[(1+r)^n−1]÷r，反解 A（每月 ×12）。来源：第三十二章（AI 长期规划）。书 → 工具系列（B2）。教学假设，不构成投资建议。"},
 en:{back:"← Toolbox",title:"Life Goal Translator",subtitle:"Turn goals into monthly numbers · from Ch32",disclaimer:"Reverse tool: given a target amount & horizon, find the monthly saving needed. Hypothetical (fixed annual return), not advice.",
 inTitle:"Your goal",lType:"Goal type (reference)",tp0:"Custom",tp1:"Home down payment",tp2:"Children's education",tp3:"Early retirement / freedom",
-lAmt:"Target amount (CNY)",lYr:"Years away",lHave:"Already saved (CNY)",lRate:"Expected annual return (%)",hRate:"Conservative 2–3% · bond-heavy 3–5% · with equity 5–8% · never assume short-term high returns",btnRun:"Translate to monthly",
+lAmt:"Target amount (CNY)",lYr:"Years away",lHave:"Already saved (CNY)",lRate:"Expected annual return (%)",hRate:"Hypothetical effective annual return, not a product forecast. Consider inflation separately.",btnRun:"Translate to monthly",
 outTitle:"Result",lSave:"Your monthly saving (CNY)?",
 needBig:"Need to save {need} / month",
 need0:"Savings already suffice: let compounding work — no extra saving needed.",
@@ -116,9 +117,8 @@ function run(){
   const fvHave=have*Math.pow(1+rate,y);
   const gap=Math.max(0,target-fvHave);
   let need=0;
-  if(gap>0 && rate>0){need=(gap*rate)/(Math.pow(1+rate,y)-1)/12;}
-  else if(gap>0){need=gap/(y*12);}
-  const fvAnn=save>0? save*12*((Math.pow(1+rate,y)-1)/Math.max(rate,1e-9)) : 0;
+  need=FinanceMath.requiredMonthly(target,have,rate,y);
+  const fvAnn=save>0? save*FinanceMath.annuityFactor(rate,y) : 0;
   const acc=fvHave+fvAnn;
   const el=document.getElementById("need");
   if(gap<=0){el.innerHTML=t("need0");document.getElementById("verdict").innerHTML="";}
