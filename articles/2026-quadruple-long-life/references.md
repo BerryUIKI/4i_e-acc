@@ -16,9 +16,9 @@
 | Ch10 债券 | `ch10_bond_yields.png` | `ch10_bond_yields.py` | 中国债券信息网中债收益率曲线 | [chinabond.com.cn](https://www.chinabond.com.cn) → 中债收益率 → 国债到期收益率 |
 | Ch11 股票 | `ch11_stock_returns.png` | `ch11_stock_returns.py` | Bloomberg / Wind 终端共识数据 | 终端导出（盈利增长、股息率、PE 变化）；或 [S&P DJI](https://www.spglobal.com/spdji/) + [中证指数](https://www.csindex.com.cn) 公开年报 |
 | Ch12 黄金 | `ch12_gold.png` | `ch12_gold.py` | 伦敦金定盘价 USD/oz 年化涨跌 | [LBMA](https://www.lbma.org.uk) 或 [World Gold Council](https://www.gold.org) |
-| Ch15 溢价 | `ch15_qdii_premium.png` | `ch15_qdii_premium.py` | 各 QDII-ETF 历史溢价率峰值 | [东方财富](https://quote.eastmoney.com) → ETF 详情页 → IOPV 折溢价历史 |
+| Ch15 溢价 | `ch15_qdii_premium.png` | `ch15_qdii_premium.py` | 纯数学模型 | p/(1+p)，假设溢价 5/10/20/30%，净值不变且溢价归零，无费用；2026-11-05 复核 |
 | Ch16 费率 | `ch16_etf_fees.png` | `ch16_etf_fees.py` | 纯数学模拟 | 终值 = 本金 × (1 + 年化收益 − 费率)^年数，参数见脚本注释 |
-| Ch18 主动基金 | `ch18_spiva.png` | `ch18_spiva.py` | S&P SPIVA Scorecard（2024 年终） | [spglobal.com/spiva](https://www.spglobal.com/spdji/en/research-insights/spiva/) → 免费下载 PDF |
+| Ch18 主动基金 | `ch18_spiva.png` | `ch18_spiva.py` | SPIVA U.S. Year-End 2024 官方介绍 | [报告介绍](https://www.spglobal.com/spdji/en/spiva/article/spiva-us-year-end-2024/)：美股大盘主动基金一年跑输标普 500，2023 年 60%、2024 年 65%；2026-11-05 查阅 |
 | Ch20 配置 | `ch20_correlation.png` | `ch20_correlation.py` | 五大类资产年化收益相关系数 | Bloomberg / Wind 导出日收益 → Pearson 相关系数；替代来源 [Portfolio Visualizer](https://www.portfoliovisualizer.com) |
 | Ch27 定投 | `ch27_smile_curve.png` | `ch27_smile_curve.py` | 纯数学模拟 | V 形价格路径（100→50→100），参数见脚本注释 |
 | Ch29 周期 | `ch29_market_cycles.png` | `ch29_market_cycles.py` | Bloomberg 终端沪深300 + 标普500 历史数据 | 终端导出年化回报；替代来源 [Yahoo Finance](https://finance.yahoo.com) / [AKShare](https://github.com/akfamily/akshare) |
@@ -27,7 +27,7 @@
 
 | 引用位置 | 文献 | 用途 |
 |---------|------|------|
-| Ch18 · 主动基金 | S&P Dow Jones Indices, *SPIVA Scorecard*（年度） | 主动基金跑输基准的比例 |
+| Ch18 主动基金 | `ch18_spiva.png` | `ch18_spiva.py` | SPIVA U.S. Year-End 2024 官方介绍 | [报告介绍](https://www.spglobal.com/spdji/en/spiva/article/spiva-us-year-end-2024/)：美股大盘主动基金一年跑输标普 500，2023 年 60%、2024 年 65%；2026-11-05 查阅 |
 | Ch11 · 股票收益 | 杰里米·西格尔《股市长线法宝》(*Stocks for the Long Run*) | 总收益拆解的方法论框架 |
 | Ch7 · 风险 | S&P Dow Jones Indices *History of Market* | 标普500 历史回撤与恢复时间 |
 
