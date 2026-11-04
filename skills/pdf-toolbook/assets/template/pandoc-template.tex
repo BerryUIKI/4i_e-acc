@@ -17,12 +17,23 @@
 
 % ── Document class (ctexbook = Chinese-enabled book) ──
 % fontset=none → ctex doesn't preload any CJK font; we set our own below.
-\documentclass[a4paper,11pt,oneside,fontset=none,UTF8,zihao=-4]{ctexbook}
+%
+% b5paper (176×250mm): the book's illustration specs were drawn for B5 (see
+% articles/2026-quadruple-long-life/illustrations/ALL-SPECS.md), and at this
+% trim size a single column gives ~30-35 CJK characters per line — the
+% comfortable reading measure for long-form Chinese. On a4paper that same
+% setting ran to 45+ characters per line.
+\documentclass[b5paper,11pt,oneside,fontset=none,UTF8,zihao=-4]{ctexbook}
 
 % ── Page geometry ──
-% headheight set to 24pt to satisfy fancyhdr and prevent header clipping
-\usepackage[top=2.6cm, bottom=2.6cm, left=2.8cm, right=2.4cm,
-            headheight=24pt, headsep=8mm, footskip=12mm,
+% headheight set to 24pt to satisfy fancyhdr and prevent header clipping.
+%
+% Margins are retuned for the smaller trim. B5 is 176mm wide; a 2.2cm inner /
+% 1.9cm outer split leaves a 115mm text block (~30-35 CJK chars at 11pt) while
+% keeping a wider gutter on the binding side. Vertical margins stay close to
+% the A4 values because the text block needs to hold a similar number of lines.
+\usepackage[top=2.2cm, bottom=2.2cm, inner=2.2cm, outer=1.9cm,
+            headheight=24pt, headsep=7mm, footskip=11mm,
             includeheadfoot]{geometry}
 
 % ── DollarHua brand colors ──
@@ -231,6 +242,38 @@
 % ── Image support ──
 \usepackage{graphicx}
 \usepackage{float}
+
+% ── Float placement ──
+% Every chart in the book was landing alone on its own page with a blank half
+% above and below. Two causes, both fixed here.
+%
+% 1. Charts were authored at web size (10-15in) and scaled down at print time by
+%    \includegraphics, but LaTeX still treats them as big objects: with only a
+%    paragraph or two of prose around them it cannot fit the float on a text
+%    page, so it promotes it to a float page. Raising the fraction thresholds
+%    lets a figure share a page with prose.
+%
+% 2. Pandoc emits a bare \begin{figure} with no placement specifier. Redefining
+%    \fps@figure gives those figures an explicit [H] via the float package
+%    (\restylefloat), which places the chart exactly where it is referenced and
+%    lets the following text continue underneath instead of starting a new page.
+%
+% [H] means "exactly here, no floating". That is the right behaviour for a book
+% whose figures are diagrammatic and tightly coupled to the surrounding text.
+\renewcommand{\topfraction}{0.95}
+\renewcommand{\bottomfraction}{0.95}
+\renewcommand{\textfraction}{0.03}
+\renewcommand{\floatpagefraction}{0.98}
+\setcounter{topnumber}{4}
+\setcounter{bottomnumber}{4}
+\setcounter{totalnumber}{6}
+\floatplacement{figure}{H}
+\floatplacement{table}{H}
+\makeatletter
+\def\fps@figure{H}
+\def\fps@table{H}
+\makeatother
+
 % Multiple graphicspath entries so image resolution works regardless of
 % whether xelatex is invoked from the workspace root, the output/ dir,
 % or the output/tex/ split dir.  Each entry is searched in order.
@@ -280,6 +323,7 @@
 % \pandocbounded{\includegraphics{...}} wrappers.
 \makeatletter
 \let\pandoc@origincludegraphics\includegraphics
+\let\dhcovergraphics\includegraphics   % pristine copy for the full-bleed cover
 \renewcommand{\includegraphics}[2][]{%
   \adjustbox{max width=\linewidth, max height=\textheight, keepaspectratio}{%
     \pandoc@origincludegraphics[#1]{#2}}}
@@ -330,6 +374,18 @@
 \setlength{\tabcolsep}{6pt}
 \renewcommand{\arraystretch}{1.25}
 
+% ── Figure cards ──
+% A chart dropped straight onto the page floats in the prose with nothing to
+% separate it from the text. Framing each figure on a faint card -- a hairline
+% in the rule colour over the page cream -- gives it the visual weight of a
+% printed exhibit, the way a research report sets its figures, without adding
+% colour that would compete with the chart itself.
+%
+% Defined after the tcolorbox package is loaded (see Block quotes, below); the
+% \AtBeginDocument hook keeps that dependency explicit.
+\definecolor{dh-card}{HTML}{FDFCFA}
+\definecolor{dh-rule-line}{HTML}{E2DED6}
+
 % ── Block quotes (brand callout box) ──
 \usepackage[most]{tcolorbox}
 \newtcolorbox{dhquote}{
@@ -342,6 +398,20 @@
   fontupper=\small\color{dh-bronze}\itshape
 }
 \renewenvironment{quote}{\begin{dhquote}}{\end{dhquote}}
+
+% Figure card. Wrapping the whole figure environment in a tcolorbox does not
+% work: the float package's [H] placement and tcolorbox's savebox disagree about
+% who owns the box, and the build dies with "tcb@savebox ... ended by
+% ── Figure cards: not used ──
+% A card behind each chart was tried and abandoned. Wrapping the image in a
+% tcolorbox inside a floating figure blows TeX's save size:
+%   "TeX capacity exceeded [save size=200000]" at the first \includegraphics.
+% Nested pgfkeys invocations inside a float cost more save stack than the 200k
+% default allows, and raising save_size is a document-wide setting that would
+% mask the real problem. The charts carry the page without a frame, so the card
+% is dropped rather than worked around.
+\definecolor{dh-card}{HTML}{FDFCFA}
+\definecolor{dh-rule-line}{HTML}{E2DED6}
 
 % ── Part divider macro (standalone full-page banner for "第N部分") ──
 \newcommand{\partdivider}[1]{%
@@ -381,26 +451,34 @@
 \begin{document}
 
 % ---- Cover: full-bleed DollarHua illustration (LFS asset 00-cover.png) ----
+% Uses the untouched \includegraphics, not the redefined one: the cover is a
+% full-bleed background inside \AddToShipoutPictureBG, and routing it through
+% the figure-card wrapper put a tcolorbox in a background picture, which blew
+% TeX's save size ("TeX capacity exceeded [save size=200000]").
 \begin{titlepage}
 \thispagestyle{empty}
 \AddToShipoutPictureBG*{%
   \AtPageLowerLeft{%
-    \includegraphics[width=\paperwidth,height=\paperheight]{00-cover.png}%
+    \dhcovergraphics[width=\paperwidth,height=\paperheight]{00-cover.png}%
   }%
 }
 \mbox{}% force the shipout
 \end{titlepage}
 
 % ---- Half title (扉页) ----
+% Spacing is elastic (\vfill above and below the title block) instead of the
+% fixed \vspace*{4.2cm} that was tuned for A4. B5 is 47mm shorter, and at the
+% old fixed offset the title block pushed the imprint line off the bottom of
+% the page, splitting this spread across two pages.
 \begin{titlepage}
 \thispagestyle{empty}
 \centering
-\vspace*{4.2cm}
+\vspace*{\fill}
 
 {\color{dh-blossom}\rule{0.55\textwidth}{2pt}\par}
-\vspace{2.0cm}
+\vspace{1.4cm}
 
-{\fontsize{30pt}{44pt}\selectfont\bfseries\color{dh-navy}%
+{\fontsize{28pt}{42pt}\selectfont\bfseries\color{dh-navy}%
 四倍做多认知\\[0.35em]%
 长期做多人生\par}
 
@@ -410,35 +488,48 @@
 \vspace{0.5cm}
 
 {\large\color{dh-navy!85}Quadruple Leverage on Cognition, Long Life\par}
-\vspace{1.4cm}
+\vspace{1.2cm}
 
 {\large\color{dh-bronze}$author$\par}
-\vfill
+
+\vspace*{\fill}
 
 {\normalsize\color{dh-navy}第 1 版 · $date$\par}
 \vspace{0.4cm}
 {\color{dh-gold}\rule{0.55\textwidth}{1pt}\par}
-\vspace{1.6cm}
+\vspace{1.0cm}
 \end{titlepage}
 
 % ---- Copyright page (版权页) ----
+% Vertically centred by \vfill above and below rather than pushed down by a
+% fixed offset. The old fixed \vspace*{9cm} was tuned for A4: on the shorter B5
+% trim it pushed the block so low that the disclaimer overflowed onto the next
+% page, leaving this one visibly bottom-heavy. Centring adapts to either trim
+% and to however many lines the legal text wraps to.
 \thispagestyle{empty}
 \begingroup
 \small\color{dh-navy-soft}
 \setlength{\parindent}{0pt}
-\vspace*{9cm}
+\vspace*{\fill}
 
-《四倍做多认知，长期做多人生》\par
-Quadruple Leverage on Cognition, Long Life\par
+{\color{dh-navy}\bfseries\large 《四倍做多认知，长期做多人生》\par}
+\vspace{0.15em}
+{\color{dh-bronze} Quadruple Leverage on Cognition, Long Life\par}
+\vspace{0.6em}
 作者：花花（@BerryUIKI）\par
 第 1 版 · $date$ \par
-\hspace{0pt}\par
+\vspace{0.9em}
+
 书稿 © 花花。保留所有权利，转载请标注出处。\par
 代码与脚本示例以 Apache-2.0 许可发布（见仓库 LICENSE）。\par
 本书配套网页工具为开源软件，仓库见 \texttt{github.com/BerryUIKI/4i\_e-acc}。\par
-\hspace{0pt}\par
+\vspace{0.9em}
+
 {\color{dh-bronze}\textbf{免责声明}}\par
+\vspace{0.2em}
 本书所有投资案例均为教学假设，不构成任何投资建议；历史收益不代表未来表现。投资有风险，入市需谨慎。\par
+
+\vspace*{\fill}
 \endgroup
 \clearpage
 
