@@ -148,7 +148,7 @@
 | 3 | 基金经理（管理年限/历史业绩） | |
 | 4 | 管理费和托管费（总费率） | |
 | 5 | 申购费和赎回费 | |
-| 6 | 超额收益（Alpha vs 基准，3年/5年） | |
+| 6 | 同口径基准收益差（3年/5年；Alpha 另按模型估计） | |
 | 7 | 风格漂移历史 | |
 | 8 | 最大回撤（历史） | |
 | 9 | 换手率 | |
@@ -300,7 +300,7 @@ _________
 | 到期收益率 | Yield to Maturity (YTM) | 持有债券至到期日的年化总回报 |
 | 久期 | Duration | 债券价格对利率变化的敏感度指标 |
 | 信用利差 | Credit Spread | 企业债收益率高出同期限国债的部分 |
-| ETF | Exchange-Traded Fund | 在交易所交易的指数基金 |
+| ETF | Exchange-Traded Fund | 在交易所交易的开放式基金，可为指数或主动管理 |
 | 净值 | Net Asset Value (NAV) | 基金资产减去负债后每份的价值 |
 | 溢价率 | Premium Rate | (市价-净值)÷净值 |
 | 折价率 | Discount Rate | (净值-市价)÷净值 |
@@ -310,7 +310,7 @@ _________
 | 资产配置 | Asset Allocation | 在不同资产类别之间分配资金 |
 | 再平衡 | Rebalancing | 将投资组合比例恢复到目标配置 |
 | 相关性 | Correlation | 不同资产价格之间的联动关系 |
-| 超额收益 | Alpha | 基金收益减去基准收益 |
+| 超额收益 | Alpha | 风险调整后的超额表现，需指定模型；简单收益差另列 |
 | 最大回撤 | Maximum Drawdown | 从高峰到低谷的最大跌幅 |
 | QDII | Qualified Domestic Institutional Investor | 合格境内机构投资者（可投境外市场） |
 | FOF | Fund of Funds | 投资于其他基金的基金 |

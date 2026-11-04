@@ -24,8 +24,8 @@ style_axes(ax, grid_axis="y")
 # The shaded band between the two curves is the whole argument: it is the money
 # the fee difference takes, and it widens with every year held.
 ax.fill_between(years, high_fee, low_fee, color=C_RED, alpha=0.10, zorder=2)
-ax.plot(years, low_fee, color=C_BLUE, linewidth=2, label="低成本 ETF（0.15%）", zorder=3)
-ax.plot(years, high_fee, color=C_RED, linewidth=2, label="主动基金（1.00%）", zorder=3)
+ax.plot(years, low_fee, color=C_BLUE, linewidth=2, label="较低费率假设（0.15%）", zorder=3)
+ax.plot(years, high_fee, color=C_RED, linewidth=2, label="较高费率假设（1.00%）", zorder=3)
 
 # Endpoint values, labelled directly on the curves at the right edge. The ¥
 # glyph is avoided entirely: msyh.ttc renders U+00A5 as tofu for some
@@ -49,7 +49,7 @@ ax.annotate(
     linespacing=1.6,
 )
 
-ax.set_title("ETF 费率：0.85% 的差，30 年吞噬多少", loc="left")
+ax.set_title("纯数学模型：费率差 0.85 个百分点", loc="left")
 ax.set_xlabel("投资年数")
 ax.set_ylabel("资产价值 (万元)")
 ax.set_xlim(0, 33)
