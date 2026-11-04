@@ -122,12 +122,13 @@
   </footer>
 </div>
 
+<script src="../shared/finance-math.js"></script>
 <script>
 const I18N = {
   zh:{back:"← 返回工具箱",
     title:"复利计算器", subtitle:"源自《四倍做多认知，长期做多人生》第五章 · Compound Calculator",
     disclaimer:"教学模拟工具：公式与口径见页脚。结果仅为教学假设，不构成任何投资建议；历史收益不代表未来表现。",
-    inputTitle:"输入你的参数", lPrincipal:"初始本金（元）", lMonthly:"每月追加定投（元，可为 0）", hMonthly:"按每年年末投入一次等额（每月追加 × 12）计算",
+    inputTitle:"输入你的参数", lPrincipal:"初始本金（元）", lMonthly:"每月追加定投（元，可为 0）", hMonthly:"每月末投入；有效年收益率折算为月收益率",
     lRate:"年化收益率（%）", lYears:"投资年限（年）", btnCalc:"计算",
     resultTitle:"结果", mInvested:"总共投入", mGain:"复利增长部分", mFinal:"到期总额",
     lgTotal:"账户总额（复利）", lgInvested:"累计投入本金",
@@ -137,16 +138,16 @@ const I18N = {
     gapFmt:"{v}（晚 10 年，少投 {less}，却少积累 {gap}）",
     catchup:"35 岁才开始、仍想在 60 岁达到同样总额，每月需要约 {need}（而不是 500 元）——越晚开始，需要付出的越多。",
     catchup0:"收益率 0% 时无复利差距，早开始的意义主要来自时间（此处未计通胀）。",
-    caliber:"口径注：书序章同案例（每月 500 元、25 岁至 60 岁）约得 91 万，因其按「每月投入、按月复利」计算；本工具统一按「年末投入、年复利」口径（上表约 83 万）。结论方向一致，精确数字随口径而变。",
-    foot1:"口径与来源：① 终值（一次性本金）：P × (1+r)^n；② 定投（普通年金，年末投入）：A × [(1+r)^n − 1] ÷ r，A = 每月追加 × 12，r 为年化收益率、n 为年数。",
-    foot2:"假设：年复利、每年年末投入、期间不再取出；未计税费与费率（费率影响见书第十六章）。",
+    caliber:"与书中口径一致：7% 有效年收益率、月末投入 500 元，35 年约 85.6 万元。固定收益为教学假设。",
+    foot1:"纯数学模型：P×(1+r)^n + M×[(1+q)^(12n)−1]/q；q=(1+r)^(1/12)−1。零收益时追加部分=M×12n。",
+    foot2:"固定有效年收益率、月末投入、无提款，不计费用与通胀；2026-11-05 校核。",
     foot3:"72 法则：资产翻倍所需年数 ≈ 72 ÷ 年化收益率（书中第五章）；精确值为 ln2 / ln(1+r)。",
     foot4:"来源：《四倍做多认知，长期做多人生》第五章（复利）、第二十七章（定投）。本工具为「书 → 工具」系列（A1）；遵循仓库 data-provenance 规则。教学假设，不构成投资建议。"
   },
   en:{back:"← Toolbox",
     title:"Compound Interest Calculator", subtitle:"From Chapter 5 of 《Quadruple Leverage on Cognition, Long Life》",
     disclaimer:"Teaching simulation: formulas and caliber in footer. Results are hypothetical and not investment advice.",
-    inputTitle:"Your inputs", lPrincipal:"Initial principal (CNY)", lMonthly:"Monthly contribution (CNY, 0 allowed)", hMonthly:"Modeled as one equal annual contribution (monthly × 12) at year-end",
+    inputTitle:"Your inputs", lPrincipal:"Initial principal (CNY)", lMonthly:"Monthly contribution (CNY, 0 allowed)", hMonthly:"Month-end contributions; effective annual return converted to monthly",
     lRate:"Annual return (%)", lYears:"Years", btnCalc:"Calculate",
     resultTitle:"Result", mInvested:"Total invested", mGain:"Growth from compounding", mFinal:"Final value",
     lgTotal:"Account value (compounded)", lgInvested:"Cumulative contributions",
@@ -156,9 +157,9 @@ const I18N = {
     gapFmt:"{v} — starting 10 yrs later invests {less} less yet accumulates {gap} less",
     catchup:"To reach the same final value by 60 when starting at 35, you would need about {need} per month (not 500) — the later you start, the more it costs.",
     catchup0:"At 0% return there is no compounding gap; the point of starting early is time (inflation not modeled).",
-    caliber:"Caliber note: the book's prologue case (¥500/month, age 25-60) yields ≈¥910k using monthly compounding; this tool uses year-end annual compounding (≈¥830k above). Direction is identical; exact figures vary by caliber.",
-    foot1:"Formulas: ① Lump sum: P × (1+r)^n. ② Periodic (ordinary annuity, year-end): A × [(1+r)^n − 1] ÷ r, A = monthly × 12, r = annual rate, n = years.",
-    foot2:"Assumptions: annual compounding, year-end contributions, no withdrawals; taxes/fees ignored (see book Ch16 for fees).",
+    caliber:"Aligned with the book: 7% effective annual return, 500 each month end, 35 years: about 855,707. Hypothetical fixed returns.",
+    foot1:"Pure mathematics: P(1+r)^n + M[(1+q)^(12n)-1]/q; q=(1+r)^(1/12)-1. At zero return, contributions equal M*12n.",
+    foot2:"Fixed effective annual return, month-end contributions, no withdrawals, fees or inflation. Verified 2026-11-05.",
     foot3:"Rule of 72: years to double ≈ 72 ÷ annual return (book Ch5); exact: ln2 / ln(1+r).",
     foot4:"Source: 《Quadruple Leverage on Cognition, Long Life》 Ch5 (compounding), Ch27 (DCA). Part of the book-to-tool series (A1); follows repo data-provenance rules. Hypothetical — not investment advice."
   }
@@ -175,7 +176,7 @@ function applyLang(){
 function toggleLang(){ LANG = LANG==="zh"?"en":"zh"; applyLang(); }
 function fmt(n){ return "¥" + Math.round(n).toLocaleString(LANG==="zh"?"zh-CN":"en-US"); }
 function money(n){ return Math.round(n).toLocaleString(LANG==="zh"?"zh-CN":"en-US"); }
-function totalWith(monthly, rate, years){ const A=monthly*12, r=rate/100, n=years; return A*((Math.pow(1+r,n)-1)/r); }
+function totalWith(monthly,rate,years){ return monthly*FinanceMath.annuityFactor(rate/100,years); }
 function finalVals(p, monthly, rate, years){
   const r=rate/100, n=years, fvLump=p*Math.pow(1+r,n), fvAnn=totalWith(monthly,rate,years);
   const final=fvLump+fvAnn, invested=p+monthly*12*years;
@@ -211,7 +212,7 @@ function calc(){
   document.getElementById("c-early-p").textContent=fmt(e.invested);
   document.getElementById("c-late-p").textContent=fmt(l.invested);
   document.getElementById("c-gap").textContent=t("gapFmt",{v:fmt(e.final-l.final), less:fmt(e.invested-l.invested), gap:fmt(e.final-l.final)});
-  if(rate>0){ const need=(e.final*rate/100)/(Math.pow(1+rate/100,25)-1)/12; document.getElementById("c-catchup").innerHTML=t("catchup",{need:fmt(need)}); }
+  if(rate>0){ const need=FinanceMath.requiredMonthly(e.final,0,rate/100,25); document.getElementById("c-catchup").innerHTML=t("catchup",{need:fmt(need)}); }
   else document.getElementById("c-catchup").innerHTML=t("catchup0");
   document.getElementById("c-caliber").textContent=t("caliber");
 }
