@@ -127,7 +127,7 @@ function termText(){return document.getElementById("term").options[document.getE
 function run(){
   const term=document.getElementById("term").value, where=document.getElementById("where").value;
   const v=document.getElementById("verdict");v.className="verdict";v.style.display="block";
-  const T={1y:t("t1y"),"3y":t("t3y"),"5y":t("t5y"),"5y+":t("t5p")}[term];
+  const T={"1y":t("t1y"),"3y":t("t3y"),"5y":t("t5y"),"5y+":t("t5p")}[term];
   if(term==="1y"){ if(where==="dep"){v.className+=" ok";v.innerHTML=t("vOkDep");}
     else if(where==="bond"){v.className+=" warn";v.innerHTML=t("vOkBond");}
     else {v.className+=" bad";v.innerHTML=t("vBadEq",{term:T});} }
