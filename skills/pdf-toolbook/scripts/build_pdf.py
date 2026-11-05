@@ -898,6 +898,7 @@ def generate_tex(template_file, merged_md_path, output_tex_path,
         f"--metadata=author:{author}",
         f"--metadata=date:{date}",
         f"--variable=localfontdir:{FONTS_DIR.as_posix()}/",
+        f"--variable=coverimage:{(WORKSPACE_ROOT / 'assets/illustrations/00-cover.png').as_posix()}",
         "--from=markdown-smart",
         "--highlight-style=tango",
         "--listings",
@@ -1179,8 +1180,9 @@ def compile_pdf(template_file, merged_md_path, output_pdf_path,
     if date is None:
         date = datetime.now().strftime("%Y-%m-%d")
 
-    output_dir = Path(output_pdf_path).parent
-    output_dir.mkdir(parents=True, exist_ok=True)
+    output_pdf_path = Path(output_pdf_path).resolve()
+    output_pdf_path.parent.mkdir(parents=True, exist_ok=True)
+    output_dir = merged_md_path.parent
 
     # Step 1: Generate .tex
     base_name = Path(output_pdf_path).stem
@@ -1225,9 +1227,6 @@ def compile_pdf(template_file, merged_md_path, output_pdf_path,
     if cleanup:
         clean_aux_files(work_dir)
         clean_aux_files(output_dir)
-        # Also clean merged intermediate if in output dir
-        if merged_md_path.parent == output_dir:
-            merged_md_path.unlink(missing_ok=True)
 
     return True
 
@@ -1277,7 +1276,7 @@ def main():
             sys.exit(1)
 
         index_file = sys.argv[2]
-        output_pdf = sys.argv[3] if len(sys.argv) > 3 else str(WORKSPACE_ROOT / "output" / "toolbook.pdf")
+        output_pdf = sys.argv[3] if len(sys.argv) > 3 else str(WORKSPACE_ROOT / "output/pdf/quadruple-long-life.pdf")
         title = sys.argv[4] if len(sys.argv) > 4 else "四倍做多认知，长期做多人生"
         author = sys.argv[5] if len(sys.argv) > 5 else "花花 | @BerryUIKI"
         date = sys.argv[6] if len(sys.argv) > 6 else None
@@ -1291,17 +1290,9 @@ def main():
             sys.exit(1)
 
         # Merge MD with preprocessing
-        merged_path = WORKSPACE_ROOT / "output" / "_merged.md"
+        merged_path = WORKSPACE_ROOT / "output/build" / Path(output_pdf).stem / "merged.md"
         merged_path.parent.mkdir(parents=True, exist_ok=True)
         merged_path, chapter_count = merge_markdown(entries, merged_path)
-
-        # Source images resolve absolutely; do not overwrite legacy output copies.
-        # Copy the LFS cover illustration (00-cover.png) next to the merged
-        # md — xelatex resolves {./} graphicspath against the build dir.
-        cover_src = WORKSPACE_ROOT / "assets" / "illustrations" / "00-cover.png"
-        if cover_src.exists():
-            shutil.copy2(cover_src, merged_path.parent / cover_src.name)
-            rprint(f"Cover illustration copied: {cover_src.name}", "ok")
 
         # Ensure Source Han fonts (download if missing)
         ensure_fonts()
@@ -1337,7 +1328,7 @@ def main():
             sys.exit(1)
 
         index_file = sys.argv[2]
-        output_tex = sys.argv[3] if len(sys.argv) > 3 else str(WORKSPACE_ROOT / "output" / "toolbook.tex")
+        output_tex = sys.argv[3] if len(sys.argv) > 3 else str(WORKSPACE_ROOT / "output/build/quadruple-long-life/book.tex")
         title = sys.argv[4] if len(sys.argv) > 4 else "四倍做多认知，长期做多人生"
         author = sys.argv[5] if len(sys.argv) > 5 else "花花 | @BerryUIKI"
         date = sys.argv[6] if len(sys.argv) > 6 else None
@@ -1345,17 +1336,9 @@ def main():
         idx_content = Path(index_file).read_text(encoding="utf-8")
         entries = parse_index(idx_content)
 
-        merged_path = WORKSPACE_ROOT / "output" / "_merged.md"
+        merged_path = Path(output_tex).resolve().parent / "merged.md"
         merged_path.parent.mkdir(parents=True, exist_ok=True)
         merged_path, chapter_count = merge_markdown(entries, merged_path)
-
-        # Source images resolve absolutely; do not overwrite legacy output copies.
-        # Copy the LFS cover illustration (00-cover.png) next to the merged
-        # md — xelatex resolves {./} graphicspath against the build dir.
-        cover_src = WORKSPACE_ROOT / "assets" / "illustrations" / "00-cover.png"
-        if cover_src.exists():
-            shutil.copy2(cover_src, merged_path.parent / cover_src.name)
-            rprint(f"Cover illustration copied: {cover_src.name}", "ok")
 
         # Ensure Source Han fonts (download if missing)
         ensure_fonts()

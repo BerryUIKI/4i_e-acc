@@ -40,7 +40,7 @@ python scripts/verify_pages.py
 ### PDF build
 
 ```bash
-python skills/pdf-toolbook/scripts/build_pdf.py tex book-task.md output/toolbook.tex
+python skills/pdf-toolbook/scripts/build_pdf.py build book-task.md
 ```
 
 ```bash
@@ -106,7 +106,7 @@ Two consequences worth remembering: merging book content to `main` publishes a r
 - **Data provenance is mandatory** for every chart, table, or dataset: a docstring/companion `.md` naming the source, the acquisition URL, and how to refresh. `analysis/src/*.py` is the reference implementation.
 - **File naming:** ASCII, lowercase, kebab-case. Analysis scripts are `chNN_topic.py`, illustrations `NN-slug.png`, chapters `XNNN-slug.md`.
 - **LFS:** `*.png *.jpg *.jpeg *.csv *.pdf` go through Git LFS, except chart PNGs and desktop icons which `.gitattributes` deliberately exempts so CI (which does not pull LFS) can embed them in XeLaTeX.
-- **`output/` is gitignored** for new files; a handful of chart PNGs and `output/toolbook.tex` remain tracked from earlier builds. Do not add new artifacts under it. `skills/pdf-toolbook/assets/fonts/` is likewise ignored — `build_pdf.py` downloads ~495 MB of Source Han OTF there when no system font is found.
+- **`output/` is gitignored** for new files; deliverables belong in `output/pdf/`, intermediates in `output/build/`, previews in `output/previews/`, and old local artifacts in `output/archive/`. Chart sources remain in the book analysis directory. Do not commit build artifacts. `skills/pdf-toolbook/assets/fonts/` is likewise ignored — `build_pdf.py` downloads ~495 MB of Source Han OTF there when no system font is found.
 
 ## Where to look first
 
