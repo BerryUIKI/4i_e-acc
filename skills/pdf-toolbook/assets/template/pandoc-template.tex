@@ -1,18 +1,10 @@
 %===========================================================
 %  pandoc-template.tex — DollarHua PDF Toolbook Template
-%  Version: v2.0 · Updated: 2026-09-07
-%
-%  Used with: pandoc merged.md --template=this -o output.tex
-%  Compile with: xelatex (2 passes: TOC + cross-refs; optional 3rd if "Rerun")
-%
-%  Optimizations over v1.3:
-%    • Cover rendered as literal titlepage (v1.3 \@maketitle was shadowed by ctex)
-%    • Chapter: display style with 0.6×\textwidth decorative band + 章号居中
-%    • Header: chapter name (left) + book title (right), Bond Navy on blossom rule
-%    • Footer: page number centered
-%    • Part divider macro: \partdivider{...} for "第N部分" inline banners
-%    • Tighter line spacing for body, generous for chapter intros
-%    • First-line indent 2em CJK, parskip 0.4em
+%  Version: v3.0 · Updated: 2026-11-05
+%  Body 11.2/18pt, chapter 22/30pt, section 15/22pt,
+%  subsection 13/20pt, table 10/15pt, caption 9.2/14pt.
+%  B5 single column; 133mm text width; fixed Source Han when available.
+%  Cover/source images resolve directly; build artifacts live under output/build/.
 %===========================================================
 
 % ── Document class (ctexbook = Chinese-enabled book) ──
@@ -28,8 +20,8 @@
 % ── Page geometry ──
 % headheight set to 24pt to satisfy fancyhdr and prevent header clipping.
 %
-% Margins are retuned for the smaller trim. B5 is 176mm wide; a 2.2cm inner /
-% 1.9cm outer split leaves a 135mm text block; charts use a narrower 115mm
+% B5 is 176mm wide; a 2.3cm inner /
+% 2.0cm outer split leaves a 133mm text block; charts use a narrower 115mm
 % design measure at their natural print size, while
 % keeping a wider gutter on the binding side. Vertical margins stay close to
 % the A4 values because the text block needs to hold a similar number of lines.
@@ -544,7 +536,10 @@
 \frontmatter
 
 $if(toc)$
+\begingroup
+\fontsize{10.5pt}{14.5pt}\selectfont
 \tableofcontents
+\endgroup
 $endif$
 
 $body$
