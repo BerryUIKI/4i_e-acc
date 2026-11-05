@@ -4,12 +4,12 @@
 
 ## Meta
 - **Working title (zh):** 《四倍做多认知，长期做多人生》
-- **Working title (en):** Quadruple Long on Cognition, Long on Life for the Long Run
-- **Status:** Draft (33 chapters + epilogue written; illustrations and data-filling in progress)
+- **Working title (en):** Grow Your Understanding, Invest in Life
+- **Status:** Revised manuscript (2026-11-05); final release remains separate from dev integration
 - **Languages:** Chinese-primary, English inline
 - **Summary:** A long-form investment guidebook for the 四爱 (4i) community -- a café-style chat that builds wealth consciousness, asset allocation thinking, and long-term investing habits from zero to intermediate.
 
-## Structure -- 9 Parts, 33 Chapters + Epilogue + 14 Appendices
+## Structure -- 8 Parts, 33 Chapters + Epilogue + 14 Appendices
 
 | Part | Prefix | Chapters | Range |
 |------|--------|----------|-------|
@@ -32,8 +32,8 @@
 | `FM003-table-of-contents.md` | 目录 · Table of Contents |
 | `FM004-prologue.md` | 序章 · Prologue |
 
-### Appendices (12 templates & references)
-`Appendices/A-to-L-appendices.md` covers A.个人资产负债表 through L.不同司法辖区需自行确认的事项.
+### Appendices (14 templates & references)
+`Appendices/A-to-L-appendices.md` covers A.个人资产负债表 through N.遗产与传承规划清单.
 
 ## Book Deliverable Files
 - `Front-Matter/` -- opening statement, reading notice, author note, TOC, prologue (5 files)
@@ -61,3 +61,5 @@
 - **Column** = `### 茶话会` (H3) at end of each chapter -- light commentary / life notes
 - **Language**: Chinese-primary, English terms inline on first mention
 - **Tone**: café-style chat; confident, warm, rational; no preaching, no stock-picking hype
+
+Author resources and interests are disclosed separately in [Back Matter](Back-Matter/author-resources.md).

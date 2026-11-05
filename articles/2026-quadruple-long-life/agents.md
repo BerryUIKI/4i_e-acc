@@ -9,12 +9,12 @@
 **不荐股、不鼓吹短期投机**（与公开仓库政策一致）。
 
 ## 当前状态 (Status)
-全书 **33 章 + 终章 + 12 附录** 正文已写完（2026-08-17 新增第八部分「使用 AI 管理你的财务计划」3 章），处于：
+全书 **33 章 + 终章 + 14 附录** 正文已写完（2026-08-17 新增第八部分「使用 AI 管理你的财务计划」3 章），处于：
 - 配图待生成（规格已写，见 `illustrations/ALL-SPECS.md`）
 - 13 处 `[数据待补充]` 已补齐（由 sub-agent c8dfea5fc1 于 2026-07-29 完成，见 `COLLABORATION-NEEDED.md`）
 - 每章末尾改为简短作者个人感悟（非「茶话会」专栏——后决定用 2-3 句第一人称反思替代）
 
-## 全书结构 (Structure) — 9 部分、33 章 + 终章 + 12 附录
+## 全书结构 (Structure) — 9 部分、33 章 + 终章 + 14 附录
 
 ### 结构约定
 - **部分（Part）**：`---` 分隔线 + 粗体标签（如 `**第一部分 · 先看清自己的财务生活**`）——不占标题层级。
@@ -51,34 +51,15 @@
 - 章节标题可选双语；正文中首次出现的英文术语以括号注记，后续可只写中文。
 - 不另起完整英文翻译稿。
 
-## 工作流 (Workflow)
-1. **作者写 MD 文字发给智能体** → 智能体负责整理到对应章节文件。
-2. **不擅自 push**。作者说「执行」才动手 commit / push / 开 PR。
-3. **配图**：智能体标记需要配图的章节，在 `illustrations/<n>-<slug>.md` 写清
-   ——图片内容、比例、背景（透明 / 底色）、以及用于生成的 Prompt。
-4. **全书可发布时，才开一次 PR 到 `main`**。
+## Current workflow (2026-11-05)
 
-## 配图约定 (Illustrations)
-- 规格文档放 `illustrations/`，每个需要配图的章节一个文件。
-- 每个文件含：用途、图片内容描述、比例、背景、以及用于生成的英文 Prompt。
-- 配色：暖奶油色背景 `#FBF7F0` 为主；部分内联图用透明底 PNG。
-- 全书视觉基调：扁平 / 编辑插画，柔和暖色调（奶油、焦糖、鼠尾草绿），圆润线条，治愈感。
-- 已有规格列表见 `illustrations/ALL-SPECS.md`。
-
-## 仓库约束 (Repo constraints)
-- 分支：`article/2026-quadruple-long-life`（已建、已推远程）。日常改动只 commit + push 到本分支。
-- **绝不直接推 `main`**。
-- **PR 频率（重要约定）**：**不要频繁开 PR**。在分支上持续 commit / push 累积改动，
-  **只有当整本书达到「可发布」状态（全部章节写完、配图就位、数据补齐、PDF/排版就绪）时，才开一次 PR 到 `main`**。
-  此前即使有小里程碑也不要单独开 PR。
-- 公开仓库：不提交密钥；不荐股。
-- 提交前跑 `../../.github/scripts/check_links.py` 与 `check_style.py`。
+The author explicitly authorized comprehensive editing, small PRs and frequent commits. Use short-lived article branches, open PRs to dev, run required checks, and squash-merge only after checks pass. Never push directly to dev or main. A main release is a separate acceptance step. Keep illustration prompts and provenance, and do not invent autobiographical experiences.
 
 ## 文件结构 (Files)
 ### 书稿交付物
 - `Front-Matter/` — FM000 扉页 / FM001 阅读须知 / FM002 作者的话 / FM003 目录 / FM004 序章
 - `Main-Text/` — 33 章 + 终章（A001–A004 至 I001–I003、H001）
-- `Appendices/` — 12 份附录模板（A.资产负债表–L.司法辖区事项）
+- `Appendices/` — 14 份附录模板与参考（A–N）
 - `illustrations/` — 配图规格、ALL-SPECS.md 汇总清单
 - `assets/` — 图片、图表成品
 - `README.md` / `README-zh_CN.md` — 双语索引

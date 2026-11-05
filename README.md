@@ -104,19 +104,22 @@ The complete book manuscript is maintained under [`articles/2026-quadruple-long-
 
 ### 2.2 Appendix Templates Library
 
-Located in [`articles/2026-quadruple-long-life/Appendices/A-to-L-appendices.md`](./articles/2026-quadruple-long-life/Appendices/A-to-L-appendices.md), providing 12 battle-tested templates:
-- **Appendix A**: Household Balance Sheet & Monthly Net Worth Ledger
-- **Appendix B**: Monthly Income/Expense Categorization Standard Card
-- **Appendix C**: Emergency Fund Requirement Matrix
-- **Appendix D**: ETF Premium/Discount Loss Lookup Table
-- **Appendix E**: Broad-Based Index Classifications & Representative ETF Checklist
-- **Appendix F**: 20-Year Cumulative Fee Erosion Matrix
-- **Appendix G**: Three-Bucket Family Asset Separation Scheme
-- **Appendix H**: Dollar-Cost Averaging & Dynamic Rebalancing Protocol
-- **Appendix I**: Quarterly & Annual Investment Review 9-Question Template
-- **Appendix J**: Age-Bracket & Risk-Tolerance Asset Allocation Reference Ranges
-- **Appendix K**: Curated AI Financial Prompt Collection
-- **Appendix L**: Multi-Jurisdiction & Cross-Border Compliance Checklist
+Located in [`articles/2026-quadruple-long-life/Appendices/A-to-L-appendices.md`](./articles/2026-quadruple-long-life/Appendices/A-to-L-appendices.md)，providing 14 educational templates and reference checklists:
+
+- **Appendix A**：Personal balance sheet
+- **Appendix B**：Monthly household cash flow
+- **Appendix C**：Risk-capacity self-check
+- **Appendix D**：Twenty-point ETF checklist
+- **Appendix E**：Fund checklist
+- **Appendix F**：Investment policy statement template
+- **Appendix G**：Contribution plan template
+- **Appendix H**：Rebalancing record
+- **Appendix I**：Annual investment review
+- **Appendix J**：Life-stage and allocation review
+- **Appendix K**：Financial glossary
+- **Appendix L**：Jurisdiction-specific questions
+- **Appendix M**：Personal investment tax checklist
+- **Appendix N**：Inheritance and succession checklist
 
 ### 2.3 Automated PDF Compilation & Releases
 
@@ -225,7 +228,7 @@ pnpm tauri build
 │   └── 2026-quadruple-long-life/ # Full book manuscript
 │       ├── Front-Matter/         # Opening, reading notice, author note, TOC, prologue
 │       ├── Main-Text/            # 33 chapters (A001–I003) + Epilogue (H001)
-│       ├── Appendices/           # 12 appendix templates (A-to-L)
+│       ├── Appendices/           # 14 appendix templates (A-to-N)
 │       └── analysis/             # Market data scripts and chart sources
 ├── tools/                        # 10 bilingual interactive web tools
 │   ├── index.html                # Toolbox portal navigation page
