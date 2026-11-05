@@ -809,7 +809,7 @@ def merge_markdown(entries, output_file, frontmatter_count=5):
         # Switch to \backmatter right before an appendix entry
         is_appendix_entry = "附录" in e["title"] or "附录" in e["path"]
         if (is_appendix_entry or '终章' in e['title']) and not switched_to_back:
-            merged_lines.append("\\backmatter\n")
+            merged_lines.append("\\backmatter\n\\setcounter{secnumdepth}{-1}\n")
             switched_to_back = True
 
         chapter_num += 1
@@ -828,7 +828,7 @@ def merge_markdown(entries, output_file, frontmatter_count=5):
             content = preprocess_markdown(content)      # task lists, emoji, …
             content = promote_appendix_headings(content, e["title"])
             content = rewrite_image_paths(content)
-            merged_lines.append("\n\n\\newpage\n\n")
+            merged_lines.append("\n\n")
             merged_lines.append(content)
             continue
 
@@ -864,7 +864,7 @@ def merge_markdown(entries, output_file, frontmatter_count=5):
         content = rewrite_image_paths(content)
 
         # Add chapter separator (ctexbook auto-numbers chapters, so use title only)
-        merged_lines.append("\n\n\\newpage\n\n")
+        merged_lines.append("\n\n")
         # Strip leading "第N章" / "第N部分" — the LaTeX chapter format
         # already renders the chapter number via \thechapter.
         chapter_title = clean_chapter_title(e["title"])

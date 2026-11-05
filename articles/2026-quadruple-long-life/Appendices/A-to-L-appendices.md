@@ -8,7 +8,9 @@
 
 ```{=latex}
 \begingroup
-\setlength{\extrarowheight}{2mm}
+\small
+\renewcommand{\arraystretch}{1.0}
+\setlength{\extrarowheight}{1mm}
 ```
 
 | 资产 | 金额（元） | 负债 | 金额（元） |
@@ -41,7 +43,9 @@
 
 ```{=latex}
 \begingroup
-\setlength{\extrarowheight}{2mm}
+\small
+\renewcommand{\arraystretch}{1.0}
+\setlength{\extrarowheight}{1mm}
 ```
 
 | 收入与固定支出 | 金额（元） |
@@ -64,7 +68,9 @@
 \clearpage
 \section*{月度家庭现金流表（续）}
 \begingroup
-\setlength{\extrarowheight}{2mm}
+\small
+\renewcommand{\arraystretch}{1.0}
+\setlength{\extrarowheight}{1mm}
 ```
 
 | 可变支出与月度结余 | 金额（元） |
