@@ -29,7 +29,8 @@
 % headheight set to 24pt to satisfy fancyhdr and prevent header clipping.
 %
 % Margins are retuned for the smaller trim. B5 is 176mm wide; a 2.2cm inner /
-% 1.9cm outer split leaves a 115mm text block (~30-35 CJK chars at 11pt) while
+% 1.9cm outer split leaves a 135mm text block; charts use a narrower 115mm
+% design measure at their natural print size, while
 % keeping a wider gutter on the binding side. Vertical margins stay close to
 % the A4 values because the text block needs to hold a similar number of lines.
 \usepackage[top=2.2cm, bottom=2.2cm, inner=2.2cm, outer=1.9cm,
@@ -52,6 +53,13 @@
 \usepackage{fontspec}
 \usepackage{xeCJK}
 
+\IfFileExists{$localfontdir$SourceHanSerifSC-Regular.otf}{
+  \setCJKmainfont{SourceHanSerifSC-Regular.otf}[
+    Path={$localfontdir$}, BoldFont={SourceHanSerifSC-Bold.otf}]
+  \setCJKsansfont{SourceHanSansSC-Regular.otf}[
+    Path={$localfontdir$}, BoldFont={SourceHanSansSC-Bold.otf}]
+  \setCJKmonofont{SourceHanSansSC-Regular.otf}[Path={$localfontdir$}]
+}{
 \IfFontExistsTF{PingFang SC}{
   \setCJKmainfont{PingFang SC}[
     BoldFont={PingFang SC Semibold},
@@ -94,6 +102,7 @@
     }
   }
 }
+}
 
 % CJK line breaking + spacing
 \XeTeXlinebreaklocale "zh"
@@ -126,7 +135,7 @@
   \color{dh-blossom}\leaders\hrule height \headrulewidth\hfill}}
 % In oneside mode: left header shows current chapter, right header shows book title
 \fancyhead[L]{\footnotesize\color{dh-navy}\leftmark}
-\fancyhead[R]{\footnotesize\color{dh-navy}\mytitle}
+\fancyhead[R]{}
 \newcommand{\footerdisclaimer}{{\tiny\color{dh-navy-muted}投资有风险，入市需谨慎}}
 \fancyfoot[C]{\small\color{dh-navy-soft}\thepage}
 \fancypagestyle{plain}{
@@ -167,25 +176,23 @@
 % \vskip / \hrulefill instead of \par / \rule.
 \titleformat{\chapter}[display]
   {\centering\Huge\bfseries\sffamily\color{dh-navy}}
-  {{\color{dh-blossom}\hrule height 3pt}\vskip 0.7cm
-   {\color{dh-blossom}\LARGE\bfseries\sffamily 第\ \thechapter\ 章}}
+  {{\color{dh-bronze}\large\bfseries\sffamily 第\ \thechapter\ 章}}
   {1.0em}
   {}
-  [\vskip 0.6cm{\color{dh-blossom}\hrule height 2pt}]
+  [\vskip 0.35cm{\color{dh-blossom}\hrule height 0.6pt}]
 
 % Chapter top spacing: 50pt left a ~4.4cm blank band at the top of every
 % chapter-opening page (2.6cm margin + 50pt before-spacing) — tightened
 % to 14pt so the chapter title sits near the top of the text block.
-\titlespacing*{\chapter}{0pt}{14pt}{34pt}
+\titlespacing*{\chapter}{0pt}{8pt}{24pt}
 
-% Section: large bold with blossom number prefix (each section starts on a new page)
-\newcommand{\sectionbreak}{\clearpage}
+% Sections stay with the surrounding prose; chapter openings retain page breaks.
 \titleformat{\section}
   {\Large\bfseries\sffamily\color{dh-navy}}
   {\color{dh-blossom}\bfseries\thesection}
   {0.8em}
   {}
-  [\vspace{-0.2em}{\color{dh-blossom}\titlerule[1.4pt]}]
+  []
 
 \titlespacing*{\section}{0pt}{2.0em}{0.8em}
 
@@ -216,6 +223,7 @@
 
 % ── TOC styling ──
 \usepackage{tocloft}
+\setcounter{tocdepth}{0} % Parts and chapters only; detailed PDF bookmarks remain.
 \renewcommand{\cftchapfont}{\bfseries\sffamily\color{dh-navy}}
 \renewcommand{\cftchappagefont}{\bfseries\color{dh-bronze}}
 \renewcommand{\cftsecfont}{\color{dh-navy-soft}}
@@ -230,6 +238,7 @@
 % ── Hyperref (must be near end of preamble) ──
 \usepackage[unicode,bookmarks=true,bookmarksnumbered=true]{hyperref}
 \hypersetup{
+  bookmarksdepth=2,
   colorlinks=true,
   linkcolor=dh-navy,
   urlcolor=dh-gold,
@@ -244,22 +253,8 @@
 \usepackage{float}
 
 % ── Float placement ──
-% Every chart in the book was landing alone on its own page with a blank half
-% above and below. Two causes, both fixed here.
-%
-% 1. Charts were authored at web size (10-15in) and scaled down at print time by
-%    \includegraphics, but LaTeX still treats them as big objects: with only a
-%    paragraph or two of prose around them it cannot fit the float on a text
-%    page, so it promotes it to a float page. Raising the fraction thresholds
-%    lets a figure share a page with prose.
-%
-% 2. Pandoc emits a bare \begin{figure} with no placement specifier. Redefining
-%    \fps@figure gives those figures an explicit [H] via the float package
-%    (\restylefloat), which places the chart exactly where it is referenced and
-%    lets the following text continue underneath instead of starting a new page.
-%
-% [H] means "exactly here, no floating". That is the right behaviour for a book
-% whose figures are diagrammatic and tightly coupled to the surrounding text.
+% Let figures share prose pages and move to a nearby top/bottom position.
+% Chapter clearpages flush pending figures; tables remain at their reference.
 \renewcommand{\topfraction}{0.95}
 \renewcommand{\bottomfraction}{0.95}
 \renewcommand{\textfraction}{0.03}
@@ -267,10 +262,10 @@
 \setcounter{topnumber}{4}
 \setcounter{bottomnumber}{4}
 \setcounter{totalnumber}{6}
-\floatplacement{figure}{H}
+\floatplacement{figure}{htbp}
 \floatplacement{table}{H}
 \makeatletter
-\def\fps@figure{H}
+\def\fps@figure{htbp}
 \def\fps@table{H}
 \makeatother
 
@@ -355,6 +350,8 @@
 
 % ── Pandoc compatibility ──
 \providecommand{\tightlist}{\setlength{\itemsep}{2pt}\setlength{\parskip}{1pt}}
+\providecommand{\passthrough}[1]{#1}
+\newcounter{none} % Pandoc 3.13 uncaptioned longtables
 \usepackage{longtable}
 \usepackage{calc}
 \setlength{\LTleft}{0pt}
@@ -391,11 +388,11 @@
 \newtcolorbox{dhquote}{
   blanker,
   breakable,
-  borderline west={4.5pt}{0pt}{dh-blossom},
-  left=14pt, right=8pt,
+  borderline west={1.5pt}{0pt}{dh-blossom},
+  left=10pt, right=6pt,
   top=4pt, bottom=4pt,
   before skip=0.6em, after skip=0.6em,
-  fontupper=\small\color{dh-bronze}\itshape
+  fontupper=\small\color{dh-navy-soft}
 }
 \renewenvironment{quote}{\begin{dhquote}}{\end{dhquote}}
 
@@ -416,12 +413,14 @@
 % ── Part divider macro (standalone full-page banner for "第N部分") ──
 \newcommand{\partdivider}[1]{%
   \clearpage
+  \phantomsection
+  \addcontentsline{toc}{part}{#1}%
   \thispagestyle{empty}%
   \begin{center}%
     \vspace*{2.0cm}%
-    {\color{dh-blossom}\rule{\textwidth}{12pt}\par}%
+    {\color{dh-blossom}\rule{\textwidth}{1pt}\par}%
     \vspace{0.35cm}%
-    {\color{dh-pink}\rule{\textwidth}{4pt}\par}%
+    {\color{dh-pink}\rule{\textwidth}{0.5pt}\par}%
     \vspace{2.2cm}%
     {\color{dh-bronze}\large\bfseries\sffamily PART\par}%
     \vspace{1.0cm}%
@@ -429,11 +428,11 @@
     \vspace{1.4cm}%
     {\color{dh-blossom}\rule{0.45\textwidth}{3pt}\par}%
     \vspace{0.9cm}%
-    {\color{dh-navy-faint}\small\sffamily\itshape Quadruple Leverage on Cognition, Long Life\par}%
+    {\color{dh-navy-faint}\small\sffamily\itshape Grow Your Understanding, Invest in Life\par}%
     \vfill
-    {\color{dh-pink}\rule{\textwidth}{4pt}\par}%
+    {\color{dh-pink}\rule{\textwidth}{0.5pt}\par}%
     \vspace{0.35cm}%
-    {\color{dh-blossom}\rule{\textwidth}{12pt}\par}%
+    {\color{dh-blossom}\rule{\textwidth}{1pt}\par}%
     \vspace{1.2cm}%
   \end{center}%
   \clearpage
@@ -487,7 +486,7 @@
 {\color{dh-gold}\rule{0.25\textwidth}{1.2pt}\par}
 \vspace{0.5cm}
 
-{\large\color{dh-navy!85}Quadruple Leverage on Cognition, Long Life\par}
+{\large\color{dh-navy!85}Grow Your Understanding, Invest in Life\par}
 \vspace{1.2cm}
 
 {\large\color{dh-bronze}$author$\par}
@@ -514,7 +513,7 @@
 
 {\color{dh-navy}\bfseries\large 《四倍做多认知，长期做多人生》\par}
 \vspace{0.15em}
-{\color{dh-bronze} Quadruple Leverage on Cognition, Long Life\par}
+{\color{dh-bronze} Grow Your Understanding, Invest in Life\par}
 \vspace{0.6em}
 作者：花花（@BerryUIKI）\par
 第 1 版 · $date$ \par
@@ -527,7 +526,7 @@
 
 {\color{dh-bronze}\textbf{免责声明}}\par
 \vspace{0.2em}
-本书所有投资案例均为教学假设，不构成任何投资建议；历史收益不代表未来表现。投资有风险，入市需谨慎。\par
+本书家庭案例与数学模型用于教学，不构成投资建议；历史数据另注来源，历史收益不代表未来表现。投资有风险，入市需谨慎。\par
 
 \vspace*{\fill}
 \endgroup

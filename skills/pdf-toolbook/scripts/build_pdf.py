@@ -182,6 +182,9 @@ def ensure_fonts():
     """
     Ensure Source Han fonts are available. Downloads them if missing.
     """
+    if (FONTS_DIR / 'SourceHanSerifSC-Regular.otf').exists() and (FONTS_DIR / 'SourceHanSansSC-Regular.otf').exists():
+        rprint('Using cached local Source Han fonts', 'ok')
+        return True
     if check_source_han_fonts():
         return True
     rprint("Source Han fonts not found. Downloading from GitHub...", "warn")
@@ -498,11 +501,9 @@ def ensure_block_images(text):
     (surrounded by newlines) so Pandoc creates a proper \begin{figure} environment
     and centers them rather than rendering them inline after a text sentence.
     """
-    # If preceded by non-newline, insert two newlines
-    text = re.sub(r'([^\n])\s*(!\[.*?\]\([^)]+\))', r'\1\n\n\2', text)
-    # If followed by non-newline, insert two newlines
-    text = re.sub(r'(!\[.*?\]\([^)]+\))\s*([^\n])', r'\1\n\n\2', text)
-    return text
+    # Keep Pandoc image attributes attached to the image, including width.
+    return re.sub(r'(!\[[^\n]*?\]\([^\n)]+\)(?:\{[^\n{}]*\})?)',
+                  r'\n\n\1\n\n', text)
 
 
 def remove_footer_instructions(text):
@@ -540,7 +541,19 @@ def preprocess_markdown(text):
     text = remove_emoji(text)                     # 3. Remove emoji
     text = ensure_block_images(text)             # 4. Ensure images are standalone paragraphs
     text = remove_footer_instructions(text)      # 5. Strip editorial footer notes
+    text = normalize_chinese_quotes(text)
     return text
+
+
+def normalize_chinese_quotes(text):
+    """Use Chinese quote glyphs in prose; preserve fenced and inline code."""
+    chunks = re.split(r'(^```[^\n]*\n[\s\S]*?^```[^\n]*$|`[^`\n]+`)',
+                      text, flags=re.MULTILINE)
+    for i in range(0, len(chunks), 2):
+        chunks[i] = re.sub(
+            r'"([^"\n]*[\u3400-\u9fff][^"\n]*)"',
+            lambda m: '“' + m.group(1) + '”', chunks[i])
+    return ''.join(chunks)
 
 
 def promote_appendix_headings(content, collection_title):
@@ -728,7 +741,7 @@ def resolve_image_paths(md_content, md_dir):
 
     # Markdown image syntax
     content = re.sub(
-        r'(!\[.*?\])\(([^)]+)\)',
+        r'(!\[.*?\]\()([^)]+)(\))',
         replacer,
         md_content
     )
@@ -795,8 +808,8 @@ def merge_markdown(entries, output_file, frontmatter_count=5):
 
         # Switch to \backmatter right before an appendix entry
         is_appendix_entry = "附录" in e["title"] or "附录" in e["path"]
-        if is_appendix_entry and not switched_to_back:
-            merged_lines.append("\\backmatter\n")
+        if (is_appendix_entry or '终章' in e['title']) and not switched_to_back:
+            merged_lines.append("\\backmatter\n\\setcounter{secnumdepth}{-1}\n")
             switched_to_back = True
 
         chapter_num += 1
@@ -806,6 +819,7 @@ def merge_markdown(entries, output_file, frontmatter_count=5):
         # Crucial: Pandoc treats --- blocks as YAML metadata; if CJK
         # body text falls inside a YAML block, Pandoc silently discards it.
         content = strip_yaml_frontmatter(content)
+        content = resolve_image_paths(content, md_path.parent)
 
         # Step 0.4: Appendix collection gets its own heading treatment —
         # internal `## 附录 X` headings are promoted to unnumbered chapters
@@ -814,7 +828,7 @@ def merge_markdown(entries, output_file, frontmatter_count=5):
             content = preprocess_markdown(content)      # task lists, emoji, …
             content = promote_appendix_headings(content, e["title"])
             content = rewrite_image_paths(content)
-            merged_lines.append("\n\n\\newpage\n\n")
+            merged_lines.append("\n\n")
             merged_lines.append(content)
             continue
 
@@ -850,7 +864,7 @@ def merge_markdown(entries, output_file, frontmatter_count=5):
         content = rewrite_image_paths(content)
 
         # Add chapter separator (ctexbook auto-numbers chapters, so use title only)
-        merged_lines.append("\n\n\\newpage\n\n")
+        merged_lines.append("\n\n")
         # Strip leading "第N章" / "第N部分" — the LaTeX chapter format
         # already renders the chapter number via \thechapter.
         chapter_title = clean_chapter_title(e["title"])
@@ -883,6 +897,8 @@ def generate_tex(template_file, merged_md_path, output_tex_path,
         f"--metadata=title:{title}",
         f"--metadata=author:{author}",
         f"--metadata=date:{date}",
+        f"--variable=localfontdir:{FONTS_DIR.as_posix()}/",
+        "--from=markdown-smart",
         "--highlight-style=tango",
         "--listings",
         "--standalone",
@@ -895,7 +911,7 @@ def generate_tex(template_file, merged_md_path, output_tex_path,
 
     if toc:
         pandoc_args.append("--toc")
-        pandoc_args.append("--toc-depth=2")
+        pandoc_args.append("--toc-depth=1")
 
     rprint("Generating .tex source...", "step")
     try:
@@ -935,7 +951,7 @@ def postprocess_tex(tex_path):
     # 1. Horizontal rules
     content = content.replace(
         r"\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}",
-        r"\begin{center}{\color{dh-bronze}\rule{0.2\textwidth}{0.5pt}}\end{center}"
+        r"\par\medskip"
     )
 
     # 2. Block quotes
@@ -1279,14 +1295,7 @@ def main():
         merged_path.parent.mkdir(parents=True, exist_ok=True)
         merged_path, chapter_count = merge_markdown(entries, merged_path)
 
-        # Copy Chart images from book assets to output directory
-        book_chart_src = WORKSPACE_ROOT / "articles" / "2026-quadruple-long-life" / "analysis" / "output"
-        if book_chart_src.exists():
-            chart_dest = merged_path.parent
-            for img in book_chart_src.glob("*.png"):
-                shutil.copy2(img, chart_dest / img.name)
-            rprint(f"Chart images copied from {book_chart_src}", "ok")
-
+        # Source images resolve absolutely; do not overwrite legacy output copies.
         # Copy the LFS cover illustration (00-cover.png) next to the merged
         # md — xelatex resolves {./} graphicspath against the build dir.
         cover_src = WORKSPACE_ROOT / "assets" / "illustrations" / "00-cover.png"
@@ -1340,14 +1349,7 @@ def main():
         merged_path.parent.mkdir(parents=True, exist_ok=True)
         merged_path, chapter_count = merge_markdown(entries, merged_path)
 
-        # Copy Chart images from book assets to output directory
-        book_chart_src = WORKSPACE_ROOT / "articles" / "2026-quadruple-long-life" / "analysis" / "output"
-        if book_chart_src.exists():
-            chart_dest = merged_path.parent
-            for img in book_chart_src.glob("*.png"):
-                shutil.copy2(img, chart_dest / img.name)
-            rprint(f"Chart images copied from {book_chart_src}", "ok")
-
+        # Source images resolve absolutely; do not overwrite legacy output copies.
         # Copy the LFS cover illustration (00-cover.png) next to the merged
         # md — xelatex resolves {./} graphicspath against the build dir.
         cover_src = WORKSPACE_ROOT / "assets" / "illustrations" / "00-cover.png"
