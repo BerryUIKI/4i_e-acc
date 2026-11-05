@@ -14,4 +14,13 @@
 
 不必把一次买入当成阅读成绩。填好一张资产表、发现预算缺口，或决定先保留现金，都是有效进展。遇到不确定的数字，先回查来源和口径，再作判断。
 
+```{=latex}
+\begingroup
+\fontsize{9.5pt}{14pt}\selectfont
+```
+
 *English note: This is an educational handbook for the 4i community and interested Chinese-language readers. Mainland-China examples are jurisdiction-specific. Distinguish hypothetical models from historical observations, verify local eligibility and tax rules, and make decisions based on your own circumstances. Investment returns are not guaranteed.*
+
+```{=latex}
+\endgroup
+```
