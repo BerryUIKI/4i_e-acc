@@ -3,6 +3,7 @@ import importlib.util
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 spec = importlib.util.spec_from_file_location('builder', Path(__file__).with_name('build_pdf.py'))
 builder = importlib.util.module_from_spec(spec)
@@ -10,6 +11,32 @@ spec.loader.exec_module(builder)
 
 
 class ContentPreservation(unittest.TestCase):
+    def test_nested_pdf_keeps_sources_in_build_directory(self):
+        with tempfile.TemporaryDirectory() as folder:
+            base = Path(folder)
+            work = base / 'build/book'
+            work.mkdir(parents=True)
+            merged = work / 'merged.md'
+            merged.write_text('# Chapter', encoding='utf-8')
+            target = base / 'pdf/book.pdf'
+
+            def fake_tex(template, source, target_tex, *args):
+                target_tex.write_text('source', encoding='utf-8')
+
+            def fake_compile(tex, directory, passes):
+                self.assertEqual(passes, 3)
+                (directory / 'book.pdf').write_bytes(b'%PDF-test')
+                return True
+
+            with patch.object(builder, 'generate_tex', side_effect=fake_tex), \
+                 patch.object(builder, 'should_split', return_value=False), \
+                 patch.object(builder, 'run_xelatex', side_effect=fake_compile):
+                self.assertTrue(builder.compile_pdf('template', merged, target))
+            self.assertEqual(target.read_bytes(), b'%PDF-test')
+            self.assertTrue((work / 'book.tex').exists())
+            self.assertTrue(merged.exists())
+            self.assertEqual([p.name for p in target.parent.iterdir()], ['book.pdf'])
+
     def test_image_attributes_survive_preprocessing_and_resolution(self):
         with tempfile.TemporaryDirectory() as folder:
             base = Path(folder)
