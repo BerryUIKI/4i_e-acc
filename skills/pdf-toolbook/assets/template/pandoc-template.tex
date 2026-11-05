@@ -23,7 +23,7 @@
 % trim size a single column gives ~30-35 CJK characters per line — the
 % comfortable reading measure for long-form Chinese. On a4paper that same
 % setting ran to 45+ characters per line.
-\documentclass[b5paper,11pt,oneside,fontset=none,UTF8,zihao=-4]{ctexbook}
+\documentclass[b5paper,11pt,oneside,fontset=none,UTF8]{ctexbook}
 
 % ── Page geometry ──
 % headheight set to 24pt to satisfy fancyhdr and prevent header clipping.
@@ -33,8 +33,8 @@
 % design measure at their natural print size, while
 % keeping a wider gutter on the binding side. Vertical margins stay close to
 % the A4 values because the text block needs to hold a similar number of lines.
-\usepackage[top=2.2cm, bottom=2.2cm, inner=2.2cm, outer=1.9cm,
-            headheight=24pt, headsep=7mm, footskip=11mm,
+\usepackage[top=2.1cm, bottom=2.1cm, inner=2.3cm, outer=2.0cm,
+            headheight=15pt, headsep=5mm, footskip=9mm,
             includeheadfoot]{geometry}
 
 % ── DollarHua brand colors ──
@@ -110,8 +110,15 @@
 \xeCJKsetup{CJKecglue=\hskip 0.15em plus 0.05em minus 0.05em,
             PunctStyle=quanjiao}  % full-width CJK punctuation (publishing standard)
 
-% Line spreading for CJK body text readability
-\linespread{1.45}\selectfont
+% Explicit point sizes avoid ctex zihao and class-size overrides competing.
+% Body: 11.2/18pt; paragraph rhythm combines a two-character indent with 2pt.
+\usepackage{etoolbox}
+\makeatletter
+\renewcommand{\normalsize}{\@setfontsize\normalsize{11.2pt}{18pt}%
+  \abovedisplayskip=8pt plus 2pt minus 2pt
+  \belowdisplayskip=8pt plus 2pt minus 2pt}
+\makeatother
+\linespread{1.0}\normalsize
 
 % ── Unicode character support ──
 \usepackage{newunicodechar}
@@ -134,7 +141,7 @@
 \renewcommand{\headrule}{\hbox to\headwidth{%
   \color{dh-blossom}\leaders\hrule height \headrulewidth\hfill}}
 % In oneside mode: left header shows current chapter, right header shows book title
-\fancyhead[L]{\footnotesize\color{dh-navy}\leftmark}
+\fancyhead[L]{\fontsize{8.5pt}{12pt}\selectfont\color{dh-navy}\leftmark}
 \fancyhead[R]{}
 \newcommand{\footerdisclaimer}{{\tiny\color{dh-navy-muted}投资有风险，入市需谨慎}}
 \fancyfoot[C]{\small\color{dh-navy-soft}\thepage}
@@ -154,7 +161,7 @@
 
 % ── Paragraph: first-line indent 2 CJK chars, generous inter-paragraph ──
 \setlength{\parindent}{2em}
-\setlength{\parskip}{0.4em plus 0.1em minus 0.1em}
+\setlength{\parskip}{2pt plus 1pt minus 0.5pt}
 \setlength{\emergencystretch}{1.5em}
 \clubpenalty=10000
 \widowpenalty=10000
@@ -175,35 +182,35 @@
 % We therefore wrap the entire label in a single {…} and use
 % \vskip / \hrulefill instead of \par / \rule.
 \titleformat{\chapter}[display]
-  {\centering\Huge\bfseries\sffamily\color{dh-navy}}
-  {{\color{dh-bronze}\large\bfseries\sffamily 第\ \thechapter\ 章}}
-  {1.0em}
+  {\raggedright\fontsize{22pt}{30pt}\selectfont\bfseries\sffamily\color{dh-navy}}
+  {{\color{dh-bronze}\fontsize{10pt}{15pt}\selectfont\bfseries\sffamily 第\ \thechapter\ 章}}
+  {0.6em}
   {}
   [\vskip 0.35cm{\color{dh-blossom}\hrule height 0.6pt}]
 
 % Chapter top spacing: 50pt left a ~4.4cm blank band at the top of every
 % chapter-opening page (2.6cm margin + 50pt before-spacing) — tightened
 % to 14pt so the chapter title sits near the top of the text block.
-\titlespacing*{\chapter}{0pt}{8pt}{24pt}
+\titlespacing*{\chapter}{0pt}{6pt}{20pt}
 
 % Sections stay with the surrounding prose; chapter openings retain page breaks.
 \titleformat{\section}
-  {\Large\bfseries\sffamily\color{dh-navy}}
+  {\fontsize{15pt}{22pt}\selectfont\bfseries\sffamily\color{dh-navy}}
   {\color{dh-blossom}\bfseries\thesection}
   {0.8em}
   {}
   []
 
-\titlespacing*{\section}{0pt}{2.0em}{0.8em}
+\titlespacing*{\section}{0pt}{18pt}{8pt}
 
 % Subsection: medium bold
 \titleformat{\subsection}
-  {\large\bfseries\sffamily\color{dh-navy}}
+  {\fontsize{13pt}{20pt}\selectfont\bfseries\sffamily\color{dh-navy}}
   {\color{dh-blossom}\thesubsection}
   {0.6em}
   {}
 
-\titlespacing*{\subsection}{0pt}{1.6em}{0.6em}
+\titlespacing*{\subsection}{0pt}{15pt}{6pt}
 
 % Subsubsection: small bold
 \titleformat{\subsubsection}
@@ -232,7 +239,7 @@
 \renewcommand{\cftsubsecpagefont}{\color{dh-navy-faint}}
 \renewcommand{\cftdotsep}{1.5}
 \renewcommand{\cftchapleader}{\color{dh-blossom}\cftdotfill{\cftdotsep}}
-\setlength{\cftbeforechapskip}{6pt}
+\setlength{\cftbeforechapskip}{4pt}
 \setlength{\cftbeforesecskip}{3pt}
 
 % ── Hyperref (must be near end of preamble) ──
@@ -241,7 +248,7 @@
   bookmarksdepth=2,
   colorlinks=true,
   linkcolor=dh-navy,
-  urlcolor=dh-gold,
+  urlcolor=dh-bronze,
   citecolor=dh-bronze,
   pdfborder={0 0 0},
   pdftitle={$title$},
@@ -289,7 +296,8 @@
 
 % ── Caption styling: small, centered, bronze figure/table labels ──
 \usepackage{caption}
-\captionsetup{font=small, labelfont={bf,color=dh-bronze}, labelsep=quad,
+\DeclareCaptionFont{dhcaption}{\fontsize{9.2pt}{14pt}\selectfont\color{dh-navy-soft}}
+\captionsetup{font=dhcaption, labelfont={bf,color=dh-bronze}, labelsep=quad,
               justification=centering, skip=6pt}
 \renewcommand{\figurename}{图}
 \renewcommand{\tablename}{表}
@@ -356,6 +364,7 @@
 \usepackage{calc}
 \setlength{\LTleft}{0pt}
 \setlength{\LTright}{0pt}
+\AtBeginEnvironment{longtable}{\fontsize{10pt}{15pt}\selectfont}
 
 % ── Footnote styling ──
 \renewcommand{\footnoterule}{%
@@ -392,7 +401,7 @@
   left=10pt, right=6pt,
   top=4pt, bottom=4pt,
   before skip=0.6em, after skip=0.6em,
-  fontupper=\small\color{dh-navy-soft}
+  fontupper=\fontsize{10pt}{16pt}\selectfont\color{dh-navy-soft}
 }
 \renewenvironment{quote}{\begin{dhquote}}{\end{dhquote}}
 
@@ -424,7 +433,7 @@
     \vspace{0.7cm}%
     {\color{dh-bronze}\large\bfseries\sffamily PART\par}%
     \vspace{1.0cm}%
-    {\color{dh-navy}\Huge\bfseries\sffamily #1\par}%
+    {\color{dh-navy}\fontsize{22pt}{30pt}\selectfont\bfseries\sffamily #1\par}%
     \vspace{1.4cm}%
     {\color{dh-blossom}\rule{0.45\textwidth}{3pt}\par}%
     \vspace{0.9cm}%
