@@ -95,7 +95,7 @@
 | **第二部分 · 理解收益、复利与风险** | Ch5–Ch8 | 复利的数学本质、隐形杀手通货膨胀、风险的真实含义与自身风险承受能力评估 | [A1 复利计算器](./tools/compound-calculator/) |
 | **第三部分 · 钱到底可以放在哪里** | Ch9–Ch12 | 资产谱系全景：现金与货币基金、债券、股票、黄金及 REITs 另类资产特性 | — |
 | **第四部分 · ETF 与基金的完整操作逻辑** | Ch13–Ch19 | 被动指数哲学、ETF 运作机制与申赎套利、**溢价率回归陷阱**、**管理费率复利侵蚀**、主动基金与 QDII 海外配置 | [A3 ETF 溢价率速算](./tools/etf-premium-calculator/)<br>[A4 费率侵蚀对比器](./tools/fee-erosion-calculator/) |
-| **第五部分 · 家庭资产配置** | Ch20–Ch25 | 核心配置原则、资金三层分账法（日常/稳健/进攻）、**年龄动态配置模型**、不同家庭生命周期真实案例剖析、组合搭建与定期再平衡 | [A5 年龄配置建议器](./tools/age-allocation-advisor/) |
+| **第五部分 · 家庭资产配置** | Ch20–Ch25 | 核心配置原则、资金三层分账法（日常/稳健/进攻）、**按人生阶段复核目标（不按年龄生成配比）**、不同家庭生命周期真实案例剖析、组合搭建与定期再平衡 | [A5 人生阶段复核](./tools/age-allocation-advisor/) |
 | **第六部分 · 真正开始投资** | Ch26–Ch28 | 迈出第一步心理障碍拆解、**定投（DCA）数学模型与微笑曲线**、投资日志与定期复盘方法论 | [A2 定投模拟器](./tools/dca-simulator/)<br>[B3 投资复盘生成器](./tools/review-generator/) |
 | **第七部分 · 面对市场周期与人性** | Ch29–Ch30 | 牛熊周期演变规律、行为金融学（损失厌恶、心理账户、羊群效应与过度自信） | — |
 | **第八部分 · 使用 AI 管理你的财务计划** | Ch31–Ch33 | **AI 自动化记账**与财务分类、**人生目标转财务数字规划**、**AI 投资辅助的三条红线与能力边界** | [B1 AI 记账对话包](./tools/ai-accounting-pack/)<br>[B2 人生目标翻译器](./tools/goal-translator/)<br>[B4 AI 投资红线卡](./tools/ai-redline-cards/) |
@@ -149,7 +149,7 @@
 4. **[费率侵蚀对比器 (Fee Erosion Comparator)](./tools/fee-erosion-calculator/)**：
    - 对应章节：Ch16、附录 F
    - 核心功能：对比两只基金费率差（如 0.2% vs 1.5%），通过复利模拟揭示 10~30 年后被中介机构吃掉的惊人财富比例。
-5. **[年龄配置建议器 (Age Allocation Advisor)](./tools/age-allocation-advisor/)**：
+5. **[人生阶段复核 (Life-stage Review)](./tools/age-allocation-advisor/)**：
    - 对应章节：Ch22、附录 J
    - 核心功能：按应急储备、资金期限、收入和退休保障逐项复核约束；不计分、不按年龄生成配比。
 6. **[五年规则检查器 (Five-Year Rule Checker)](./tools/five-year-rule-checker/)**：
@@ -245,7 +245,7 @@ pnpm tauri build
 │   ├── dca-simulator/            # A2 定投模拟器
 │   ├── etf-premium-calculator/   # A3 ETF 溢价率速算
 │   ├── fee-erosion-calculator/   # A4 费率侵蚀对比器
-│   ├── age-allocation-advisor/   # A5 年龄配置建议器
+│   ├── age-allocation-advisor/   # A5 人生阶段复核
 │   ├── five-year-rule-checker/   # A6 五年规则检查器
 │   ├── ai-accounting-pack/       # B1 AI 记账对话包
 │   ├── goal-translator/          # B2 人生目标翻译器
