@@ -372,18 +372,6 @@
 \setlength{\tabcolsep}{6pt}
 \renewcommand{\arraystretch}{1.25}
 
-% ── Figure cards ──
-% A chart dropped straight onto the page floats in the prose with nothing to
-% separate it from the text. Framing each figure on a faint card -- a hairline
-% in the rule colour over the page cream -- gives it the visual weight of a
-% printed exhibit, the way a research report sets its figures, without adding
-% colour that would compete with the chart itself.
-%
-% Defined after the tcolorbox package is loaded (see Block quotes, below); the
-% \AtBeginDocument hook keeps that dependency explicit.
-\definecolor{dh-card}{HTML}{FDFCFA}
-\definecolor{dh-rule-line}{HTML}{E2DED6}
-
 % ── Block quotes (brand callout box) ──
 \usepackage[most]{tcolorbox}
 \newtcolorbox{dhquote}{
@@ -397,19 +385,16 @@
 }
 \renewenvironment{quote}{\begin{dhquote}}{\end{dhquote}}
 
-% Figure card. Wrapping the whole figure environment in a tcolorbox does not
-% work: the float package's [H] placement and tcolorbox's savebox disagree about
-% who owns the box, and the build dies with "tcb@savebox ... ended by
 % ── Figure cards: not used ──
 % A card behind each chart was tried and abandoned. Wrapping the image in a
 % tcolorbox inside a floating figure blows TeX's save size:
 %   "TeX capacity exceeded [save size=200000]" at the first \includegraphics.
 % Nested pgfkeys invocations inside a float cost more save stack than the 200k
 % default allows, and raising save_size is a document-wide setting that would
-% mask the real problem. The charts carry the page without a frame, so the card
-% is dropped rather than worked around.
-\definecolor{dh-card}{HTML}{FDFCFA}
-\definecolor{dh-rule-line}{HTML}{E2DED6}
+% mask the real problem. Wrapping the whole figure environment fails differently:
+% the float package's [H] placement and tcolorbox's savebox disagree about who
+% owns the box, and the build dies with "tcb@savebox ... ended by ...". The
+% charts carry the page without a frame, so there is no card colour.
 
 % ── Part divider macro (standalone full-page banner for "第N部分") ──
 \newcommand{\partdivider}[1]{%

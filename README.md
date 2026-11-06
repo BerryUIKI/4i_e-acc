@@ -96,7 +96,7 @@ The complete book manuscript is maintained under [`articles/2026-quadruple-long-
 | **Part II · Returns, Compounding & Risk** | Ch5–Ch8 | Mathematical compounding; the invisible inflation tax; real nature of risk and measuring risk capacity | [A1 Compound Calculator](./tools/compound-calculator/) |
 | **Part III · Where Money Can Live** | Ch9–Ch12 | Comprehensive asset spectrum: cash, money funds, bonds, equities, gold, and REITs | — |
 | **Part IV · ETFs & Funds End-to-End** | Ch13–Ch19 | Passive indexing philosophy; ETF creation/redemption mechanics; **the premium reversion trap**; **fee compounding erosion**; active funds and cross-border QDII | [A3 ETF Premium Calculator](./tools/etf-premium-calculator/)<br>[A4 Fee Erosion Comparator](./tools/fee-erosion-calculator/) |
-| **Part V · Household Asset Allocation** | Ch20–Ch25 | Core allocation principles; three-bucket accounting (daily, safety, offensive); **dynamic age-based models**; real lifecycle case studies; portfolio construction and periodic rebalancing | [A5 Age Allocation Advisor](./tools/age-allocation-advisor/) |
+| **Part V · Household Asset Allocation** | Ch20–Ch25 | Core allocation principles; three-bucket accounting (daily, safety, offensive); **life-stage goal review (no age-based allocation ratios)**; real lifecycle case studies; portfolio construction and periodic rebalancing | [A5 Life-stage Review](./tools/age-allocation-advisor/) |
 | **Part VI · Actually Start Investing** | Ch26–Ch28 | Breaking the first-trade paralysis; **dollar-cost averaging (DCA) mathematical models and the smile curve**; investment journaling and systematic reviews | [A2 DCA Simulator](./tools/dca-simulator/)<br>[B3 Investment Review Generator](./tools/review-generator/) |
 | **Part VII · Market Cycles & Human Nature** | Ch29–Ch30 | Bull/bear cycle mechanics; behavioral finance (loss aversion, mental accounting, herd behavior, and overconfidence) | — |
 | **Part VIII · AI for Your Financial Plan** | Ch31–Ch33 | **Automated AI bookkeeping** and categorization; **translating life goals into financial numbers**; **three inviolable red lines and boundaries of AI in investing** | [B1 AI Accounting Prompt Pack](./tools/ai-accounting-pack/)<br>[B2 Life Goal Translator](./tools/goal-translator/)<br>[B4 AI Investing Red-Line Cards](./tools/ai-redline-cards/) |
@@ -146,8 +146,8 @@ Turning the mathematical formulas from the book into interactive simulations:
    Market price vs NAV → real-time premium rate and expected principal loss upon reversion, with a 10-step lookup guide.
 4. **[Fee Erosion Comparator](./tools/fee-erosion-calculator/)** (Ch16, Appendix F):
    Visualizing how an expense gap (e.g. 0.2% vs 1.5%) compounds into a massive wealth disparity over 10–30 years.
-5. **[Age Allocation Advisor](./tools/age-allocation-advisor/)** (Ch22, Appendix J):
-   Age rule weighted by emergency fund cushion, income volatility, and debt ratio → tailored allocation ranges and boundary caveats.
+5. **[Life-stage Review](./tools/age-allocation-advisor/)** (Ch22, Appendix J):
+   Checks reserves, near-term spending, income stability and pension coverage item by item → a review checklist. No score, no age-based allocation ratios.
 6. **[Five-Year Rule Checker](./tools/five-year-rule-checker/)** (Ch4):
    Time horizon × asset volatility match check; intercepting the dangerous mistake of parking 5-year goal funds into volatile equities.
 
@@ -236,7 +236,7 @@ pnpm tauri build
 │   ├── dca-simulator/            # A2 DCA Simulator
 │   ├── etf-premium-calculator/   # A3 ETF Premium Calculator
 │   ├── fee-erosion-calculator/   # A4 Fee Erosion Comparator
-│   ├── age-allocation-advisor/   # A5 Age Allocation Advisor
+│   ├── age-allocation-advisor/   # A5 Life-stage Review
 │   ├── five-year-rule-checker/   # A6 Five-Year Rule Checker
 │   ├── ai-accounting-pack/       # B1 AI Accounting Prompt Pack
 │   ├── goal-translator/          # B2 Life Goal Translator

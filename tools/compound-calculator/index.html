@@ -175,7 +175,6 @@ function applyLang(){
 }
 function toggleLang(){ LANG = LANG==="zh"?"en":"zh"; applyLang(); }
 function fmt(n){ return "¥" + Math.round(n).toLocaleString(LANG==="zh"?"zh-CN":"en-US"); }
-function money(n){ return Math.round(n).toLocaleString(LANG==="zh"?"zh-CN":"en-US"); }
 function totalWith(monthly,rate,years){ return monthly*FinanceMath.annuityFactor(rate/100,years); }
 function finalVals(p, monthly, rate, years){
   const r=rate/100, n=years, fvLump=p*Math.pow(1+r,n), fvAnn=totalWith(monthly,rate,years);
