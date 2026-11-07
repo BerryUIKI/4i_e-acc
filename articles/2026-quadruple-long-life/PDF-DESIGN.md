@@ -15,3 +15,11 @@
 构建输出见 [PDF 目录说明](../../skills/pdf-toolbook/OUTPUTS.md)。成品位于 `output/pdf/quadruple-long-life.pdf`；TeX、合并稿与分章文件位于 `output/build/quadruple-long-life/`；预览位于 `output/previews/reading-design/`。旧产物保留在本地归档，源图和图表来源不移动。
 
 验收：三轮 XeLaTeX 编译，全册缩略图检查，正文、插图、长标题和填写表格放大复核；核查实际输出字号、Source Han 字体嵌入、中文文本保留与空白页。此版面面向电子阅读；实体纸张及印厂要求另行打样。
+
+## 演示版（16:9）
+
+书稿另有一套投影用的演示版，与阅读版共用同一份 Markdown，不各自维护内容。按部分拆成 11 册（前辅文、正文八部分、终章、附录 A–N），每册可单独用于一场分享。版式为 13.333×7.5 英寸，一页一个观点：主张行加支撑段落，长段落按句号拆分。
+
+演示版图表为投影重绘，不沿用阅读版的 115 mm 数据图：配色更重、刻度更少、字号更大，图内直接写明一句结论。数值与 `analysis/src/` 同源，微笑曲线的价格路径从 `teaching_models.py` 导入而非重新录入，避免与正文脱节。构建方式与输出位置见 [`skills/screen-deck/README.md`](../../skills/screen-deck/README.md)；成品位于 `output/decks/`，属构建产物，不入库。
+
+两套版面互不替代：阅读版承担完整论述与填写表格，演示版承担现场讲述。改动正文后两者都需重新构建。

@@ -4,11 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repository is
 
-`4i_e-acc` is a **content-first** repo, not an application. It publishes one deliverable — the Chinese book 《四倍做多认知，长期做多人生》 (*Quadruple Leverage on Cognition, Long Life*) — through four coupled surfaces that all read the same sources:
+`4i_e-acc` is a **content-first** repo, not an application. It publishes one deliverable — the Chinese book 《四倍做多认知，长期做多人生》 (*Quadruple Leverage on Cognition, Long Life*) — through five coupled surfaces that all read the same sources:
 
 | Surface | Source of truth | Ships as |
 |---|---|---|
 | Book manuscript | `articles/2026-quadruple-long-life/` (Markdown) | Pandoc + XeLaTeX PDF → GitHub Releases |
+| Screen decks | Same Markdown, via `skills/screen-deck/` | 16:9 PDFs, one per book part (local build) |
 | Web toolbox | `tools/<slug>/index.html` (self-contained, no CDN) | GitHub Pages via `gh-pages` branch |
 | Desktop app | `desktop/` (Tauri 2 + Rust) | Reuses `tools/` as `frontendDist` |
 | Landing page | `index.html` at repo root | GitHub Pages |
@@ -60,6 +61,16 @@ cd articles/2026-quadruple-long-life/analysis/src && python ch07_drawdowns.py
 
 Requires `matplotlib pandas numpy`; `_style.py` handles CJK font discovery and the shared palette. Output lands in `../output/`, which is exactly where the chapter image references under `Main-Text/` point.
 
+### Screen decks
+
+```bash
+python skills/screen-deck/scripts/build_decks.py
+```
+
+Builds ten 16:9 PDFs (one per book part plus an appendix deck) into `output/decks/`, with HTML in `output/decks/html/` and redrawn charts in `output/decks/charts/`. Needs `matplotlib numpy` and a headless Chrome/Edge. `--part A` limits the build; `--html-only` skips rendering. Details: [`skills/screen-deck/README.md`](skills/screen-deck/README.md).
+
+Deck charts must take their numbers from `analysis/src/` — never retype a series. `deck_charts.py` imports `teaching_models.py` for the DCA path precisely so a chart cannot drift from the prose.
+
 ### Desktop
 
 ```bash
@@ -106,7 +117,7 @@ Two consequences worth remembering: merging book content to `main` publishes a r
 - **Data provenance is mandatory** for every chart, table, or dataset: a docstring/companion `.md` naming the source, the acquisition URL, and how to refresh. `analysis/src/*.py` is the reference implementation.
 - **File naming:** ASCII, lowercase, kebab-case. Analysis scripts are `chNN_topic.py`, illustrations `NN-slug.png`, chapters `XNNN-slug.md`.
 - **LFS:** `*.png *.jpg *.jpeg *.csv *.pdf` go through Git LFS, except chart PNGs and desktop icons which `.gitattributes` deliberately exempts so CI (which does not pull LFS) can embed them in XeLaTeX.
-- **`output/` is gitignored** for new files; deliverables belong in `output/pdf/`, intermediates in `output/build/`, previews in `output/previews/`, and old local artifacts in `output/archive/`. Chart sources remain in the book analysis directory. Do not commit build artifacts. `skills/pdf-toolbook/assets/fonts/` is likewise ignored — `build_pdf.py` downloads ~495 MB of Source Han OTF there when no system font is found.
+- **`output/` is gitignored** for new files; deliverables belong in `output/pdf/`, intermediates in `output/build/`, previews in `output/previews/`, decks in `output/decks/`, and old local artifacts in `output/archive/`. Chart sources remain in the book analysis directory. Do not commit build artifacts. `skills/pdf-toolbook/assets/fonts/` is likewise ignored — `build_pdf.py` downloads ~495 MB of Source Han OTF there when no system font is found. `.local/` is ignored too, for a locally downloaded toolchain such as a pandoc binary.
 
 ## Where to look first
 

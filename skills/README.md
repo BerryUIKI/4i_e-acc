@@ -11,6 +11,7 @@ Reusable agent skills (`SKILL.md` bundles) for specialized tasks within this wor
 |-------|---------|
 | [book-editorial-review](./book-editorial-review/SKILL.md) | Structural and editorial review of non-fiction book manuscripts. Evaluates readiness for submission to a traditional Chinese publisher (e.g. CITIC Press, China Machine Press). |
 | [pdf-toolbook](./pdf-toolbook/SKILL.md) | PDF toolbook generator. Aggregates Markdown investment documents from the workspace into a complete PDF book with DollarHua brand styling, powered by Pandoc + XeLaTeX. |
+| [screen-deck](./screen-deck/README.md) | 16:9 presentation decks built from the same Markdown — one PDF per book part — rendered through headless Chrome. Output layout: [OUTPUTS.md](./screen-deck/README.md#decks). |
 
 ## Related
 - Workspace home: [README.md](../README.md) · [中文](../README-zh_CN.md)
