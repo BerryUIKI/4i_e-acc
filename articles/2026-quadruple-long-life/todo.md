@@ -51,9 +51,7 @@
 - **新增附录 M/N**（2026-09-07）：附录 M 个人投资者税务自查清单（M1 股息差别化 20/10/0 · M2 差价免税 · M3 基金分红细节 · M4 跨境提醒 · M5 年度自查行动表）；附录 N 遗产与传承规划清单（N1 资产清点表 · N2 民法典继承速查 · N3 传承工具对比 · N4 行动清单）。已并入 `Appendices/A-to-L-appendices.md`，同步更新 agents.md / README 双语 / book-task.md 条目 40。**已合并 main（PR #56，commit `d3d94b2`）**。
 
 ### ⚠️ 待办
-- [ ] **P0-6 补齐插图 09–17（9 张）**：09 资金金字塔、10 三档配置、11 牛熊温度计、12 通胀幽灵、13 主动vs被动、14 25vs35、15 费率侵蚀、16 全球地图、17 选择权之路
-  - 说明：18 份 spec（00–17）完整存在于 `illustrations/ALL-SPECS.md`；已生成 9 张（00–08）存于 `assets/illustrations/`；剩余 9 张按 ALL-SPECS 的 Prompt + DollarHua 参考图（`assets/dollarhua/references/front.png`）生成
-  - 状态：2026-09-07 决定**暂缓**（ImageGen 消耗 credits，用户选择延后）
+- [x] **P0-6 补齐插图 09–17（9 张）**：已生成并接入 LaTeX 版。详见[插图来源、资产和提示词](illustrations/latex-interior-09-17.md)。
 - [x] 补充附录（税务、遗产规划）— 附录 M/N 已写入并合并 main（PR #56）
 - [ ] 关键章节英文翻译 — 可选
 

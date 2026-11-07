@@ -294,6 +294,17 @@
 \renewcommand{\figurename}{图}
 \renewcommand{\tablename}{表}
 
+% Interior art in raw LaTeX blocks belongs to the book edition.
+$if(illustrationdir)$
+\newcommand{\bookillustration}[3]{%
+  \begin{figure}[htbp]
+    \centering
+    \includegraphics[width=#2]{$illustrationdir$#1}%
+    \caption*{#3\par 概念插画：ImageGen 生成，DollarHua 形象由作者提供。}%
+  \end{figure}%
+}
+$endif$
+
 % ── Image sizing ────────────────────────────────────────────────────
 % Every chart in this book was bleeding off the page: TeX laid each one out at
 % its natural pixel size (~54 cm wide for a 2083 px PNG), far past the ~16 cm
