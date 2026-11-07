@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """Build 16:9 screen-format presentation decks from the book manuscript.
 
-One PDF per book part, so each part can be presented on its own.
+One PDF per book part — front matter, the eight body parts, the epilogue and
+the appendices — so each can be presented on its own.
 
 Usage (from the repository root):
     python skills/screen-deck/scripts/build_decks.py
-    python skills/screen-deck/scripts/build_decks.py --part A --part B
+    python skills/screen-deck/scripts/build_decks.py --part A --part APX
     python skills/screen-deck/scripts/build_decks.py --html-only
 
-Output: output/decks/<part-letter>-<slug>.pdf
+Output: output/decks/<key>.pdf  (keys: fm00 a01 b02 … i08 h09 apx10)
 HTML intermediates: output/decks/html/
 """
 
@@ -40,9 +41,10 @@ PARTS: dict[str, tuple[str, str, str]] = {
     "G": ("07", "面对市场周期与人性", "Cycles and Human Nature"),
     "I": ("08", "使用 AI 管理你的财务计划", "AI for Your Financial Plan"),
     "H": ("09", "终章 · 财富的作用", "The Point of It All"),
+    "APX": ("10", "附录 · 模板与参考资料", "Templates and References"),
 }
 
-PART_ORDER = ["FM", "A", "B", "C", "D", "E", "F", "G", "I", "H"]
+PART_ORDER = ["FM", "A", "B", "C", "D", "E", "F", "G", "I", "H", "APX"]
 
 
 # ---------------------------------------------------------------- parsing
@@ -57,16 +59,24 @@ def parse_index(text: str) -> list[dict]:
             continue
         path = BOOK.parent.parent / m.group(3)
         name = Path(m.group(3)).name
-        pm = re.match(r"^([A-Z]+)\d{3}-", name)
-        part = pm.group(1) if pm else "H"
+        title = m.group(2)
+        if "附录" in title:
+            part = "APX"
+        else:
+            pm = re.match(r"^([A-Z]+)\d{3}-", name)
+            part = pm.group(1) if pm else "H"
         entries.append(
-            {"num": int(m.group(1)), "title": m.group(2), "path": path, "part": part}
+            {"num": int(m.group(1)), "title": title, "path": path, "part": part}
         )
     return entries
 
 
-def split_sections(body: str) -> tuple[str, str, list[tuple[str, str]]]:
-    """Split a chapter into (title, epigraph, [(section_title, section_body)])."""
+def split_sections(body: str) -> tuple[str, str, list[tuple[str, str]], list[str]]:
+    """Split a chapter into (title, epigraph, [(section_title, section_body)], groups).
+
+    `groups` collects `##` headings after the first, which is how a collection
+    file (the appendices) marks its individual entries.
+    """
     lines = body.splitlines()
 
     title = ""
@@ -89,20 +99,24 @@ def split_sections(body: str) -> tuple[str, str, list[tuple[str, str]]]:
             epigraph = epigraph.replace("**", "")
 
     sections: list[tuple[str, str]] = []
+    groups: list[str] = []
     current_title, buf = "", []
     for line in lines:
-        if line.startswith("### "):
+        if line.startswith("## "):
+            if buf:
+                sections.append((current_title, "\n".join(buf)))
+            groups.append(line[3:].strip())
+            current_title, buf = "", []
+        elif line.startswith("### "):
             if buf:
                 sections.append((current_title, "\n".join(buf)))
             current_title = line[4:].strip()
             buf = []
-        elif line.startswith("## "):
-            continue
         else:
             buf.append(line)
     if buf:
         sections.append((current_title, "\n".join(buf)))
-    return title, epigraph, sections
+    return title, epigraph, sections, groups
 
 
 def paragraphs(block: str) -> list[str]:
@@ -179,25 +193,42 @@ def slide(inner: str, extra: str = "", kind: str = "") -> str:
 
 def part_opener(part: str, chapters: list[dict]) -> str:
     num, name, en = PARTS[part]
+    if part == "APX":
+        body = Path(chapters[0]["path"]).read_text(encoding="utf-8")
+        count = len([l for l in body.splitlines() if l.startswith("## ")])
+        meta = f"{count} 个附录 · 四倍做多认知，长期做多人生"
+    else:
+        meta = f"{len(chapters)} 章 · 四倍做多认知，长期做多人生"
     inner = f"""
       <div class="part-num">{num}</div>
       <div class="part-body">
         <div class="eyebrow">{en}</div>
         <h1 class="part-title">{htmllib.escape(name)}</h1>
         <div class="rule"></div>
-        <div class="part-meta">{len(chapters)} 章 · 四倍做多认知，长期做多人生</div>
+        <div class="part-meta">{meta}</div>
       </div>"""
     return slide(inner, kind="cover")
 
 
 def deck_toc(part: str, chapters: list[dict]) -> str:
-    items = []
-    for i, ch in enumerate(chapters, 1):
-        title = re.sub(r"^第.+?章\s*·\s*", "", ch["title"])
-        items.append(
-            f'<li><span class="toc-n">{i:02d}</span>'
-            f'<span class="toc-t">{htmllib.escape(title)}</span></li>'
-        )
+    if part == "APX":
+        body = Path(chapters[0]["path"]).read_text(encoding="utf-8")
+        names = [l[3:].strip() for l in body.splitlines() if l.startswith("## ")]
+        items = []
+        for i, n in enumerate(names, 1):
+            label = n.replace("附录", "").strip()
+            items.append(
+                f'<li><span class="toc-n">{i:02d}</span>'
+                f'<span class="toc-t">{htmllib.escape(label)}</span></li>'
+            )
+    else:
+        items = []
+        for i, ch in enumerate(chapters, 1):
+            title = re.sub(r"^第.+?章\s*·\s*", "", ch["title"])
+            items.append(
+                f'<li><span class="toc-n">{i:02d}</span>'
+                f'<span class="toc-t">{htmllib.escape(title)}</span></li>'
+            )
     inner = f"""
       <div class="eyebrow">Contents</div>
       <h2 class="toc-title">本册目录</h2>
@@ -339,9 +370,81 @@ def closing_slide(part: str) -> str:
 # ---------------------------------------------------------------- chapter
 
 
-def build_chapter(ch: dict, part: str) -> list[str]:
+def appendix_slides(ch: dict) -> list[str]:
+    """One collection file holding many `## 附录 X` entries."""
     body = ch["path"].read_text(encoding="utf-8")
-    title, epigraph, sections = split_sections(body)
+    _title, _epi, sections, groups = split_sections(body)
+
+    slides: list[str] = []
+    # Walk the file again, keeping each `##` heading with the text under it and
+    # treating `###` as a subheading inside that appendix.
+    blocks: list[tuple[str, str]] = []
+    cur, buf = "", []
+    for line in body.splitlines():
+        if line.startswith("## "):
+            if buf:
+                blocks.append((cur, "\n".join(buf)))
+            cur, buf = line[3:].strip(), []
+        elif line.startswith("# "):
+            continue
+        else:
+            buf.append(line)
+    if buf:
+        blocks.append((cur, "\n".join(buf)))
+
+    for name, block in blocks:
+        if not name:
+            continue
+        letter = name.replace("附录", "").strip().split("·")[0].strip()
+        slides.append(appendix_opener(letter, name))
+
+        sub, subbuf = "", []
+        chunks: list[tuple[str, str]] = []
+        for line in block.splitlines():
+            if line.startswith("### "):
+                if subbuf:
+                    chunks.append((sub, "\n".join(subbuf)))
+                sub, subbuf = line[4:].strip(), []
+            else:
+                subbuf.append(line)
+        if subbuf:
+            chunks.append((sub, "\n".join(subbuf)))
+
+        for sub_title, chunk in chunks:
+            paras = paragraphs(chunk)
+            imgs = re.findall(r"!\[([^\]]*)\]\(([^)]+)\)", chunk)
+            for alt, src in imgs:
+                slides.append(figure_slide(src, alt, "APX"))
+            paras = [p for p in paras
+                     if not re.search(r"!\[[^\]]*\]\([^)]+\)", p)]
+            if not paras:
+                continue
+            if sub_title:
+                slides.append(section_lead(sub_title, paras[0]))
+                paras = paras[1:]
+            for p in paras:
+                if p.strip().startswith(("（来源", "来源：")):
+                    continue
+                slides.extend(content_slides(p, name))
+    return slides
+
+
+def appendix_opener(letter: str, full_title: str) -> str:
+    inner = f"""
+      <div class="chap-ghost">{htmllib.escape(letter)}</div>
+      <div class="chap-body">
+        <div class="eyebrow">附录</div>
+        <h2 class="chap-title">{htmllib.escape(full_title)}</h2>
+      </div>"""
+    return slide(inner, kind="chapter")
+
+
+def build_chapter(ch: dict, part: str) -> list[str]:
+    if part == "APX":
+        return appendix_slides(ch)
+
+    body = ch["path"].read_text(encoding="utf-8")
+    title, epigraph, sections, _groups = split_sections(body)
 
     clean_title = re.sub(r"^第.+?章\s*·\s*", "", title or ch["title"])
     num_m = re.search(r"第(\w+?)章", ch["title"])
